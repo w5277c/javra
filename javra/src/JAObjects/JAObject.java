@@ -6,6 +6,8 @@
 
 package JAObjects;
 
+import common.Mnemonic;
+import enums.EMnemonic;
 import enums.EMsgType;
 import main.Constant;
 import main.Line;
@@ -93,7 +95,14 @@ public class JAObject {
 							return new JALabel(l_pi, l_line, tmp.substring(0x00, tmp.length()-0x01));
 						}
 						else {
-							l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME);
+							String[] parts = tmp.split("\\s", 0x02);
+							EMnemonic em = EMnemonic.fromName(parts[0x00].trim().toLowerCase());
+							if(null != em) {
+								Mnemonic.parse(l_pi, l_line, em, (0x01 < parts.length ? parts[0x01] : null));
+							}
+							else {
+								l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME);
+							}
 						}
 				}
 			}

@@ -5,10 +5,13 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package common;
 
-/**
- *
- * @author kostas
- */
+import enums.EMnemonic;
+import main.Line;
+import main.ProgInfo;
+
 public class Mnemonic {
 	
+	public static void parse(ProgInfo l_pi, Line l_line, EMnemonic l_em, String l_value) {
+		//TODO
+	}
 }
