@@ -1,19 +1,23 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.03.2022	konstantin@5277.ru			Начало
+09.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package JAObjects.Directives;
+package JAObjects;
 
+import JAObjects.JAObject;
 import enums.EMsgType;
-import main.Constant;
 import main.Line;
 import main.ProgInfo;
 
-public class JALabel extends JADirective {
-	public JALabel(ProgInfo l_pi, Line l_line, String l_name) throws Exception {
-		if(is_undefined(l_pi, l_line, l_name)) {
-			l_pi.get_constants().put(l_name, new Constant(l_line, l_name, l_pi.get_cur_segment().get_datablock().get_addr()));
+public class JAIfNDef extends JAObject {
+	public JAIfNDef(ProgInfo l_pi, Line l_line) throws Exception {
+		String tmp = l_line.get_value().trim().toLowerCase();
+		if(!tmp.isEmpty()) {
+			l_pi.get_ii().block_start(l_line, null != l_pi.get_constants().get(tmp));
+		}
+		else {
+			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
 		}
 	}
 }

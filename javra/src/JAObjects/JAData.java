@@ -1,11 +1,12 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.03.2022	konstantin@5277.ru			Начало
+09.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package JAObjects.Directives;
+package JAObjects;
 
-import JAObjects.Expr;
+import common.Expr;
+import JAObjects.JAObject;
 import static JAObjects.JAObject.MSG_ALREADY_DEFINED;
 import enums.EMsgType;
 import main.Constant;
@@ -13,29 +14,31 @@ import main.Line;
 import main.Macro;
 import main.ProgInfo;
 
-public class JADSET extends JADirective {
+public class JAData extends JAObject {
 	private	String	name;
 	private	Constant	constant;
 	private	long		num;
 	
-	public JADSET(ProgInfo l_pi, Line l_line) {
-		String parts[] = l_line.get_value().split("=");
-		String tmp = parts[0x00].trim().toLowerCase();
-		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
-			name = tmp;
-			if(is_undefined(l_pi, l_line, name)) {
-				tmp = parts[0x01].trim().toLowerCase();
-				Long _num = Expr.parse(l_pi, l_line, tmp);
-				if(null == _num) {
-					constant = l_pi.get_constants().get(tmp);
-					if(null == constant) {
-						l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_CONSTANT);
+	public JAData(ProgInfo l_pi, Line l_line, int l_size) {
+		String parts[] = l_line.get_value().split(",");
+		if(0x00 != parts.length) {
+			for(String part : parts) {
+				String tmp = part.trim().toLowerCase();
+				if(tmp.startsWith("\"") && tmp.endsWith("\"")) {
+					try {
+						byte[] data = tmp.substring(0x01, tmp.length()-0x01).getBytes("ASCII");
+						l_pi.get_cur_segment().get_datablock().write(data, 0x00, data.length);
+					}
+					catch(Exception ex) {
+						ex.printStackTrace();
 					}
 				}
 				else {
-					num = _num;
+					Long value = Expr.parse(l_pi, l_line, tmp);
+					if(null != value) {
+						l_pi.get_cur_segment().get_datablock().write(value, l_size);
+					}
 				}
-				l_pi.get_constants().put(name, new Constant(l_line, name, (null == constant ? num : constant.get_num()), true));
 			}
 		}
 		else {

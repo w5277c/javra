@@ -1,32 +1,19 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.03.2022	konstantin@5277.ru			Начало
+09.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package JAObjects.Directives;
+package JAObjects;
 
+import JAObjects.JAObject;
 import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
 
-public class JADDef extends JADirective {
-	private	String	name;
-	
-	public JADDef(ProgInfo l_pi, Line l_line) {
-		String parts[] = l_line.get_value().split("=");
-		String tmp = parts[0x00].trim().toLowerCase();
-		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
-			name = tmp;
-			if(is_undefined(l_pi, l_line, name)) {
-				tmp = parts[0x01].trim().toLowerCase();
-				Integer register = get_register(l_pi, tmp);
-				if(null == register) {
-					l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_WRONG_REGISTER);
-				}
-				else {
-					l_pi.get_registers()[register] = name;
-				}
-			}
+public class JADevice extends JAObject {
+	public JADevice(ProgInfo l_pi, Line l_line) throws Exception {
+		if(!l_line.get_value().trim().isEmpty()) {
+			l_pi.set_device(l_line.get_value().trim().toLowerCase());
 		}
 		else {
 			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);

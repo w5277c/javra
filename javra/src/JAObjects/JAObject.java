@@ -1,13 +1,11 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.03.2022	konstantin@5277.ru			Начало
+09.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 package JAObjects;
 
-import JAObjects.Directives.JADirective;
-import JAObjects.Directives.JALabel;
 import enums.EMsgType;
 import main.Constant;
 import main.Line;
@@ -36,12 +34,64 @@ public class JAObject {
 	public static JAObject parse(ProgInfo l_pi, Line l_line) throws Exception {
 		String tmp = l_line.get_key().trim().toLowerCase();
 		if(!tmp.isEmpty()) {
-			if(tmp.startsWith(".")) {
-				return JADirective.parse(l_pi, l_line);
+			if(l_pi.get_ii().is_blockskip()) {
+				switch(tmp) {
+					case ".ifdef":
+						return new JAIfDef(l_pi, l_line);
+					case ".ifndef":
+						return new JAIfNDef(l_pi, l_line);
+					case ".if":
+						return new JAIf(l_pi, l_line);
+					case ".endif":
+						return new JAEndIf(l_pi, l_line);
+					case ".else":
+						return new JAElse(l_pi, l_line);
+					default:
+						int g = 0;
+				}
 			}
-			if(!l_pi.get_ii().is_blockskip()) {
-				if(tmp.replaceAll(REGEX_LABEL_NAME, "").isEmpty()) {
-					new JALabel(l_pi, l_line, tmp.substring(0x00, tmp.length()-0x01));
+			else {
+				switch(tmp) {
+					case ".equ":
+						return new JAEQU(l_pi, l_line);
+					case ".set":
+						return new JASet(l_pi, l_line);
+					case ".org":
+						return new JAORG(l_pi, l_line);
+					case ".include":
+						return new JAInclude(l_pi, l_line);
+					case ".device":
+						return new JADevice(l_pi, l_line);
+					case ".ifdef":
+						return new JAIfDef(l_pi, l_line);
+					case ".ifndef":
+						return new JAIfNDef(l_pi, l_line);
+					case ".endif":
+						return new JAEndIf(l_pi, l_line);
+					case ".else":
+						return new JAElse(l_pi, l_line);
+					case ".if":
+						return new JAIf(l_pi, l_line);
+					case ".message":
+						return new JAMessage(l_pi, l_line);
+					case ".def":
+						return new JADef(l_pi, l_line);
+					case ".macro":
+						return new JAMacro(l_pi, l_line, true);
+					case ".endm":
+					case ".endmacro":
+						return new JAMacro(l_pi, l_line, false);
+					case ".db":
+						return new JAData(l_pi, l_line, 0x01);
+					case ".dw":
+						return new JAData(l_pi, l_line, 0x02);
+					default:
+						if(tmp.replaceAll(REGEX_LABEL_NAME, "").isEmpty()) {
+							return new JALabel(l_pi, l_line, tmp.substring(0x00, tmp.length()-0x01));
+						}
+						else {
+							l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_DIRECTIVE);
+						}
 				}
 			}
 		}

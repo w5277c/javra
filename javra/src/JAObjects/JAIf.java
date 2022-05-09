@@ -1,17 +1,18 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.03.2022	konstantin@5277.ru			Начало
+09.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package JAObjects.Directives;
+package JAObjects;
 
-import JAObjects.Expr;
+import common.Expr;
+import JAObjects.JAObject;
 import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
 
-public class JADIf extends JADirective {
-	public JADIf(ProgInfo l_pi, Line l_line) throws Exception {
+public class JAIf extends JAObject {
+	public JAIf(ProgInfo l_pi, Line l_line) throws Exception {
 		String tmp = l_line.get_value().trim().toLowerCase();
 		if(!tmp.isEmpty()) {
 			if(l_pi.get_ii().is_blockskip()) {
