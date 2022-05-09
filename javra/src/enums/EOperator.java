@@ -21,7 +21,7 @@ public enum EOperator {
 	OP_ADD("+"),
 	OP_SUB("-"),
 	OP_LESS_THAN("<"),
-	OP_GREATER_THAN("<"),
+	OP_GREATER_THAN(">"),
 	OP_EQUAL("="),
 	OP_BITWISE_XOR("^"),
 	OP_LOGICAL_AND("&"),

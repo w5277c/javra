@@ -56,8 +56,13 @@ public class JADirective extends JAObject {
 					return new JADDef(l_pi, l_line);
 				case ".macro":
 					return new JADMacro(l_pi, l_line, true);
+				case ".endm":
 				case ".endmacro":
 					return new JADMacro(l_pi, l_line, false);
+				case ".db":
+					return new JADData(l_pi, l_line, 0x01);
+				case ".dw":
+					return new JADData(l_pi, l_line, 0x02);
 			}
 			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_DIRECTIVE);
 		}

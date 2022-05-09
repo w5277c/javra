@@ -3,32 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADInclude.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADElse.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/main/Javra.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/enums/EMsgType.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADDevice.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/enums/EFunction.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/main/Parser.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/main/Constant.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADEndIf.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/main/SegmentInfo.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADIfDef.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/enums/ESegmentType.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/JAObject.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/main/ProgInfo.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADORG.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADSET.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADIf.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADEQU.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Expr.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADIfNDef.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/enums/EDirective.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADDef.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADMessage.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/enums/EOperator.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/main/Line.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/src/JAObjects/Directives/JADirective.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/Expr.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/enums/EOperator.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/DataBlock.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/Directives/JADIf.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/Directives/JADData.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/SegmentInfo.java</file>
         </group>
     </open-files>
 </project-private>

@@ -7,6 +7,7 @@ package main;
 
 import enums.EMsgType;
 import enums.EPass;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,8 +23,8 @@ public class ProgInfo {
 	private	int								warning_ctr	= 0;
 	private	long								timestamp	= System.currentTimeMillis();
 	private	HashMap<String,Constant>	constants	= new HashMap<>();
-	private	HashMap<String,Macros>		macros		= new HashMap<>();
-	private	Macros							cur_macros	= null;
+	private	HashMap<String,Macro>		macros		= new HashMap<>();
+	private	Macro							cur_macros	= null;
 	private	String							root_path;
 	private	String							device		= null;
 	private	IncludeInfo						ii				= null;
@@ -35,6 +36,10 @@ public class ProgInfo {
 
 	public ProgInfo() throws IOException {
 		root_path = new java.io.File(".").getCanonicalPath();
+		if(!root_path.endsWith(File.separator)) {
+			root_path += File.separator;
+		}
+		
 		for(int id = 0x00; id < 0x20; id++) {
 			registers[id] = ("r" + id);
 		}
@@ -121,24 +126,24 @@ public class ProgInfo {
 		return registers;
 	}
 	
-	public boolean create_macros(String l_name) {
+	public boolean create_macro(Line l_line, String l_name) {
 		if(null == cur_macros) {
-			cur_macros = new Macros(l_name);
+			cur_macros = new Macro(l_line, l_name);
 			macros.put(l_name, cur_macros);
 			return true;
 		}
 		return false;
 	}
 	
-	public HashMap<String, Macros> get_macros() {
+	public HashMap<String, Macro> get_macros() {
 		return macros;
 	}
 
-	public Macros get_cur_macros() {
+	public Macro get_cur_macros() {
 		return cur_macros;
 	}
 	
-	public boolean close_macros() {
+	public boolean close_macro() {
 		if(null != cur_macros) {
 			cur_macros = null;
 			return true;

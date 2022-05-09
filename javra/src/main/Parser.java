@@ -60,13 +60,13 @@ public class Parser {
 	private void line_parse(ProgInfo l_pi, Line l_line) throws Exception {
 		//Парсим .EQU&etc, .INCLUDE, IFDEF&etc, MACROSES, LABEL, MNEMONICS
 		
-		if(l_line.get_text().contains(".EQU	HISTORY_OFFSET")) {
+		if(l_line.get_text().contains(".if ES_DATA_SIZE > 0x00")) {
 			int t = 0;
 		}
 		l_line.parse();
 		
-		Macros cur_macros = l_pi.get_cur_macros();
-		if(null != cur_macros && !l_line.get_key().equalsIgnoreCase(".endmacro")) {
+		Macro cur_macros = l_pi.get_cur_macros();
+		if(null != cur_macros && !l_line.get_key().equalsIgnoreCase(".endmacro") && !l_line.get_key().equalsIgnoreCase(".endm")) {
 			cur_macros.get_body().add(l_line);
 		}
 		else {

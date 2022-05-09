@@ -7,12 +7,17 @@ package main;
 
 import java.util.LinkedList;
 
-public class Macros {
+public class Macro {
 	private	String				name;
+	private	Line					line;
 	private	LinkedList<Line>	body	= new LinkedList<>();
 	
-	public Macros(String l_name) {
+	public Macro(Line l_line, String l_name) {
 		name = l_name;
+	}
+	
+	public Line get_line() {
+		return line;
 	}
 	
 	public LinkedList<Line> get_body() {

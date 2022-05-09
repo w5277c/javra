@@ -7,7 +7,11 @@
 package JAObjects;
 
 import JAObjects.Directives.JADirective;
+import JAObjects.Directives.JALabel;
+import enums.EMsgType;
+import main.Constant;
 import main.Line;
+import main.Macro;
 import main.ProgInfo;
 
 public class JAObject {
@@ -23,17 +27,23 @@ public class JAObject {
 	public	final	static	String	MSG_DIVISION_BY_ZERO		= "division by zero";
 	public	final	static	String	MSG_WRONG_REGISTER		= "wrong register";
 			  
-	public	final	static	String	REG_CONST_NAME				= "[_|a-z][_\\d|a-z]*";
+	public	final	static	String	REGEX_CONST_NAME			= "[_|a-z][_\\d|a-z]*";
+	public	final	static	String	REGEX_LABEL_NAME			= "[_|a-z][_\\d|a-z]*:";
 	
 	protected JAObject() {
 	}
 	
 	public static JAObject parse(ProgInfo l_pi, Line l_line) throws Exception {
-		if(l_line.get_key().startsWith(".")) {
-			return JADirective.parse(l_pi, l_line);
-		}
-		if(!l_pi.get_ii().is_blockskip()) {
-			//TODO
+		String tmp = l_line.get_key().trim().toLowerCase();
+		if(!tmp.isEmpty()) {
+			if(tmp.startsWith(".")) {
+				return JADirective.parse(l_pi, l_line);
+			}
+			if(!l_pi.get_ii().is_blockskip()) {
+				if(tmp.replaceAll(REGEX_LABEL_NAME, "").isEmpty()) {
+					new JALabel(l_pi, l_line, tmp.substring(0x00, tmp.length()-0x01));
+				}
+			}
 		}
 		return null;
 	}
@@ -95,5 +105,27 @@ public class JAObject {
 			}
 		}
 		return null;
+	}
+	
+	protected boolean is_undefined(ProgInfo l_pi, Line l_line, String l_name) {
+		Constant contant = l_pi.get_constants().get(l_name);
+		if(null != contant) {
+			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + contant.get_line().get_location() + "'");
+			return false;
+		}
+		Integer register_id = get_register(l_pi, l_name);
+		if(null != register_id) {
+			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
+			return false;
+		}
+		Macro macros = l_pi.get_macros().get(l_name);
+		if(null != macros) {
+			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
+			return false;
+		}
+		
+		//TODO добавить остальне проверки
+		
+		return true;
 	}
 }

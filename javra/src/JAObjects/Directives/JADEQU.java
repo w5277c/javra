@@ -19,13 +19,9 @@ public class JADEQU extends JADirective {
 	public JADEQU(ProgInfo l_pi, Line l_line) {
 		String parts[] = l_line.get_value().split("=");
 		String tmp = parts[0x00].trim().toLowerCase();
-		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REG_CONST_NAME, "").isEmpty()) {
+		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 			name = tmp;
-			Constant _constant = l_pi.get_constants().get(name);
-			if(null != _constant) {
-				l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, " at '" + _constant.get_line().get_location() + "'");
-			}
-			else {
+			if(is_undefined(l_pi, l_line, name)) {
 				tmp = parts[0x01].trim().toLowerCase();
 				Long _num = Expr.parse(l_pi, l_line, tmp);
 				if(null == _num) {

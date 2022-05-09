@@ -3,20 +3,17 @@
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 09.03.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package main;
+package JAObjects.Directives;
 
-public class ORGInfo {
-	private	long		start;
-	private	long		length				= 0x0000;
-	private	boolean	segment_overlap	= false;
-	
-	public ORGInfo(long l_start) {
-		start = l_start;
-	}
+import enums.EMsgType;
+import main.Constant;
+import main.Line;
+import main.ProgInfo;
 
-	public ORGInfo(long l_strat, long l_length, boolean l_segment_overlap) {
-		start = l_strat;
-		length = l_length;
-		segment_overlap = l_segment_overlap;
+public class JALabel extends JADirective {
+	public JALabel(ProgInfo l_pi, Line l_line, String l_name) throws Exception {
+		if(is_undefined(l_pi, l_line, l_name)) {
+			l_pi.get_constants().put(l_name, new Constant(l_line, l_name, l_pi.get_cur_segment().get_datablock().get_addr()));
+		}
 	}
 }
