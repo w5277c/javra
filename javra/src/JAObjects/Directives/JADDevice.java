@@ -1,27 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+09.03.2022	konstantin@5277.ru			Начало
+--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects.Directives;
 
-import JAObjects.JAObject;
 import enums.EMsgType;
-import java.io.File;
-import java.io.FileNotFoundException;
-import main.Constant;
 import main.Line;
-import main.ORGInfo;
-import main.Parser;
 import main.ProgInfo;
 
-/**
- *
- * @author kostas
- */
 public class JADDevice extends JADirective {
-	private	String	value;
-	
 	public JADDevice(ProgInfo l_pi, Line l_line) throws Exception {
 		if(!l_line.get_value().trim().isEmpty()) {
 			l_pi.set_device(l_line.get_value().trim().toLowerCase());

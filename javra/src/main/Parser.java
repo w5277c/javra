@@ -8,7 +8,6 @@ package main;
 import JAObjects.JAObject;
 import enums.EMsgType;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
@@ -18,7 +17,7 @@ public class Parser {
 	public	static	final	String	MULTILINE	= "\\";
 
 	public Parser(ProgInfo l_pi, File l_file) throws Exception {
-		int blockcntr = l_pi.get_blockcntr();
+		IncludeInfo ii = l_pi.exch_ii(new IncludeInfo(l_file.getName()));
 		
 		l_pi.print(EMsgType.MSG_INFO, null, "Enter " + l_file.getCanonicalPath());
 		Scanner scanner = new Scanner(l_file, StandardCharsets.UTF_8.name());
@@ -50,32 +49,29 @@ public class Parser {
 			}
 		}
 		scanner.close();
-		if(0 != (l_pi.get_blockcntr() - blockcntr)) {
-			l_pi.print(EMsgType.MSG_WARNING, null, "some of.if/.ifdef/.ifndef not correctly closed(cntr:" + (l_pi.get_blockcntr() - blockcntr) + ")");
-		}
-		l_pi.set_blockcntr(blockcntr);
 		
+		ii = l_pi.exch_ii(ii);
+		if(0 != ii.get_blockcntr()) {
+			l_pi.print(EMsgType.MSG_WARNING, null, "some of.if/.ifdef/.ifndef not correctly closed(cntr:" + ii.get_blockcntr() + ")");
+		}
 		l_pi.print(EMsgType.MSG_INFO, null, "Exit " + l_file.getCanonicalPath());
 	}
 	
 	private void line_parse(ProgInfo l_pi, Line l_line) throws Exception {
 		//Парсим .EQU&etc, .INCLUDE, IFDEF&etc, MACROSES, LABEL, MNEMONICS
 		
-		if(l_line.get_text().contains("PC4")) {
+		if(l_line.get_text().contains(".EQU	HISTORY_OFFSET")) {
 			int t = 0;
 		}
 		l_line.parse();
 		
-		JAObject jaobj = JAObject.parse(l_pi, l_line);
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		Macros cur_macros = l_pi.get_cur_macros();
+		if(null != cur_macros && !l_line.get_key().equalsIgnoreCase(".endmacro")) {
+			cur_macros.get_body().add(l_line);
+		}
+		else {
+			JAObject jaobj = JAObject.parse(l_pi, l_line);
+		}
 	}
 	
 	

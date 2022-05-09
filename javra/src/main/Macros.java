@@ -3,20 +3,19 @@
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 09.03.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package JAObjects.Directives;
+package main;
 
-import enums.EMsgType;
-import main.Line;
-import main.ProgInfo;
+import java.util.LinkedList;
 
-public class JADElse extends JADirective {
-	public JADElse(ProgInfo l_pi, Line l_line) throws Exception {
-		String tmp = l_line.get_value().trim().toLowerCase();
-		if(tmp.isEmpty()) {
-			l_pi.get_ii().block_skip_invet(l_line);
-		}
-		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
-		}
+public class Macros {
+	private	String				name;
+	private	LinkedList<Line>	body	= new LinkedList<>();
+	
+	public Macros(String l_name) {
+		name = l_name;
+	}
+	
+	public LinkedList<Line> get_body() {
+		return body;
 	}
 }

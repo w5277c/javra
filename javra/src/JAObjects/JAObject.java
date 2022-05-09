@@ -1,18 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+09.03.2022	konstantin@5277.ru			Начало
+--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 package JAObjects;
 
 import JAObjects.Directives.JADirective;
 import main.Line;
 import main.ProgInfo;
 
-/**
- *
- * @author kostas
- */
 public class JAObject {
 	public	final	static	String	MSG_INVALID_NUMBER		= "invalid number";
 	public	final	static	String	MSG_INVALID_SYNTAX		= "invalid syntax";
@@ -35,7 +32,7 @@ public class JAObject {
 		if(l_line.get_key().startsWith(".")) {
 			return JADirective.parse(l_pi, l_line);
 		}
-		if(!l_pi.is_blockskip()) {
+		if(!l_pi.get_ii().is_blockskip()) {
 			//TODO
 		}
 		return null;

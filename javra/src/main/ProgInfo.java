@@ -7,7 +7,6 @@ package main;
 
 import enums.EMsgType;
 import enums.EPass;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,51 +22,16 @@ public class ProgInfo {
 	private	int								warning_ctr	= 0;
 	private	long								timestamp	= System.currentTimeMillis();
 	private	HashMap<String,Constant>	constants	= new HashMap<>();
+	private	HashMap<String,Macros>		macros		= new HashMap<>();
+	private	Macros							cur_macros	= null;
 	private	String							root_path;
 	private	String							device		= null;
-	private	int								block_cntr	= 0;
-	private	boolean							blockskip	= false;
+	private	IncludeInfo						ii				= null;
 	private	String[]							registers	= new String[32];	
 	
 
-//struct args *args;
-	//struct device *device;
-	//struct macro_call *macro_call;
-	//struct macro_line *macro_line;
-	//FILE *list_file;
-	//int list_on;
-	//int map_on;
-	//char *list_line;
-	//char *root_path;
-	//FILE *obj_file;
-	//struct include_file *last_include_file;
-	//struct include_file *first_include_file;
-	//struct def *first_def;
-	//struct def *last_def;
-	//struct label *first_label;
-	//struct label *last_label;
-	//struct label *first_constant;
-	//struct label *last_constant;
-	//struct label *first_variable;
-	//struct label *last_variable;
-	//struct location *first_ifdef_blacklist;
-	//struct location *last_ifdef_blacklist;
-	//struct location *first_ifndef_blacklist;
-	//struct location *last_ifndef_blacklist;
-	//struct macro *first_macro;
-	//struct macro *last_macro;
-	//struct macro_call *first_macro_call;
-	//struct macro_call *last_macro_call;
-	//struct orglist *first_orglist;	/* List of used memory segments. Needed for overlap-check */
-	//struct orglist *last_orglist;
-	//int effective_overlap; /* as specified by #pragma overlap */
-	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
-	//int conditional_depth;
-	/* coff additions */
-	//FILE *coff_file;
-	/* Warning additions */
-	//int NoRegDef;
-	private	EPass	pass;
+//	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
+//	private	EPass	pass;
 
 	public ProgInfo() throws IOException {
 		root_path = new java.io.File(".").getCanonicalPath();
@@ -77,13 +41,13 @@ public class ProgInfo {
 	}
 	
 	
-	public EPass get_pass() {
+/*	public EPass get_pass() {
 		return pass;
 	}
 	
 	public boolean get_segment_overlap() {
 		return segment_overlap;
-	}
+	}*/
 	
 	public SegmentInfo get_cur_segment() {
 		return cur_seg;
@@ -143,30 +107,42 @@ public class ProgInfo {
 		return (max_errors == error_cntr);
 	}
 
-	public boolean is_blockskip() {
-		return blockskip;
-	}
-	
-	public void block_start(Line l_line, boolean l_skip) {
-		blockskip = l_skip;
-		block_cntr++;
-	}
-	public void block_end(Line l_line) {
-		block_cntr--;
-	}
-	public void block_skip_invet() {
-		blockskip = !blockskip;
+	public IncludeInfo exch_ii(IncludeInfo l_ii) {
+		IncludeInfo old_ii = ii;
+		ii = l_ii;
+		return old_ii;
 	}
 
-	public int get_blockcntr() {
-		return  block_cntr;
-	}
-	
-	public void set_blockcntr(int l_blockcntr) {
-		block_cntr = l_blockcntr;
+	public IncludeInfo get_ii() {
+		return ii;
 	}
 	
 	public String[] get_registers() {
 		return registers;
+	}
+	
+	public boolean create_macros(String l_name) {
+		if(null == cur_macros) {
+			cur_macros = new Macros(l_name);
+			macros.put(l_name, cur_macros);
+			return true;
+		}
+		return false;
+	}
+	
+	public HashMap<String, Macros> get_macros() {
+		return macros;
+	}
+
+	public Macros get_cur_macros() {
+		return cur_macros;
+	}
+	
+	public boolean close_macros() {
+		if(null != cur_macros) {
+			cur_macros = null;
+			return true;
+		}
+		return false;
 	}
 }

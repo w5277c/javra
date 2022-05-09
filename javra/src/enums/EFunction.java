@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+09.03.2022	konstantin@5277.ru			Начало
+--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package enums;
 
-/**
- *
- * @author kostas
- */
 public enum EFunction {
 	FUNC_LOW("low"),
 	FUNC_BYTE1("byte1"),
@@ -27,6 +23,10 @@ public enum EFunction {
 	
 	private EFunction(String l_text) {
 		text = l_text;
+	}
+	
+	public String get_text() {
+		return text;
 	}
 	
 	@Override

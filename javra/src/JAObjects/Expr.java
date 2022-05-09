@@ -1,19 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+09.03.2022	konstantin@5277.ru			Начало
+--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
 import enums.EFunction;
 import enums.EMsgType;
 import enums.EOperator;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import main.Constant;
 import main.Line;
-import main.Parser;
 import main.ProgInfo;
 
 /**
@@ -21,11 +19,6 @@ import main.ProgInfo;
  * @author kostas
  */
 public class Expr {
-
-	private static Long do_function(ProgInfo l_pi, Line l_line, Long tmp) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
 	public static Long parse(ProgInfo l_pi, Line l_line, String l_expr) {
 		Long result = null;
 		int count = 0x00;
@@ -54,12 +47,12 @@ public class Expr {
 				}
 				_expr = _expr.substring(operator.get_text().length()).trim();
 				operators.add(operator);
+				first_flag = true;
 				count++;
 			}
 			else {
 				if(_expr.startsWith("0x")) {
 					int pos = 0x02;
-					//while(pos < _expr.length() && is_hex_digit(_expr.charAt(pos++)));
 					while(is_hex_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x02 != pos) {
 						result = Long.parseLong(_expr.substring(0x02, pos), 0x10);
@@ -72,7 +65,6 @@ public class Expr {
 				}
 				else if(_expr.startsWith("0b")) {
 					int pos = 0x02;
-					//while(pos < _expr.length() && is_bin_digit(_expr.charAt(pos++)));
 					while(is_bin_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x02 != pos) {
 						result = Long.parseLong(_expr.substring(0x02, pos), 0x02);
@@ -127,7 +119,7 @@ public class Expr {
 					_expr = _expr.substring(pos).trim();
 					EFunction func = null;
 					for(EFunction _func : EFunction.values()) {
-						if(_func.equals(name)) {
+						if(_func.get_text().equals(name)) {
 							func = _func;
 							break;
 						}
@@ -139,14 +131,14 @@ public class Expr {
 								l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, ")");
 								break;
 							}
-							Long tmp = parse(l_pi, l_line, _expr.substring(0x01, length));
+							Long tmp = parse(l_pi, l_line, _expr.substring(0x01, 0x01+length));
 							if(null != tmp) {
-								result = do_function(l_pi, l_line, tmp);
+								result = do_function(l_pi, l_line, func, tmp);
+								_expr = _expr.substring(0x02+length).trim();
 								if(null == result) {
 									l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 									break;
 								}
-								elemets.add(result);
 							}
 							else {
 								l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
@@ -173,9 +165,21 @@ public class Expr {
 					break;
 				}
 				if(null != result) {
+					switch(unary) {
+						case "-":
+							result = -result;
+							break;
+						case "!":
+							result = (0x00 == result ? 0x01l : 0x00l);
+							break;
+						case "~":
+							result = ~result;
+							break;
+					}
 					elemets.add(result);
-					count++;
 				}
+				count++;
+				first_flag = false;
 			}
 		}
 		
@@ -198,7 +202,7 @@ public class Expr {
 	private static long calc(ProgInfo l_pi, Line l_line, long l_left, EOperator l_op, Long l_right) {
 		switch(l_op) {
 			case OP_MUL:
-				return l_left * l_right;
+				return l_left*l_right;
 			case OP_DIV:
 				if(0 == l_right) {
 					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_DIVISION_BY_ZERO);
@@ -248,7 +252,39 @@ public class Expr {
 		}
 	}
 
-	
+	private static Long do_function(ProgInfo l_pi, Line l_line, EFunction l_func, Long l_value) {
+		switch(l_func) {
+			case FUNC_LOW:
+			case FUNC_BYTE1:
+				return l_value & 0xff;
+			case FUNC_HIGH:
+			case FUNC_BYTE2:
+				return (l_value >> 0x08) & 0xff;
+			case FUNC_BYTE3:
+				return (l_value >> 0x10) & 0xff;
+			case FUNC_BYTE4:
+				return (l_value >> 0x18) & 0xff;
+			case FUNC_LWRD:
+				return l_value & 0xffff;
+			case FUNC_HWRD:
+				return (l_value >> 0x10) & 0xffff;
+			case FUNC_PAGE:
+				return (l_value >> 0x10) & 0xff;
+			case FUNC_EXP2:
+				return (0x01l << l_value);
+			case FUNC_LOG2:
+				long i = 0;
+				while (0x01 <= l_value) {
+					l_value = l_value >> 0x01;
+					i++;
+				}
+				return i;
+			default:
+				l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_UNSUPPORTED);
+		}
+		return null;
+	}
+
 	private static int par_length(String l_str, int l_pos) {
 		int b_count = 0x01;
 
