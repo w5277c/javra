@@ -112,5 +112,24 @@ public enum EDevice {
 		eeprom_size = l_eeprom_size;
 		flags = l_flags;
 	}
-
+	
+	public String get_name() {
+		return name;
+	}
+	
+	public int get_flash_size() {
+		return flash_size;
+	}
+	
+	public int get_ram_start() {
+		return ram_start;
+	}
+	
+	public int get_ram_size() {
+		return ram_size;
+	}
+	
+	public int get_eeprom_size() {
+		return eeprom_size;
+	}
 }

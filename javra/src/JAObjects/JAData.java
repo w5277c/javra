@@ -45,28 +45,4 @@ public class JAData extends JAObject {
 			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
 		}
 	}
-	
-	@Override
-	protected boolean is_undefined(ProgInfo l_pi, Line l_line, String l_name) {
-		Constant contant = l_pi.get_constants().get(l_name);
-		if(null != contant && !contant.is_redef()) {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + contant.get_line().get_location() + "'");
-			return false;
-		}
-		Integer register_id = get_register(l_pi, l_name);
-		if(null != register_id) {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "' register");
-			return false;
-		}
-		Macro macros = l_pi.get_macros().get(l_name);
-		if(null != macros) {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
-			return false;
-		}
-		
-		//TODO добавить остальне проверки
-		
-		return true;
-	}
-
 }

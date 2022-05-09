@@ -33,7 +33,7 @@ public class Constant {
 		return name;
 	}
 	
-	public long get_num() {
+	public long get_num(Line l_line) {
 		return num;
 	}
 	

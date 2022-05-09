@@ -5,27 +5,25 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import enums.EMsgType;
 import enums.ESegmentType;
-import java.util.LinkedList;
 
-public class SegmentInfo {
-	private	ESegmentType				type;
-	private	LinkedList<DataBlock>	datablocks	= new LinkedList<>();
-
-	public SegmentInfo(ESegmentType l_type) {
-		type = l_type;
-		datablocks.add(new DataBlock(0x0000));
-	}
-
-	public ESegmentType get_type() {
-		return type;
+public class PCConstant extends Constant {
+	private	Line		line;
+	private	String	name;
+	private	ProgInfo	pi;
+	
+	public PCConstant(ProgInfo l_pi) {
+		super(new Line("", 0, ""), "pc", 0);
+		
+		pi = l_pi;
 	}
 	
-	public void add_datablock(long l_addr) {
-		datablocks.add(new DataBlock(l_addr));
-	}
-	
-	public DataBlock get_datablock() {
-		return datablocks.getLast();
+	@Override
+	public long get_num(Line l_line) {
+		if(ESegmentType.CODE != pi.get_cur_segment().get_type()) {
+			pi.print(EMsgType.MSG_WARNING, line, "got PC request in not CSEG");
+		}
+		return pi.get_cseg().get_datablock().get_addr();
 	}
 }

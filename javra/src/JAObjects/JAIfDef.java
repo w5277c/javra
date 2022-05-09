@@ -5,7 +5,6 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
-import JAObjects.JAObject;
 import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
@@ -14,7 +13,7 @@ public class JAIfDef extends JAObject {
 	public JAIfDef(ProgInfo l_pi, Line l_line) throws Exception {
 		String tmp = l_line.get_value().trim().toLowerCase();
 		if(!tmp.isEmpty()) {
-			l_pi.get_ii().block_start(l_line, null == l_pi.get_constants().get(tmp));
+			l_pi.get_ii().block_start(l_line, null == l_pi.get_constant(tmp));
 		}
 		else {
 			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);

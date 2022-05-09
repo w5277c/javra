@@ -152,9 +152,9 @@ public class Expr {
 						}
 					}
 					else {
-						Constant constant = l_pi.get_constants().get(name);
+						Constant constant = l_pi.get_constant(name);
 						if(null != constant) {
-							result = constant.get_num();
+							result = constant.get_num(l_line);
 						}
 						else {
 							l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_UNSUPPORTED);

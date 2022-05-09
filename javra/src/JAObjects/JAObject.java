@@ -16,7 +16,7 @@ public class JAObject {
 	public	final	static	String	MSG_INVALID_NUMBER		= "invalid number";
 	public	final	static	String	MSG_INVALID_SYNTAX		= "invalid syntax";
 	public	final	static	String	MSG_ALREADY_DEFINED		= "already defined";
-	public	final	static	String	MSG_UNKNOWN_DIRECTIVE	= "unknown directive";
+	public	final	static	String	MSG_UNKNOWN_LEXEME		= "unknown lexeme";
 	public	final	static	String	MSG_UNKNOWN_CONSTANT		= "unknown constant";
 	public	final	static	String	MSG_ABSENT_FILE			= "absent_file";
 	public	final	static	String	MSG_MISSING					= "missing ";
@@ -86,11 +86,14 @@ public class JAObject {
 					case ".dw":
 						return new JAData(l_pi, l_line, 0x02);
 					default:
-						if(tmp.replaceAll(REGEX_LABEL_NAME, "").isEmpty()) {
+						if(tmp.startsWith("#")) {
+							l_pi.print(EMsgType.MSG_WARNING, l_line, MSG_UNSUPPORTED);
+						}
+						else if(tmp.replaceAll(REGEX_LABEL_NAME, "").isEmpty()) {
 							return new JALabel(l_pi, l_line, tmp.substring(0x00, tmp.length()-0x01));
 						}
 						else {
-							l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_DIRECTIVE);
+							l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME);
 						}
 				}
 			}
@@ -158,9 +161,9 @@ public class JAObject {
 	}
 	
 	protected boolean is_undefined(ProgInfo l_pi, Line l_line, String l_name) {
-		Constant contant = l_pi.get_constants().get(l_name);
-		if(null != contant) {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + contant.get_line().get_location() + "'");
+		Constant constant = l_pi.get_constant(l_name);
+		if(null != constant && !constant.is_redef()) {
+			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
 			return false;
 		}
 		Integer register_id = get_register(l_pi, l_name);

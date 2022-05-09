@@ -37,7 +37,9 @@ public class Parser {
 			
 			if(null == line) {
 				line = new Line(l_file.getName(), line_number++, str);
-				line_parse(l_pi, line);
+				if(!line_parse(l_pi, line)) {
+					break;
+				}
 			}
 			else {
 				line.append(str);
@@ -57,10 +59,10 @@ public class Parser {
 		l_pi.print(EMsgType.MSG_INFO, null, "Exit " + l_file.getCanonicalPath());
 	}
 	
-	private void line_parse(ProgInfo l_pi, Line l_line) throws Exception {
+	private boolean line_parse(ProgInfo l_pi, Line l_line) throws Exception {
 		//Парсим .EQU&etc, .INCLUDE, IFDEF&etc, MACROSES, LABEL, MNEMONICS
 		
-		if(l_line.get_text().contains(".if ES_DATA_SIZE > 0x00")) {
+		if(l_line.get_text().contains(".EQU	EEPROM_SIZE")) {
 			int t = 0;
 		}
 		l_line.parse();
@@ -72,6 +74,8 @@ public class Parser {
 		else {
 			JAObject jaobj = JAObject.parse(l_pi, l_line);
 		}
+		
+		return !l_pi.is_terminating();
 	}
 	
 	
@@ -81,9 +85,8 @@ public class Parser {
 		int pos = -1;
 		for(String substr : l_substrs) {
 			int _pos = l_str.indexOf(substr);
-			if(-1 != _pos) {
+			if(-1 != _pos && (-1 == pos || _pos < pos)) {
 				pos = _pos;
-				break;
 			}
 		}
 		return pos;

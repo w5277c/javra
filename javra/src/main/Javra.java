@@ -24,10 +24,13 @@ public class Javra {
 			}
 		}
 		
-		
-		
-		
 		Parser parser = new Parser(pi, new File("main.asm"));
+		if(0 != pi.get_error_cntr()) {
+			System.out.println("\nBuild fail, wrns:" + pi.get_warning_cntr() + ", errs:" + pi.get_error_cntr() + "/" + pi.get_max_errors());
+		}
+		else {
+			System.out.println("\nBuild sucess, wrns:" + pi.get_warning_cntr());
+		}
 	}
 	
 }

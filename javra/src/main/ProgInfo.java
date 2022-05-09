@@ -5,8 +5,11 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import static JAObjects.JAObject.MSG_ALREADY_DEFINED;
+import enums.EDevice;
 import enums.EMsgType;
 import enums.EPass;
+import enums.ESegmentType;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,19 +17,19 @@ import java.util.LinkedList;
 
 public class ProgInfo {
 	private	LinkedList<String>			lib_paths	= new LinkedList<>();
-	private	SegmentInfo						cseg			= new SegmentInfo();
-	private	SegmentInfo						dseg			= new SegmentInfo();
-	private	SegmentInfo						eseg			= new SegmentInfo();
+	private	SegmentInfo						cseg			= new SegmentInfo(ESegmentType.CODE);
+	private	SegmentInfo						dseg			= new SegmentInfo(ESegmentType.DATA);
+	private	SegmentInfo						eseg			= new SegmentInfo(ESegmentType.EEPROM);
 	private	SegmentInfo						cur_seg		= cseg;
 	private	int								max_errors	= 10;
 	private	int								error_cntr	= 0;
-	private	int								warning_ctr	= 0;
+	private	int								warning_cntr	= 0;
 	private	long								timestamp	= System.currentTimeMillis();
 	private	HashMap<String,Constant>	constants	= new HashMap<>();
 	private	HashMap<String,Macro>		macros		= new HashMap<>();
-	private	Macro							cur_macros	= null;
+	private	Macro								cur_macros	= null;
 	private	String							root_path;
-	private	String							device		= null;
+	private	EDevice							device		= null;
 	private	IncludeInfo						ii				= null;
 	private	String[]							registers	= new String[32];	
 	
@@ -43,6 +46,8 @@ public class ProgInfo {
 		for(int id = 0x00; id < 0x20; id++) {
 			registers[id] = ("r" + id);
 		}
+		
+		constants.put("pc", new PCConstant(this));
 	}
 	
 	
@@ -67,8 +72,20 @@ public class ProgInfo {
 		return eseg;
 	}
 
-	public HashMap<String, Constant> get_constants() {
-		return constants;
+	public Constant get_constant(String l_name) {
+		return constants.get(l_name);
+	}
+	
+	public boolean add_constant(Line l_line, Constant l_constant) {
+		Constant constant = constants.get(l_constant.get_name());
+		if(null == constant || constant.is_redef() || (constant.get_num(l_line) == l_constant.get_num(l_line) && !l_constant.is_redef())) {
+			constants.put(l_constant.get_name(), l_constant);
+			return true;
+		}
+		else {
+			print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
+			return false;
+		}
 	}
 	
 	public String get_root_path() {
@@ -79,11 +96,29 @@ public class ProgInfo {
 		return lib_paths;
 	}
 
-	public String get_device() {
+	public EDevice get_device() {
 		return device;
 	}
-	public void set_device(String l_device) {
-		device = l_device;
+	public void set_device(Line l_line, EDevice l_device) {
+		if(null == device) {
+			device = l_device;
+
+			if(!add_constant(l_line, new Constant(l_line, "prog_flash", device.get_flash_size()))) {
+				print(EMsgType.MSG_ERROR, l_line, "PROG_FLASH already defined");
+			}
+			if(!add_constant(l_line, new Constant(l_line, "ram_start", device.get_ram_start()))) {
+				print(EMsgType.MSG_ERROR, l_line, "RAM_START already defined");
+			}
+			if(!add_constant(l_line, new Constant(l_line, "ram_end", device.get_ram_start() + device.get_ram_size() - 0x01))) {
+				print(EMsgType.MSG_ERROR, l_line, "RAM_END already defined");
+			}
+			if(!add_constant(l_line, new Constant(l_line, "eeprom_size", device.get_eeprom_size()))) {
+				print(EMsgType.MSG_ERROR, l_line, "EEPROM_SIZE already defined");
+			}
+		}
+		else {
+			print(EMsgType.MSG_ERROR, l_line, "More than one .DEVICE definition");
+		}
 	}
 
 	public void print(EMsgType l_msg_type, Line l_line, String... l_messages) {
@@ -94,7 +129,8 @@ public class ProgInfo {
 			
 		}
 		else if(EMsgType.MSG_WARNING == l_msg_type) {
-			System.out.print("[" + warning_ctr + "]");
+			warning_cntr++;
+			System.out.print("[" + warning_cntr + "]");
 		}
 		if(null != l_line) {
 			System.out.print("line:" + l_line.get_number() + " ");
@@ -149,5 +185,15 @@ public class ProgInfo {
 			return true;
 		}
 		return false;
+	}
+	
+	public int get_error_cntr() {
+		return error_cntr;
+	}
+	public int get_warning_cntr() {
+		return warning_cntr;
+	}
+	public int get_max_errors() {
+		return max_errors;
 	}
 }
