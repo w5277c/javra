@@ -9,6 +9,7 @@ import JAObjects.JAObject;
 import enums.EFunction;
 import enums.EMsgType;
 import enums.EOperator;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import main.Constant;
@@ -25,8 +26,8 @@ public class Expr {
 		int count = 0x00;
 		String unary = "";
 		boolean first_flag = true;
-		Queue<Long> elemets = new LinkedBlockingQueue<>();
-		Queue<EOperator> operators = new LinkedBlockingQueue<>();
+		LinkedList<Long> elemets = new LinkedList<>();
+		LinkedList<EOperator> operators = new LinkedList<>();
 		
 		String _expr = new String(l_expr.trim());
 		while(!_expr.isEmpty()) {
@@ -188,11 +189,20 @@ public class Expr {
 			return elemets.poll();
 		}
 		if(0x03 <= count && 0x01 == (count%2)) {
-			long _result = elemets.poll();
-			while(!elemets.isEmpty()) {
-				_result = calc(l_pi, l_line, _result, operators.poll(), elemets.poll());
+			for(int priority = EOperator.OP_MUL.get_priority(); priority >= EOperator.OP_LOGICAL_OR.get_priority() && !operators.isEmpty(); priority--) {
+				int index = 0x00;
+				while(operators.size() > index) {
+					EOperator op = operators.get(index);
+					if(op.get_priority() == priority) {
+						Long _result = calc(l_pi, l_line, elemets.get(index), op, elemets.get(index+0x01));
+						operators.remove(index);
+						elemets.set(index, _result);
+						elemets.remove(index+0x01);
+					}
+					index++;
+				}
 			}
-			return _result;
+			return elemets.get(0x00);
 		}
 		else {
 			l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);

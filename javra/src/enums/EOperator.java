@@ -6,31 +6,36 @@
 package enums;
 
 public enum EOperator {
-	OP_ERROR(""),
-	OP_SH_LEFT("<<"),
-	OP_SH_RIGHT(">>"),
-	OP_LESS_OR_EQUAL("<="),
-	OP_GREATER_OR_EQUAL(">="),
-	OP_EQUALX2("=="),
-	OP_NOT_EQUAL("!="),
-	OP_BITWISE_AND("&&"),
-	OP_BITWISE_OR("||"),
-	OP_MUL("*"),
-	OP_DIV("/"),
-	OP_MOD("%"),
-	OP_ADD("+"),
-	OP_SUB("-"),
-	OP_LESS_THAN("<"),
-	OP_GREATER_THAN(">"),
-	OP_EQUAL("="),
-	OP_BITWISE_XOR("^"),
-	OP_LOGICAL_AND("&"),
-	OP_LOGICAL_OR("|");
+	OP_SH_LEFT("<<", 8),
+	OP_SH_RIGHT(">>", 8),
+	OP_LESS_OR_EQUAL("<=", 7),
+	OP_GREATER_OR_EQUAL(">=", 7),
+	OP_EQUALX2("==", 6),
+	OP_NOT_EQUAL("!=", 6),
+	OP_BITWISE_AND("&&", 5),
+	OP_BITWISE_OR("||", 3),
+	OP_MUL("*", 10),
+	OP_DIV("/", 10),
+	OP_MOD("%", 10),
+	OP_ADD("+", 9),
+	OP_SUB("-", 9),
+	OP_LESS_THAN("<", 7),
+	OP_GREATER_THAN(">", 7),
+	OP_EQUAL("=", 6),
+	OP_BITWISE_XOR("^", 4),
+	OP_LOGICAL_AND("&", 2),
+	OP_LOGICAL_OR("|", 1);
 	
-	private String text;
+	private	String	text;
+	private	int		priority;
 	
-	private EOperator(String l_text) {
+	private EOperator(String l_text, int l_priority) {
 		text = l_text;
+		priority = l_priority;
+	}
+	
+	public int get_priority() {
+		return priority;
 	}
 	
 	public String get_text() {

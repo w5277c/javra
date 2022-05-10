@@ -25,7 +25,7 @@ public class DataBlock {
 	
 	public void write(byte[] l_data, int l_offset, int l_size) {
 		if((data.length - length) < l_size) {
-			byte[] _data = new byte[data.length + 0x40];
+			byte[] _data = new byte[data.length + (l_size + 0x40)];
 			System.arraycopy(data, 0x00, _data, 0x00, length);
 			data = _data;
 		}
@@ -39,5 +39,14 @@ public class DataBlock {
 	
 	public int get_length() {
 		return length;
+	}
+
+	public void skip(int l_size) {
+		if((data.length - length) < l_size) {
+			byte[] _data = new byte[data.length + (l_size + 0x40)];
+			System.arraycopy(data, 0x00, _data, 0x00, length);
+			data = _data;
+		}
+		length += l_size;
 	}
 }

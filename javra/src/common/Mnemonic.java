@@ -6,12 +6,18 @@
 package common;
 
 import enums.EMnemonic;
+import enums.EPass;
 import main.Line;
 import main.ProgInfo;
 
 public class Mnemonic {
 	
-	public static void parse(ProgInfo l_pi, Line l_line, EMnemonic l_em, String l_value) {
-		//TODO
+	public static void parse(ProgInfo l_pi, EMnemonic l_em, String l_value) {
+		if(EPass.PASS_1 == l_pi.get_pass()) {
+			l_pi.get_cseg().get_datablock().skip(l_em.get_opcode_wsize()*2);
+		}
+		else {
+			//TODO
+		}
 	}
 }

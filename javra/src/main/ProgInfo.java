@@ -8,6 +8,7 @@ package main;
 import JAObjects.JAObject;
 import enums.EDevice;
 import enums.EMsgType;
+import enums.EPass;
 import enums.ESegmentType;
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class ProgInfo {
 	private	IncludeInfo						ii				= null;
 	private	String[]							registers	= new String[32];	
 	private	Line								cur_line		= null;
-
+	private	EPass								pass			= EPass.PASS_1;
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
 //	private	EPass	pass;
 
@@ -209,5 +210,9 @@ public class ProgInfo {
 	}
 	public Line get_cur_line() {
 		return cur_line;
+	}
+	
+	public EPass get_pass() {
+		return pass;
 	}
 }

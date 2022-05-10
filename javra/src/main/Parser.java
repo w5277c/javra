@@ -60,9 +60,7 @@ public class Parser {
 	}
 	
 	private boolean line_parse(ProgInfo l_pi, Line l_line) throws Exception {
-		//Парсим .EQU&etc, .INCLUDE, IFDEF&etc, MACROSES, LABEL, MNEMONICS
-		
-		if(l_line.get_text().contains(".SET	AVRA")) {
+		if(l_line.get_text().contains(".EQU	_C5_UPTIME")) {
 			int t = 0;
 		}
 		l_line.parse();
@@ -73,14 +71,16 @@ public class Parser {
 			cur_macros.get_body().add(l_line);
 		}
 		else {
-			JAObject jaobj = JAObject.parse(l_pi, l_line);
+			try {
+				JAObject jaobj = JAObject.parse(l_pi, l_line);
+			}
+			catch(Exception ex) {
+				System.out.println("Exception at " + l_line.get_location());
+				ex.printStackTrace();
+			}
 		}
-		
 		return !l_pi.is_terminating();
 	}
-	
-	
-	
 	
 	public static int get_pos(String l_str, String... l_substrs) {
 		int pos = -1;
