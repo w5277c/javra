@@ -6,9 +6,9 @@
 package enums;
 
 public enum EMsgType {
-	MSG_ERROR("ERR"),
-	MSG_WARNING("WRN"),
-	MSG_MESSAGE("MSG"),
+	MSG_ERROR("Error"),
+	MSG_WARNING("Warning"),
+	MSG_MESSAGE("Message"),
 	MSG_INFO("");
 	
 	private String text;

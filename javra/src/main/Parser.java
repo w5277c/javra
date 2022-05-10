@@ -19,7 +19,7 @@ public class Parser {
 	public Parser(ProgInfo l_pi, File l_file) throws Exception {
 		IncludeInfo ii = l_pi.exch_ii(new IncludeInfo(l_file.getName()));
 		
-		l_pi.print(EMsgType.MSG_INFO, null, "Enter " + l_file.getCanonicalPath());
+		l_pi.print("Enter " + l_file.getCanonicalPath());
 		Scanner scanner = new Scanner(l_file, StandardCharsets.UTF_8.name());
 		int line_number = 0x01;
 		
@@ -56,16 +56,17 @@ public class Parser {
 		if(0 != ii.get_blockcntr()) {
 			l_pi.print(EMsgType.MSG_WARNING, null, "some of.if/.ifdef/.ifndef not correctly closed(cntr:" + ii.get_blockcntr() + ")");
 		}
-		l_pi.print(EMsgType.MSG_INFO, null, "Exit " + l_file.getCanonicalPath());
+		l_pi.print("Exit " + l_file.getCanonicalPath());
 	}
 	
 	private boolean line_parse(ProgInfo l_pi, Line l_line) throws Exception {
 		//Парсим .EQU&etc, .INCLUDE, IFDEF&etc, MACROSES, LABEL, MNEMONICS
 		
-		if(l_line.get_text().contains(".EQU	EEPROM_SIZE")) {
+		if(l_line.get_text().contains(".SET	AVRA")) {
 			int t = 0;
 		}
 		l_line.parse();
+		l_pi.set_line(l_line);
 		
 		Macro cur_macros = l_pi.get_cur_macros();
 		if(null != cur_macros && !l_line.get_key().equalsIgnoreCase(".endmacro") && !l_line.get_key().equalsIgnoreCase(".endm")) {

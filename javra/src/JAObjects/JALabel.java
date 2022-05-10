@@ -11,8 +11,8 @@ import main.ProgInfo;
 
 public class JALabel extends JAObject {
 	public JALabel(ProgInfo l_pi, Line l_line, String l_name) throws Exception {
-		if(is_undefined(l_pi, l_line, l_name)) {
-			l_pi.add_constant(l_line, new Constant(l_line, l_name, l_pi.get_cur_segment().get_datablock().get_addr()));
+		if(is_undefined(l_pi, l_name)) {
+			l_pi.add_constant(new Constant(l_line, l_name, l_pi.get_cur_segment().get_datablock().get_addr()));
 		}
 	}
 }

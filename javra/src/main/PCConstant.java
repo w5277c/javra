@@ -22,7 +22,7 @@ public class PCConstant extends Constant {
 	@Override
 	public long get_num(Line l_line) {
 		if(ESegmentType.CODE != pi.get_cur_segment().get_type()) {
-			pi.print(EMsgType.MSG_WARNING, line, "got PC request in not CSEG");
+			pi.print(EMsgType.MSG_WARNING, "got PC request in not CSEG");
 		}
 		return pi.get_cseg().get_datablock().get_addr();
 	}

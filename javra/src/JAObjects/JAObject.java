@@ -89,7 +89,7 @@ public class JAObject {
 						return new JAData(l_pi, l_line, 0x02);
 					default:
 						if(tmp.startsWith("#")) {
-							l_pi.print(EMsgType.MSG_WARNING, l_line, MSG_UNSUPPORTED);
+							l_pi.print(EMsgType.MSG_WARNING, MSG_UNSUPPORTED);
 						}
 						else if(tmp.replaceAll(REGEX_LABEL_NAME, "").isEmpty()) {
 							return new JALabel(l_pi, l_line, tmp.substring(0x00, tmp.length()-0x01));
@@ -101,7 +101,7 @@ public class JAObject {
 								Mnemonic.parse(l_pi, l_line, em, (0x01 < parts.length ? parts[0x01] : null));
 							}
 							else {
-								l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME);
+								l_pi.print(EMsgType.MSG_ERROR, MSG_UNKNOWN_LEXEME);
 							}
 						}
 				}
@@ -142,6 +142,8 @@ public class JAObject {
 		return null;
 	}
 	
+
+	
 	protected String parse_string(String l_value) {
 		try {
 			String tmp = l_value.trim();
@@ -169,20 +171,20 @@ public class JAObject {
 		return null;
 	}
 	
-	protected boolean is_undefined(ProgInfo l_pi, Line l_line, String l_name) {
+	protected boolean is_undefined(ProgInfo l_pi, String l_name) {
 		Constant constant = l_pi.get_constant(l_name);
 		if(null != constant && !constant.is_redef()) {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
+			l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
 			return false;
 		}
 		Integer register_id = get_register(l_pi, l_name);
 		if(null != register_id) {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
+			l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
 			return false;
 		}
 		Macro macros = l_pi.get_macros().get(l_name);
 		if(null != macros) {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
+			l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
 			return false;
 		}
 		

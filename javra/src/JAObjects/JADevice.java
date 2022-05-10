@@ -22,7 +22,7 @@ public class JADevice extends JAObject {
 			catch(Exception ex) {
 			}
 			if(null != device) {
-				l_pi.set_device(l_line, device);
+				l_pi.set_device(device);
 			}
 			else {
 				StringBuilder sb = new StringBuilder("\t");
@@ -33,11 +33,11 @@ public class JADevice extends JAObject {
 						sb.append("\n\t");
 					}
 				}
-				l_pi.print(EMsgType.MSG_ERROR, l_line, "Unknown .DEVICE: " + tmp + ", supported:\n" + sb.toString().substring(0x00, sb.length()-0x01));
+				l_pi.print(EMsgType.MSG_ERROR, "Unknown .DEVICE: " + tmp + ", supported:\n" + sb.toString().substring(0x00, sb.length()-0x01));
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX, "needs operand");
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX, "needs operand");
 		}
 	}
 }

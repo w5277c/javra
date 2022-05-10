@@ -42,7 +42,7 @@ public class JAData extends JAObject {
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
 	}
 }

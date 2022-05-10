@@ -18,11 +18,11 @@ public class JADef extends JAObject {
 		String tmp = parts[0x00].trim().toLowerCase();
 		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 			name = tmp;
-			if(is_undefined(l_pi, l_line, name)) {
+			if(is_undefined(l_pi, name)) {
 				tmp = parts[0x01].trim().toLowerCase();
 				Integer register = get_register(l_pi, tmp);
 				if(null == register) {
-					l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_WRONG_REGISTER);
+					l_pi.print(EMsgType.MSG_ERROR, MSG_WRONG_REGISTER);
 				}
 				else {
 					l_pi.get_registers()[register] = name;
@@ -30,7 +30,7 @@ public class JADef extends JAObject {
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
 	}
 }

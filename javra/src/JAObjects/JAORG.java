@@ -15,7 +15,7 @@ public class JAORG extends JAObject {
 	public JAORG(ProgInfo l_pi, Line l_line) {
 		Long addr = Expr.parse(l_pi, l_line, l_line.get_value().trim().toLowerCase());
 		if(null == addr) {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_NUMBER);
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_NUMBER);
 		}
 		else {
 			l_pi.get_cur_segment().add_datablock(addr);

@@ -21,23 +21,23 @@ public class JAEQU extends JAObject {
 			
 			Integer register_id = get_register(l_pi, name);
 			if(null != register_id) {
-				l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
+				l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
 				return;
 			}
 			Macro macros = l_pi.get_macros().get(name);
 			if(null != macros) {
-				l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
+				l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
 				return;
 			}
 
 			tmp = parts[0x01].trim().toLowerCase();
 			Long num = Expr.parse(l_pi, l_line, tmp);
 			if(null != num) {
-				l_pi.add_constant(l_line, new Constant(l_line, name, num));
+				l_pi.add_constant(new Constant(l_line, name, num));
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
 	}
 }

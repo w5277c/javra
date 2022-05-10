@@ -5,10 +5,9 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
-import static JAObjects.JAObject.MSG_ALREADY_DEFINED;
+import JAObjects.JAObject;
 import enums.EDevice;
 import enums.EMsgType;
-import enums.EPass;
 import enums.ESegmentType;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +20,7 @@ public class ProgInfo {
 	private	SegmentInfo						dseg			= new SegmentInfo(ESegmentType.DATA);
 	private	SegmentInfo						eseg			= new SegmentInfo(ESegmentType.EEPROM);
 	private	SegmentInfo						cur_seg		= cseg;
-	private	int								max_errors	= 10;
+	private	int								max_errors	= 1000;
 	private	int								error_cntr	= 0;
 	private	int								warning_cntr	= 0;
 	private	long								timestamp	= System.currentTimeMillis();
@@ -32,7 +31,7 @@ public class ProgInfo {
 	private	EDevice							device		= null;
 	private	IncludeInfo						ii				= null;
 	private	String[]							registers	= new String[32];	
-	
+	private	Line								cur_line		= null;
 
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
 //	private	EPass	pass;
@@ -76,14 +75,14 @@ public class ProgInfo {
 		return constants.get(l_name);
 	}
 	
-	public boolean add_constant(Line l_line, Constant l_constant) {
+	public boolean add_constant(Constant l_constant) {
 		Constant constant = constants.get(l_constant.get_name());
-		if(null == constant || constant.is_redef() || (constant.get_num(l_line) == l_constant.get_num(l_line) && !l_constant.is_redef())) {
+		if(null == constant || constant.is_redef() || (constant.get_num(cur_line) == l_constant.get_num(cur_line) && !l_constant.is_redef())) {
 			constants.put(l_constant.get_name(), l_constant);
 			return true;
 		}
 		else {
-			print(EMsgType.MSG_ERROR, l_line, MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
+			print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
 			return false;
 		}
 	}
@@ -99,29 +98,36 @@ public class ProgInfo {
 	public EDevice get_device() {
 		return device;
 	}
-	public void set_device(Line l_line, EDevice l_device) {
+	public void set_device(EDevice l_device) {
 		if(null == device) {
 			device = l_device;
 
-			if(!add_constant(l_line, new Constant(l_line, "prog_flash", device.get_flash_size()))) {
-				print(EMsgType.MSG_ERROR, l_line, "PROG_FLASH already defined");
+			if(!add_constant(new Constant(cur_line, "prog_flash", device.get_flash_size()))) {
+				print(EMsgType.MSG_ERROR, "PROG_FLASH already defined");
 			}
-			if(!add_constant(l_line, new Constant(l_line, "ram_start", device.get_ram_start()))) {
-				print(EMsgType.MSG_ERROR, l_line, "RAM_START already defined");
+			if(!add_constant(new Constant(cur_line, "ram_start", device.get_ram_start()))) {
+				print(EMsgType.MSG_ERROR, "RAM_START already defined");
 			}
-			if(!add_constant(l_line, new Constant(l_line, "ram_end", device.get_ram_start() + device.get_ram_size() - 0x01))) {
-				print(EMsgType.MSG_ERROR, l_line, "RAM_END already defined");
+			if(!add_constant(new Constant(cur_line, "ram_end", device.get_ram_start() + device.get_ram_size() - 0x01))) {
+				print(EMsgType.MSG_ERROR, "RAM_END already defined");
 			}
-			if(!add_constant(l_line, new Constant(l_line, "eeprom_size", device.get_eeprom_size()))) {
-				print(EMsgType.MSG_ERROR, l_line, "EEPROM_SIZE already defined");
+			if(!add_constant(new Constant(cur_line, "eeprom_size", device.get_eeprom_size()))) {
+				print(EMsgType.MSG_ERROR, "EEPROM_SIZE already defined");
 			}
 		}
 		else {
-			print(EMsgType.MSG_ERROR, l_line, "More than one .DEVICE definition");
+			print(EMsgType.MSG_ERROR, "More than one .DEVICE definition");
 		}
 	}
 
-	public void print(EMsgType l_msg_type, Line l_line, String... l_messages) {
+	public void print(String... l_messages) {
+		for(String msg : l_messages) {
+			System.out.print(msg);
+		}
+		System.out.println();
+	}
+
+	public void print(EMsgType l_msg_type, String... l_messages) {
 		System.out.print(l_msg_type);
 		if(EMsgType.MSG_ERROR == l_msg_type) {
 			error_cntr++;
@@ -132,14 +138,15 @@ public class ProgInfo {
 			warning_cntr++;
 			System.out.print("[" + warning_cntr + "]");
 		}
-		if(null != l_line) {
-			System.out.print("line:" + l_line.get_number() + " ");
+		if(null != cur_line && EMsgType.MSG_MESSAGE != l_msg_type) {
+			System.out.print("line " + cur_line.get_number());
 		}
+		System.out.print(": ");
 		for(String msg : l_messages) {
 			System.out.print(msg);
 		}
-		if(null != l_line) {
-			System.out.print(" " + l_line.get_text().trim());
+		if(null != cur_line && EMsgType.MSG_MESSAGE != l_msg_type) {
+			System.out.print(" " + cur_line.get_text().trim());
 		}
 		System.out.println();
 	}
@@ -162,9 +169,9 @@ public class ProgInfo {
 		return registers;
 	}
 	
-	public boolean create_macro(Line l_line, String l_name) {
+	public boolean create_macro(String l_name) {
 		if(null == cur_macros) {
-			cur_macros = new Macro(l_line, l_name);
+			cur_macros = new Macro(cur_line, l_name);
 			macros.put(l_name, cur_macros);
 			return true;
 		}
@@ -195,5 +202,12 @@ public class ProgInfo {
 	}
 	public int get_max_errors() {
 		return max_errors;
+	}
+
+	public void set_line(Line l_line) {
+		cur_line = l_line;
+	}
+	public Line get_cur_line() {
+		return cur_line;
 	}
 }

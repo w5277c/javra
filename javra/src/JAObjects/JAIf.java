@@ -21,7 +21,7 @@ public class JAIf extends JAObject {
 			else {
 				Long _tmp = Expr.parse(l_pi, l_line, tmp);
 				if(null == _tmp) {
-					l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
+					l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 				}
 				else {
 					l_pi.get_ii().block_start(l_line, 0x00 == _tmp);
@@ -29,7 +29,7 @@ public class JAIf extends JAObject {
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
 	}
 }

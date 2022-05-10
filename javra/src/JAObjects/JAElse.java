@@ -17,7 +17,7 @@ public class JAElse extends JAObject {
 			l_pi.get_ii().block_skip_invet(l_line);
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
 	}
 }

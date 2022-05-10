@@ -43,7 +43,7 @@ public class Expr {
 					}
 				}
 				if(null == operator) {
-					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ILLEGAL_OPERATOR, _expr.substring(0x00, 0x01));
+					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_ILLEGAL_OPERATOR, _expr.substring(0x00, 0x01));
 					break;
 				}
 				_expr = _expr.substring(operator.get_text().length()).trim();
@@ -60,7 +60,7 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 				}
@@ -72,7 +72,7 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 				}
@@ -84,7 +84,7 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 				}
@@ -96,19 +96,19 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 				}
 				else if(_expr.startsWith("(")) {
 					int length = par_length(_expr, 0x01);
 					if(-1 == length) {
-						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, ")");
+						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_MISSING, ")");
 						break;
 					}
 					result = parse(l_pi, l_line, _expr.substring(0x01, 0x01 + length));
 					if(null == result) {
-						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 					_expr = _expr.substring(length+0x02).trim();
@@ -129,7 +129,7 @@ public class Expr {
 						if(_expr.startsWith("(")) {
 							int length = par_length(_expr, 0x01);
 							if(-1 == length) {
-								l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, ")");
+								l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_MISSING, ")");
 								break;
 							}
 							Long tmp = parse(l_pi, l_line, _expr.substring(0x01, 0x01+length));
@@ -137,17 +137,17 @@ public class Expr {
 								result = do_function(l_pi, l_line, func, tmp);
 								_expr = _expr.substring(0x02+length).trim();
 								if(null == result) {
-									l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+									l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 									break;
 								}
 							}
 							else {
-								l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+								l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 								break;
 							}
 						}
 						else {
-							l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, "(");
+							l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_MISSING, "(");
 							break;
 						}
 					}
@@ -157,12 +157,12 @@ public class Expr {
 							result = constant.get_num(l_line);
 						}
 						else {
-							l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_UNSUPPORTED);
+							l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_UNSUPPORTED);
 						}
 					}
 				}
 				else {
-					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 					break;
 				}
 				if(null != result) {
@@ -195,7 +195,7 @@ public class Expr {
 			return _result;
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 		}
 		return null;
 	}
@@ -206,13 +206,13 @@ public class Expr {
 				return l_left*l_right;
 			case OP_DIV:
 				if(0 == l_right) {
-					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_DIVISION_BY_ZERO);
+					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_DIVISION_BY_ZERO);
 					return 0;
 				}
 				return l_left/l_right;
 			case OP_MOD:
 				if(0 == l_right) {
-					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_DIVISION_BY_ZERO, "(modulus operator)");
+					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_DIVISION_BY_ZERO, "(modulus operator)");
 					return 0;
 				}
 				return l_left%l_right;
@@ -248,7 +248,7 @@ public class Expr {
 			case OP_LOGICAL_OR:
 				return (0x00 != l_left || 0x00 != l_right) ? 1l : 0l;
 			default:
-				l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_UNSUPPORTED);
+				l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_UNSUPPORTED);
 				return 0;
 		}
 	}
@@ -281,7 +281,7 @@ public class Expr {
 				}
 				return i;
 			default:
-				l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_UNSUPPORTED);
+				l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_UNSUPPORTED);
 		}
 		return null;
 	}
@@ -318,6 +318,6 @@ public class Expr {
 		return 'a' <= l_c && 'z' >= l_c;
 	}
 	static boolean is_label(char l_c) {
-		return is_alpha(l_c) | is_dec_digit(l_c) | '_' == l_c;
+		return is_alpha(l_c) || is_dec_digit(l_c) || '_' == l_c;
 	}
 }

@@ -5,7 +5,6 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
-import JAObjects.JAObject;
 import enums.EMsgType;
 import java.io.File;
 import main.Line;
@@ -30,11 +29,11 @@ public class JAInclude extends JAObject {
 				Parser parser = new Parser(l_pi, file);
 			}
 			else {
-				l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_ABSENT_FILE);
+				l_pi.print(EMsgType.MSG_ERROR, MSG_ABSENT_FILE);
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
 	}
 }
