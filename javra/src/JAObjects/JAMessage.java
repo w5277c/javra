@@ -2,6 +2,8 @@
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 09.05.2022	konstantin@5277.ru			Начало
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+//TODO '\ooo' (ooo = octal number) and '\xhh' (hh = hex number) are also recognized.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
@@ -11,7 +13,7 @@ import main.Line;
 import main.ProgInfo;
 
 public class JAMessage extends JAObject {
-	public JAMessage(ProgInfo l_pi, Line l_line) throws Exception {
+	public JAMessage(ProgInfo l_pi, Line l_line, EMsgType l_msg_type) throws Exception {
 		StringBuilder sb = new StringBuilder();
 		
 		String value = l_line.get_value();
@@ -30,20 +32,6 @@ public class JAMessage extends JAObject {
 					break;
 				}
 			}
-			else if('\'' == value.charAt(0x00)) {
-				for (int _pos = 0x01; _pos < value.length(); _pos++) {
-					if ('\'' == value.charAt(_pos) && (0x01 == _pos || '\\' != value.charAt(_pos-0x01))) {
-						str_length = _pos;
-						break;
-					}
-				}
-				if(-1 == str_length) {
-					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
-					sb = null;
-					break;
-				}
-			}
-			
 			if(-1 != str_length) {
 				sb.append(value.substring(0x01, str_length));
 				value = value.substring(0x01+str_length).trim();
@@ -51,11 +39,11 @@ public class JAMessage extends JAObject {
 			else {
 				int expr_length = value.indexOf(',');
 				if(-1 == expr_length) {
-					sb.append(Expr.parse(l_pi, l_line, value.toLowerCase().trim().toLowerCase()));
+					sb.append(Expr.parse(l_pi, value.toLowerCase().trim().toLowerCase()));
 					value = "";
 				}
 				else {
-					sb.append(Expr.parse(l_pi, l_line, value.substring(0x00, expr_length).trim().toLowerCase()));
+					sb.append(Expr.parse(l_pi, value.substring(0x00, expr_length).trim().toLowerCase()));
 					value = value.substring(expr_length);
 				}
 			}
@@ -69,7 +57,7 @@ public class JAMessage extends JAObject {
 			}
 		}
 		if(null != sb) {
-			l_pi.print(EMsgType.MSG_MESSAGE, sb.toString());
+			l_pi.print(l_msg_type, sb.toString());
 		}
 	}
 }

@@ -6,14 +6,13 @@
 package JAObjects;
 
 import common.Expr;
-import JAObjects.JAObject;
 import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
 
 public class JAORG extends JAObject {
 	public JAORG(ProgInfo l_pi, Line l_line) {
-		Long addr = Expr.parse(l_pi, l_line, l_line.get_value().trim().toLowerCase());
+		Long addr = Expr.parse(l_pi, l_line.get_value().trim().toLowerCase());
 		if(null == addr) {
 			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_NUMBER);
 		}

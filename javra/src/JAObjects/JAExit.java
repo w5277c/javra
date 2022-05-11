@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.05.2022	konstantin@5277.ru			Начало
+11.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
@@ -9,22 +9,10 @@ import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
 
-public class JAMacro extends JAObject {
-	public JAMacro(ProgInfo l_pi, Line l_line, boolean l_start) throws Exception {
-		if(l_start) {
-			String name = l_line.get_value().trim().toLowerCase();
-			if(null != name) {
-				if(l_pi.is_undefined(name, false)) {
-					if(!l_pi.create_macro(name)) {
-						l_pi.print(EMsgType.MSG_ERROR, MSG_MISSING, "found no closing .macro");
-					}
-				}
-			}
-		}
-		else {
-			if(!l_pi.close_macro()) {
-				l_pi.print(EMsgType.MSG_ERROR, MSG_MISSING, "no .MACRO found before .endmacro");
-			}
+public class JAExit extends JAObject {
+	public JAExit(ProgInfo l_pi, Line l_line) {
+		if(!l_line.get_value().trim().isEmpty()) {
+			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
 	}
 }

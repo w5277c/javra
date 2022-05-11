@@ -7,11 +7,9 @@ package JAObjects;
 
 import common.Expr;
 import JAObjects.JAObject;
-import static JAObjects.JAObject.MSG_ALREADY_DEFINED;
 import enums.EMsgType;
 import main.Constant;
 import main.Line;
-import main.Macro;
 import main.ProgInfo;
 
 public class JAData extends JAObject {
@@ -34,7 +32,7 @@ public class JAData extends JAObject {
 					}
 				}
 				else {
-					Long value = Expr.parse(l_pi, l_line, tmp);
+					Long value = Expr.parse(l_pi, tmp);
 					if(null != value) {
 						l_pi.get_cur_segment().get_datablock().write(value, l_size);
 					}

@@ -11,7 +11,7 @@ import enums.EMnemonic;
 import enums.EMsgType;
 import main.Constant;
 import main.Line;
-import main.Macro;
+import common.Macro;
 import main.ProgInfo;
 
 public class JAObject {
@@ -36,6 +36,10 @@ public class JAObject {
 	public static JAObject parse(ProgInfo l_pi, Line l_line) throws Exception {
 		String tmp = l_line.get_key().trim().toLowerCase();
 		if(!tmp.isEmpty()) {
+			if(tmp.equals("#")) {
+				return null;
+			}
+			
 			if(l_pi.get_ii().is_blockskip()) {
 				switch(tmp) {
 					case ".ifdef":
@@ -75,9 +79,15 @@ public class JAObject {
 					case ".if":
 						return new JAIf(l_pi, l_line);
 					case ".message":
-						return new JAMessage(l_pi, l_line);
+						return new JAMessage(l_pi, l_line, EMsgType.MSG_DMESSAGE);
+					case ".warning":
+						return new JAMessage(l_pi, l_line, EMsgType.MSG_DWARNING);
+					case ".error":
+						return new JAMessage(l_pi, l_line, EMsgType.MSG_DERROR);
 					case ".def":
 						return new JADef(l_pi, l_line);
+					case ".undef":
+						return new JAUndef(l_pi, l_line);
 					case ".macro":
 						return new JAMacro(l_pi, l_line, true);
 					case ".endm":
@@ -87,6 +97,25 @@ public class JAObject {
 						return new JAData(l_pi, l_line, 0x01);
 					case ".dw":
 						return new JAData(l_pi, l_line, 0x02);
+					case ".dd":
+						return new JAData(l_pi, l_line, 0x04);
+					case ".dq":
+						return new JAData(l_pi, l_line, 0x08);
+					case ".exit":
+						return new JAExit(l_pi, l_line);
+					case ".list":
+						return new JAList(l_pi, l_line);
+					case ".nolist":
+						return new JANoList(l_pi, l_line);
+					case ".listmac":
+						return new JAListMac(l_pi, l_line);
+					case ".overlap":
+						return new JAOverlap(l_pi, l_line);
+					case ".nooverlap":
+						return new JANoOverlap(l_pi, l_line);
+
+						//TODO .byte, .cseg, .dseg, .eseg, .csegsize(for AT94K), .elif
+						
 					default:
 						if(tmp.startsWith("#")) {
 							l_pi.print(EMsgType.MSG_WARNING, MSG_UNSUPPORTED);
@@ -95,13 +124,18 @@ public class JAObject {
 							return new JALabel(l_pi, l_line, tmp.substring(0x00, tmp.length()-0x01));
 						}
 						else {
-							String[] parts = tmp.split("\\s", 0x02);
-							EMnemonic em = EMnemonic.fromName(parts[0x00].trim().toLowerCase());
+							EMnemonic em = EMnemonic.fromName(tmp);
 							if(null != em) {
-								Mnemonic.parse(l_pi, em, (0x01 < parts.length ? parts[0x01] : null));
+								Mnemonic.parse(l_pi, em, l_line.get_value().trim().toLowerCase());
 							}
 							else {
-								l_pi.print(EMsgType.MSG_ERROR, MSG_UNKNOWN_LEXEME);
+								Macro macro = l_pi.get_macros().get(tmp);
+								if(null != macro) {
+									macro.parse(l_pi, l_line.get_value().trim().toLowerCase());
+								}
+								else {
+									l_pi.print(EMsgType.MSG_ERROR, MSG_UNKNOWN_LEXEME);
+								}
 							}
 						}
 				}
@@ -154,42 +188,5 @@ public class JAObject {
 		catch(Exception ex) {
 		}
 		return null;
-	}
-	
-	protected Integer get_register(ProgInfo l_pi, String l_str) {
-		if(l_str.startsWith("r") && l_str.length() > 0x01 && l_str.length() <= 0x03 && l_str.substring(0x01).replaceAll("\\d", "").isEmpty()) {
-			return Integer.parseInt(l_str.substring(0x01));
-		}
-		else {
-			for(int id=0x00; id < 0x20; id++) {
-				
-				if(l_pi.get_registers()[id].equals(l_str)) {
-					return id;
-				}
-			}
-		}
-		return null;
-	}
-	
-	protected boolean is_undefined(ProgInfo l_pi, String l_name) {
-		Constant constant = l_pi.get_constant(l_name);
-		if(null != constant && !constant.is_redef()) {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
-			return false;
-		}
-		Integer register_id = get_register(l_pi, l_name);
-		if(null != register_id) {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
-			return false;
-		}
-		Macro macros = l_pi.get_macros().get(l_name);
-		if(null != macros) {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
-			return false;
-		}
-		
-		//TODO добавить остальне проверки
-		
-		return true;
 	}
 }

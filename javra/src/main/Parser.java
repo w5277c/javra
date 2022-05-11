@@ -5,6 +5,8 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import JAObjects.JAExit;
+import common.Macro;
 import JAObjects.JAObject;
 import enums.EMsgType;
 import java.io.File;
@@ -59,8 +61,8 @@ public class Parser {
 		l_pi.print("Exit " + l_file.getCanonicalPath());
 	}
 	
-	private boolean line_parse(ProgInfo l_pi, Line l_line) throws Exception {
-		if(l_line.get_text().contains(".EQU	_C5_UPTIME")) {
+	public static boolean line_parse(ProgInfo l_pi, Line l_line) {
+		if(l_line.get_text().contains("ldi yh,high(15360)")) {
 			int t = 0;
 		}
 		l_line.parse();
@@ -73,6 +75,9 @@ public class Parser {
 		else {
 			try {
 				JAObject jaobj = JAObject.parse(l_pi, l_line);
+				if(jaobj instanceof JAExit) {
+					return false;
+				}
 			}
 			catch(Exception ex) {
 				System.out.println("Exception at " + l_line.get_location());

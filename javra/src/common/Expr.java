@@ -10,8 +10,6 @@ import enums.EFunction;
 import enums.EMsgType;
 import enums.EOperator;
 import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 import main.Constant;
 import main.Line;
 import main.ProgInfo;
@@ -21,7 +19,7 @@ import main.ProgInfo;
  * @author kostas
  */
 public class Expr {
-	public static Long parse(ProgInfo l_pi, Line l_line, String l_expr) {
+	public static Long parse(ProgInfo l_pi, String l_expr) {
 		Long result = null;
 		int count = 0x00;
 		String unary = "";
@@ -57,7 +55,7 @@ public class Expr {
 					int pos = 0x02;
 					while(is_hex_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x02 != pos) {
-						result = Long.parseLong(_expr.substring(0x02, pos), 0x10);
+						result = Long.parseLong(_expr.substring(0x02, pos).replaceAll("_", ""), 0x10);
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
@@ -69,7 +67,7 @@ public class Expr {
 					int pos = 0x02;
 					while(is_bin_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x02 != pos) {
-						result = Long.parseLong(_expr.substring(0x02, pos), 0x02);
+						result = Long.parseLong(_expr.substring(0x02, pos).replaceAll("_", ""), 0x02);
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
@@ -77,11 +75,11 @@ public class Expr {
 						break;
 					}
 				}
-				else if(is_dec_digit(_expr.charAt(0x00))) {
+				else if('0' <= _expr.charAt(0x00) && '9' >= _expr.charAt(0x00)) {
 					int pos = 0x00;
 					while(is_dec_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x00 != pos) {
-						result = Long.parseLong(_expr.substring(0x00, pos));
+						result = Long.parseLong(_expr.substring(0x00, pos).replaceAll("_", ""));
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
@@ -93,7 +91,7 @@ public class Expr {
 					int pos = 0x00;
 					while(is_hex_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x00 != pos) {
-						result = Long.parseLong(_expr.substring(0x00, pos), 0x10);
+						result = Long.parseLong(_expr.substring(0x00, pos).replaceAll("_", ""), 0x10);
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
@@ -101,13 +99,26 @@ public class Expr {
 						break;
 					}
 				}
+				else if(0x02 <=_expr.length() && '0' == _expr.charAt(0x00) &&  '0' <= _expr.charAt(0x01) && '7' >= _expr.charAt(0x01)) {
+					int pos = 0x00;
+					while(is_oct_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
+					if(0x00 != pos) {
+						result = Long.parseLong(_expr.substring(0x00, pos).replaceAll("_", ""), 0x08);
+						_expr = _expr.substring(pos).trim();
+					}
+					else {
+						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+						break;
+					}
+					
+				}
 				else if(_expr.startsWith("(")) {
 					int length = par_length(_expr, 0x01);
 					if(-1 == length) {
 						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_MISSING, ")");
 						break;
 					}
-					result = parse(l_pi, l_line, _expr.substring(0x01, 0x01 + length));
+					result = parse(l_pi, _expr.substring(0x01, 0x01 + length));
 					if(null == result) {
 						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
 						break;
@@ -133,9 +144,9 @@ public class Expr {
 								l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_MISSING, ")");
 								break;
 							}
-							Long tmp = parse(l_pi, l_line, _expr.substring(0x01, 0x01+length));
+							Long tmp = parse(l_pi, _expr.substring(0x01, 0x01+length));
 							if(null != tmp) {
-								result = do_function(l_pi, l_line, func, tmp);
+								result = do_function(l_pi, func, tmp);
 								_expr = _expr.substring(0x02+length).trim();
 								if(null == result) {
 									l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
@@ -155,7 +166,7 @@ public class Expr {
 					else {
 						Constant constant = l_pi.get_constant(name);
 						if(null != constant) {
-							result = constant.get_num(l_line);
+							result = constant.get_value();
 						}
 						else {
 							l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_UNSUPPORTED);
@@ -194,7 +205,7 @@ public class Expr {
 				while(operators.size() > index) {
 					EOperator op = operators.get(index);
 					if(op.get_priority() == priority) {
-						Long _result = calc(l_pi, l_line, elemets.get(index), op, elemets.get(index+0x01));
+						Long _result = calc(l_pi, elemets.get(index), op, elemets.get(index+0x01));
 						operators.remove(index);
 						elemets.set(index, _result);
 						elemets.remove(index+0x01);
@@ -210,7 +221,7 @@ public class Expr {
 		return null;
 	}
 
-	private static long calc(ProgInfo l_pi, Line l_line, long l_left, EOperator l_op, Long l_right) {
+	private static long calc(ProgInfo l_pi, long l_left, EOperator l_op, Long l_right) {
 		switch(l_op) {
 			case OP_MUL:
 				return l_left*l_right;
@@ -263,7 +274,7 @@ public class Expr {
 		}
 	}
 
-	private static Long do_function(ProgInfo l_pi, Line l_line, EFunction l_func, Long l_value) {
+	private static Long do_function(ProgInfo l_pi, EFunction l_func, Long l_value) {
 		switch(l_func) {
 			case FUNC_LOW:
 			case FUNC_BYTE1:
@@ -316,18 +327,21 @@ public class Expr {
 
 	
 	static boolean is_bin_digit(char l_c) {
-		return '0' == l_c || '1' == l_c;
+		return '0' == l_c || '1' == l_c || '_' == l_c;
+	}
+	static boolean is_oct_digit(char l_c) {
+		return ('0' <= l_c && '7' >= l_c) || '_' == l_c;
 	}
 	static boolean is_dec_digit(char l_c) {
-		return '0' <= l_c && '9' >= l_c;
+		return ('0' <= l_c && '9' >= l_c) || '_' == l_c;
 	}
 	static boolean is_hex_digit(char l_c) {
-		return ('0' <= l_c && '9' >= l_c) || ('a' <= l_c && 'f' >= l_c);
+		return ('0' <= l_c && '9' >= l_c) || ('a' <= l_c && 'f' >= l_c) || '_' == l_c;
 	}
 	static boolean is_alpha(char l_c) {
 		return 'a' <= l_c && 'z' >= l_c;
 	}
 	static boolean is_label(char l_c) {
-		return is_alpha(l_c) || is_dec_digit(l_c) || '_' == l_c;
+		return is_alpha(l_c) || is_dec_digit(l_c);
 	}
 }

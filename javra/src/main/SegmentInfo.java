@@ -11,7 +11,8 @@ import java.util.LinkedList;
 public class SegmentInfo {
 	private	ESegmentType				type;
 	private	LinkedList<DataBlock>	datablocks	= new LinkedList<>();
-
+	private	boolean						overlap		= false;
+	
 	public SegmentInfo(ESegmentType l_type) {
 		type = l_type;
 		datablocks.add(new DataBlock(0x0000));
@@ -27,5 +28,12 @@ public class SegmentInfo {
 	
 	public DataBlock get_datablock() {
 		return datablocks.getLast();
+	}
+	
+	public boolean get_overlap() {
+		return overlap;
+	}
+	public void set_overlap(boolean l_is_on) {
+		overlap = l_is_on;
 	}
 }

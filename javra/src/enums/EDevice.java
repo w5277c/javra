@@ -132,4 +132,8 @@ public enum EDevice {
 	public int get_eeprom_size() {
 		return eeprom_size;
 	}
+	
+	public int get_flags() {
+		return flags;
+	}
 }

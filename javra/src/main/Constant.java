@@ -8,20 +8,20 @@ package main;
 public class Constant {
 	private	Line		line;
 	private	String	name;
-	private	long		num;
+	private	long		value;
 	private	boolean	redef;
 	
-	public Constant(Line l_line, String l_name, long l_num, boolean l_redef) {
+	public Constant(Line l_line, String l_name, long l_value, boolean l_redef) {
 		line = l_line;
 		name = l_name;
-		num = l_num;
+		value = l_value;
 		redef = l_redef;
 	}
 	
-	public Constant(Line l_line, String l_name, long l_num) {
+	public Constant(Line l_line, String l_name, long l_value) {
 		line = l_line;
 		name = l_name;
-		num = l_num;
+		value = l_value;
 		redef = false;
 	}
 
@@ -33,8 +33,8 @@ public class Constant {
 		return name;
 	}
 	
-	public long get_num(Line l_line) {
-		return num;
+	public long get_value() {
+		return value;
 	}
 	
 	public boolean is_redef() {

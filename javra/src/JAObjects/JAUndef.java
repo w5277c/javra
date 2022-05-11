@@ -1,26 +1,18 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.05.2022	konstantin@5277.ru			Начало
+11.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package main;
+package JAObjects;
 
-import java.util.LinkedList;
+import main.Line;
+import main.ProgInfo;
 
-public class Macro {
-	private	String				name;
-	private	Line					line;
-	private	LinkedList<Line>	body	= new LinkedList<>();
+public class JAUndef extends JAObject {
+	private	String	name;
 	
-	public Macro(Line l_line, String l_name) {
-		name = l_name;
-	}
-	
-	public Line get_line() {
-		return line;
-	}
-	
-	public LinkedList<Line> get_body() {
-		return body;
+	public JAUndef(ProgInfo l_pi, Line l_line) {
+		name = l_line.get_value().trim().toLowerCase();
+		l_pi.remove_register(name);
 	}
 }

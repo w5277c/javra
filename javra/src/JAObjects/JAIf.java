@@ -2,11 +2,12 @@
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 09.05.2022	konstantin@5277.ru			Начало
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+TODO:defined(__ATmega48__)
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
 import common.Expr;
-import JAObjects.JAObject;
 import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
@@ -19,7 +20,7 @@ public class JAIf extends JAObject {
 				l_pi.get_ii().block_start(l_line, false);
 			}
 			else {
-				Long _tmp = Expr.parse(l_pi, l_line, tmp);
+				Long _tmp = Expr.parse(l_pi, tmp);
 				if(null == _tmp) {
 					l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 				}

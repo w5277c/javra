@@ -14,6 +14,8 @@ import main.ProgInfo;
 public class JAInclude extends JAObject {
 	public JAInclude(ProgInfo l_pi, Line l_line) throws Exception {
 		String filename = parse_string(l_line.get_value());
+		if(null == filename) filename = l_line.get_value().trim();
+		
 		if(null != filename) {
 			File file = new File(l_pi.get_root_path() + filename);
 			

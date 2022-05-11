@@ -7,9 +7,8 @@ package JAObjects;
 
 import common.Expr;
 import enums.EMsgType;
-import main.Constant;
 import main.Line;
-import main.Macro;
+import common.Macro;
 import main.ProgInfo;
 
 public class JAEQU extends JAObject {
@@ -19,7 +18,7 @@ public class JAEQU extends JAObject {
 		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 			String name = tmp;
 			
-			Integer register_id = get_register(l_pi, name);
+			Integer register_id = l_pi.get_register(name);
 			if(null != register_id) {
 				l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
 				return;
@@ -31,9 +30,9 @@ public class JAEQU extends JAObject {
 			}
 
 			tmp = parts[0x01].trim().toLowerCase();
-			Long num = Expr.parse(l_pi, l_line, tmp);
+			Long num = Expr.parse(l_pi, tmp);
 			if(null != num) {
-				l_pi.add_constant(new Constant(l_line, name, num));
+				l_pi.add_constant(name, num, false);
 			}
 		}
 		else {

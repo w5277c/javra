@@ -20,7 +20,7 @@ public class PCConstant extends Constant {
 	}
 	
 	@Override
-	public long get_num(Line l_line) {
+	public long get_value() {
 		if(ESegmentType.CODE != pi.get_cur_segment().get_type()) {
 			pi.print(EMsgType.MSG_WARNING, "got PC request in not CSEG");
 		}

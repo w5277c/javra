@@ -180,6 +180,7 @@ public enum EMnemonic {
       }
    }
 
+	private	int		id;
 	private	String	name;
 	private	int		word;
 	private	int		opcode_wsize;
@@ -190,6 +191,10 @@ public enum EMnemonic {
 		word = l_word;
 		opcode_wsize = l_opcode_wsize;
 		flags = l_flags;
+	}
+	
+	public int get_id() {
+		return ordinal();
 	}
 	
 	public String get_name() {
