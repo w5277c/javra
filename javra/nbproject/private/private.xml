@@ -8,15 +8,19 @@
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAEQU.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAIf.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAObject.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/enums/EDevice.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JALabel.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/enums/EOperator.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/ProgInfo.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/enums/EMsgType.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/Javra.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/DataBlock.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/enums/EPass.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/PCConstant.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JANoOverlap.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JASet.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/SegmentInfo.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/enums/EMnemonic.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAList.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JADef.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/common/Macro.java</file>
@@ -28,8 +32,8 @@
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAListMac.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/Parser.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAInclude.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAORG.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/common/Mnemonic.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAORG.java</file>
         </group>
     </open-files>
 </project-private>

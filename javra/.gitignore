@@ -2,3 +2,6 @@ build
 dist
 *.inc
 *.asm
+*.hex
+*.cof
+*.obj

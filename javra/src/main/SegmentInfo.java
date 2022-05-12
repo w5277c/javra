@@ -22,7 +22,7 @@ public class SegmentInfo {
 		return type;
 	}
 	
-	public void add_datablock(long l_addr) {
+	public void add_datablock(int l_addr) {
 		datablocks.add(new DataBlock(l_addr));
 	}
 	

@@ -9,12 +9,14 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class DataBlock {
-	private	long			start;
+	private	int			start;
 	private	int			length	= 0;
 	private	byte[]		data		= new byte[0x40];
+	private	int			addr		= 0;
 	
-	public DataBlock(long l_start) {
+	public DataBlock(int l_start) {
 		start = l_start;
+		addr = l_start;
 	}
 
 	public void write(long l_data, int l_size) {
@@ -33,8 +35,11 @@ public class DataBlock {
 		length+=l_size;
 	}
 
-	public long get_addr() {
-		return start + length;
+	public void addr_reset() {
+		addr = start;
+	}
+	public int get_addr() {
+		return addr;
 	}
 	
 	public int get_length() {

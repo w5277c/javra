@@ -17,7 +17,7 @@ public class JAORG extends JAObject {
 			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_NUMBER);
 		}
 		else {
-			l_pi.get_cur_segment().add_datablock(addr);
+			l_pi.get_cur_segment().add_datablock(addr.intValue());
 		}
 	}
 }
