@@ -9,6 +9,7 @@ import enums.EMsgType;
 import java.util.HashMap;
 import java.util.LinkedList;
 import main.Constant;
+import main.Label;
 import main.Line;
 import main.Parser;
 import main.ProgInfo;
@@ -16,15 +17,19 @@ import main.ProgInfo;
 public class Macro {
 	private	String							name;
 	private	Line								line;
-	private	Integer							size		= null;
-	private	LinkedList<Line>				body		= new LinkedList<>();
-	private	HashMap<String,Constant>	labels	= new HashMap<>();
+	private	Integer							size			= null;
+	private	LinkedList<Line>				body			= new LinkedList<>();
+	private	HashMap<String,Constant>	constants	= new HashMap<>();
+	private	HashMap<String,Label>		labels		= new HashMap<>();
 	
 	public Macro(Line l_line, String l_name) {
+		line = l_line;
 		name = l_name;
 	}
 	
 	public void parse(ProgInfo l_pi, String l_value) {
+		l_pi.set_expand_macro(this);
+		
 		LinkedList<String> params = new LinkedList<>();
 		if(null != l_value && !l_value.isEmpty()) {
 			for(String _str : l_value.split("\\s")) {
@@ -36,6 +41,10 @@ public class Macro {
 					Long value = Expr.parse(l_pi, _str);
 					if(null != value) {
 						params.add(value.toString());
+					}
+					else {
+						//TODO UNPARSED???
+						params.add(_str);
 					}
 				}
 			}
@@ -55,6 +64,8 @@ public class Macro {
 
 			Parser.line_parse(l_pi, new Line(l_pi.get_cur_line().get_filename(), l_pi.get_cur_line().get_number(), str));
 		}
+		
+		l_pi.set_expand_macro(null);		
 	}
 	
 	public Line get_line() {
@@ -65,7 +76,17 @@ public class Macro {
 		return body;
 	}
 	
-	public HashMap<String,Constant> get_labels() {
-		return labels;
+	public Label get_label(String l_name) {
+		return labels.get(l_name);
+	}
+	public void add_label(Label l_label) {
+		labels.put(l_label.get_name(), l_label);
+	}
+	
+	public Constant get_constant(String l_name) {
+		return constants.get(l_name);
+	}
+	public void add_constant(Constant l_constant) {
+		constants.put(l_constant.get_name(), l_constant);
 	}
 }

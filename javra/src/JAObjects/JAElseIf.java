@@ -7,22 +7,19 @@ package JAObjects;
 
 import common.Expr;
 import enums.EMsgType;
-import main.Line;
 import main.ProgInfo;
 
-public class JASet extends JAObject {
-	public JASet(ProgInfo l_pi, Line l_line) {
-		String parts[] = l_line.get_value().split("=");
-		String tmp = parts[0x00].trim().toLowerCase();
-		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
-			String name = tmp;
-			tmp = parts[0x01].trim().toLowerCase();
-			Long num = Expr.parse(l_pi, tmp);
-			if(null != num) {
-				l_pi.add_constant(name, num, true);
+public class JAElseIf extends JAObject {
+	public JAElseIf(ProgInfo l_pi) throws Exception {
+		String tmp = l_pi.get_cur_line().get_value().trim().toLowerCase();
+		if(!tmp.isEmpty()) {
+			Long value = Expr.parse(l_pi, tmp);
+			if(null == value) {
+				//l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+				l_pi.put_unparsed();
 			}
 			else {
-				l_pi.put_unparsed();
+				l_pi.get_ii().block_elseif(0x00 == value);
 			}
 		}
 		else {

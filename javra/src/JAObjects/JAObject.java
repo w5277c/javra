@@ -40,18 +40,20 @@ public class JAObject {
 				return null;
 			}
 			
-			if(l_pi.get_ii().is_blockskip()) {
+			if(null != l_pi.get_ii() && l_pi.get_ii().is_blockskip()) {
 				switch(tmp) {
 					case ".ifdef":
 						return new JAIfDef(l_pi, l_line);
 					case ".ifndef":
 						return new JAIfNDef(l_pi, l_line);
 					case ".if":
-						return new JAIf(l_pi, l_line);
+						return new JAIf(l_pi);
 					case ".endif":
 						return new JAEndIf(l_pi, l_line);
 					case ".else":
-						return new JAElse(l_pi, l_line);
+						return new JAElse(l_pi);
+					case ".elseif":
+						return new JAElseIf(l_pi);
 					default:
 						int g = 0;
 				}
@@ -74,10 +76,12 @@ public class JAObject {
 						return new JAIfNDef(l_pi, l_line);
 					case ".endif":
 						return new JAEndIf(l_pi, l_line);
-					case ".else":
-						return new JAElse(l_pi, l_line);
 					case ".if":
-						return new JAIf(l_pi, l_line);
+						return new JAIf(l_pi);
+					case ".else":
+						return new JAElse(l_pi);
+					case ".elseif":
+						return new JAElseIf(l_pi);
 					case ".message":
 						return new JAMessage(l_pi, l_line, EMsgType.MSG_DMESSAGE);
 					case ".warning":

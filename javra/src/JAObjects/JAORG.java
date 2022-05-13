@@ -7,6 +7,7 @@ package JAObjects;
 
 import common.Expr;
 import enums.EMsgType;
+import main.DataBlock;
 import main.Line;
 import main.ProgInfo;
 
@@ -17,7 +18,10 @@ public class JAORG extends JAObject {
 			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_NUMBER);
 		}
 		else {
-			l_pi.get_cur_segment().add_datablock(addr.intValue());
+			DataBlock exist_datablock = l_pi.get_cur_segment().set_datablock(addr.intValue());
+			if(null != exist_datablock) {
+				l_pi.print(EMsgType.MSG_ERROR, "ORG " + addr + " already defined");
+			}
 		}
 	}
 }

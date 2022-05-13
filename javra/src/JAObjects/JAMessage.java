@@ -15,6 +15,7 @@ import main.ProgInfo;
 public class JAMessage extends JAObject {
 	public JAMessage(ProgInfo l_pi, Line l_line, EMsgType l_msg_type) throws Exception {
 		StringBuilder sb = new StringBuilder();
+		boolean unparsed = false;
 		
 		String value = l_line.get_value();
 		while(!value.isEmpty()) {
@@ -39,11 +40,25 @@ public class JAMessage extends JAObject {
 			else {
 				int expr_length = value.indexOf(',');
 				if(-1 == expr_length) {
-					sb.append(Expr.parse(l_pi, value.toLowerCase().trim().toLowerCase()));
+					Long expr = Expr.parse(l_pi, value.toLowerCase().trim().toLowerCase());
+					if(null != expr) {
+						sb.append(expr);
+					}
+					else {
+						l_pi.put_unparsed();
+						unparsed = true;
+					}
 					value = "";
 				}
 				else {
-					sb.append(Expr.parse(l_pi, value.substring(0x00, expr_length).trim().toLowerCase()));
+					Long expr = Expr.parse(l_pi, value.substring(0x00, expr_length).trim().toLowerCase());
+					if(null != expr) {
+						sb.append(expr);
+					}
+					else {
+						l_pi.put_unparsed();
+						unparsed = true;
+					}
 					value = value.substring(expr_length);
 				}
 			}
@@ -56,7 +71,7 @@ public class JAMessage extends JAObject {
 				value = value.substring(0x01).trim();
 			}
 		}
-		if(null != sb) {
+		if(null != sb && !unparsed) {
 			l_pi.print(l_msg_type, sb.toString());
 		}
 	}

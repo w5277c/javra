@@ -11,13 +11,9 @@ import enums.EMsgType;
 import enums.EOperator;
 import java.util.LinkedList;
 import main.Constant;
-import main.Line;
+import main.Label;
 import main.ProgInfo;
 
-/**
- *
- * @author kostas
- */
 public class Expr {
 	public static Long parse(ProgInfo l_pi, String l_expr) {
 		Long result = null;
@@ -120,8 +116,9 @@ public class Expr {
 					}
 					result = parse(l_pi, _expr.substring(0x01, 0x01 + length));
 					if(null == result) {
-						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
-						break;
+						//l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+						return null;
+						//break;
 					}
 					_expr = _expr.substring(length+0x02).trim();
 				}
@@ -154,8 +151,9 @@ public class Expr {
 								}
 							}
 							else {
-								l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
-								break;
+								//l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+								//break;
+								return null;
 							}
 						}
 						else {
@@ -169,7 +167,13 @@ public class Expr {
 							result = constant.get_value();
 						}
 						else {
-							l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_UNSUPPORTED);
+							Label label = l_pi.get_label(name);
+							if(null != label) {
+								result = (long)label.get_addr();
+							}
+							else {
+								l_pi.put_unparsed();
+							}
 						}
 					}
 				}
@@ -205,10 +209,15 @@ public class Expr {
 				while(operators.size() > index) {
 					EOperator op = operators.get(index);
 					if(op.get_priority() == priority) {
-						Long _result = calc(l_pi, elemets.get(index), op, elemets.get(index+0x01));
-						operators.remove(index);
-						elemets.set(index, _result);
-						elemets.remove(index+0x01);
+						try {
+							Long _result = calc(l_pi, elemets.get(index), op, elemets.get(index+0x01));
+							operators.remove(index);
+							elemets.set(index, _result);
+							elemets.remove(index+0x01);
+						}
+						catch(Exception ex) {
+							ex.printStackTrace();
+						}
 					}
 					index++;
 				}

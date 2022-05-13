@@ -9,49 +9,46 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class DataBlock {
-	private	int			start;
-	private	int			length	= 0;
-	private	byte[]		data		= new byte[0x40];
-	private	int			addr		= 0;
+	private	int			wstart;
+	private	int			woffset	= 0;
+	private	int			wlength	= 0;
+	private	byte[]		bdata		= new byte[0x40];
 	
-	public DataBlock(int l_start) {
-		start = l_start;
-		addr = l_start;
+	public DataBlock(int l_wstart) {
+		wstart = l_wstart;
 	}
 
-	public void write(long l_data, int l_size) {
-		ByteBuffer bb = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.LITTLE_ENDIAN);
-		bb.putLong(l_data);
-		write(bb.array(), 0x00, l_size);
+	public void write_opcode(int l_opcode) {
+		ByteBuffer bb = ByteBuffer.allocate(Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN);
+		bb.putInt(l_opcode);
+		write(bb.array(), 0x01);
 	}
 	
-	public void write(byte[] l_data, int l_offset, int l_size) {
-		if((data.length - length) < l_size) {
-			byte[] _data = new byte[data.length + (l_size + 0x40)];
-			System.arraycopy(data, 0x00, _data, 0x00, length);
-			data = _data;
+	public void write(byte[] l_bdata, int l_wsize) {
+		if((bdata.length - (woffset*2)) < (l_wsize*2)) {
+			byte[] _data = new byte[woffset*2 + l_wsize*2 + 0x40];
+			System.arraycopy(bdata, 0x00, _data, 0x00, woffset*2);
+			bdata = _data;
 		}
-		System.arraycopy(l_data, l_offset, data, length, l_size);
-		length+=l_size;
-	}
-
-	public void addr_reset() {
-		addr = start;
-	}
-	public int get_addr() {
-		return addr;
-	}
-	
-	public int get_length() {
-		return length;
-	}
-
-	public void skip(int l_size) {
-		if((data.length - length) < l_size) {
-			byte[] _data = new byte[data.length + (l_size + 0x40)];
-			System.arraycopy(data, 0x00, _data, 0x00, length);
-			data = _data;
+		System.arraycopy(l_bdata, 0x00, bdata, woffset*2, l_wsize*2);
+		woffset += l_wsize;
+		if(woffset > wlength) {
+			wlength = woffset;
 		}
-		length += l_size;
+	}
+
+	public int get_waddr() {
+		return wstart + woffset;
+	}
+	public void set_waddr(int l_waddr) {
+		woffset = l_waddr-wstart;
+	}
+
+	public int get_wlength() {
+		return wlength;
+	}
+
+	public long get_wstart() {
+		return wstart;
 	}
 }

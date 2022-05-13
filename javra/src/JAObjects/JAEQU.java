@@ -17,7 +17,7 @@ public class JAEQU extends JAObject {
 		String tmp = parts[0x00].trim().toLowerCase();
 		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 			String name = tmp;
-			
+
 			Integer register_id = l_pi.get_register(name);
 			if(null != register_id) {
 				l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
@@ -36,7 +36,8 @@ public class JAEQU extends JAObject {
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+			l_pi.put_unparsed();				
+			//l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
 	}
 }

@@ -5,16 +5,15 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
-import JAObjects.JAObject;
 import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
 
 public class JAElse extends JAObject {
-	public JAElse(ProgInfo l_pi, Line l_line) throws Exception {
-		String tmp = l_line.get_value().trim().toLowerCase();
+	public JAElse(ProgInfo l_pi) throws Exception {
+		String tmp = l_pi.get_cur_line().get_value().trim().toLowerCase();
 		if(tmp.isEmpty()) {
-			l_pi.get_ii().block_skip_invet(l_line);
+			l_pi.get_ii().block_skip_invert(l_pi.get_cur_line());
 		}
 		else {
 			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);

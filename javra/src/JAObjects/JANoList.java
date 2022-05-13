@@ -14,6 +14,6 @@ public class JANoList extends JAObject {
 		if(!l_line.get_value().trim().isEmpty()) {
 			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
 		}
-		l_pi.set_list_on(false);
+		l_pi.get_list().set_list_on(false);
 	}
 }

@@ -9,23 +9,23 @@ package JAObjects;
 
 import common.Expr;
 import enums.EMsgType;
-import main.Line;
 import main.ProgInfo;
 
 public class JAIf extends JAObject {
-	public JAIf(ProgInfo l_pi, Line l_line) throws Exception {
-		String tmp = l_line.get_value().trim().toLowerCase();
+	public JAIf(ProgInfo l_pi) throws Exception {
+		String tmp = l_pi.get_cur_line().get_value().trim().toLowerCase();
 		if(!tmp.isEmpty()) {
 			if(l_pi.get_ii().is_blockskip()) {
-				l_pi.get_ii().block_start(l_line, false);
+				l_pi.get_ii().block_start(l_pi.get_cur_line(), false);
 			}
 			else {
 				Long _tmp = Expr.parse(l_pi, tmp);
 				if(null == _tmp) {
-					l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+					//l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+					l_pi.put_unparsed();
 				}
 				else {
-					l_pi.get_ii().block_start(l_line, 0x00 == _tmp);
+					l_pi.get_ii().block_start(l_pi.get_cur_line(), 0x00 == _tmp);
 				}
 			}
 		}

@@ -22,10 +22,19 @@ mnemonic[ operand[,operand] ][:...]
 9. #pragma partinclude num
 TODO: поддержка #
 TODO: Pre-defined Macros
+
+
+TODO: Навести порядок с заполнением памяти в DataBlock с учетом PASS
+
+-f /home/kostas/repos/w5277c/javra/javra/test.asm
+
+//-l /home/kostas/repos/w5277c/core5277/ -f main.asm
+/media/kostas/repos/w5277c/5277.ru/firmware/solid_relay_x4_v1.0
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
 import java.io.File;
+import java.util.LinkedList;
 
 public class Javra {
 	public	static	final	String	VERSION	= "0.0.1";
@@ -33,6 +42,7 @@ public class Javra {
 	public static void main(String[] args) throws Exception {
 		ProgInfo pi = new ProgInfo();
 		
+		String filename = "";
 		int args_pos = 0x00;
 		while(args.length > args_pos) {
 			String arg = args[args_pos++];
@@ -42,15 +52,39 @@ public class Javra {
 			else {
 				System.out.println("invalid params " + args[args_pos-0x01]);
 			}
+			if(arg.equals("-f") && args.length > args_pos) {
+				filename = args[args_pos++];
+			}
+			else {
+				System.out.println("invalid params " + args[args_pos-0x01]);
+			}
 		}
 		
-		Parser parser = new Parser(pi, new File("main.asm"));
+		Parser parser = new Parser(pi, new File(filename));
+
+		System.out.println("---ADDITIONAL PASS---");
+		boolean progress = true;
+		while(progress) {
+			progress = false;
+			LinkedList<Line> unparesed = pi.pull_unparsed();
+			for(Line line : unparesed) {
+				if(line.get_text().equalsIgnoreCase("JMP main")) {
+					int t =1;
+				}
+				Parser.line_parse(pi, line);
+			}
+			if(pi.unparsed_qnt() < unparesed.size()) {
+				progress = true;
+			}
+		}
+		
 		if(0 != pi.get_error_cntr()) {
 			System.out.println("\nBuild fail, wrns:" + pi.get_warning_cntr() + ", errs:" + pi.get_error_cntr() + "/" + pi.get_max_errors());
 		}
 		else {
 			System.out.println("\nBuild sucess, wrns:" + pi.get_warning_cntr());
 		}
+		pi.get_list().close();
 	}
 	
 }

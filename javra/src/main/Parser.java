@@ -20,8 +20,9 @@ public class Parser {
 
 	public Parser(ProgInfo l_pi, File l_file) throws Exception {
 		IncludeInfo ii = l_pi.exch_ii(new IncludeInfo(l_file.getName()));
-		
-		l_pi.print("Enter " + l_file.getCanonicalPath());
+		l_pi.get_list().push_include(l_file.getName());
+
+//		l_pi.print("Enter " + l_file.getCanonicalPath());
 		Scanner scanner = new Scanner(l_file, StandardCharsets.UTF_8.name());
 		int line_number = 0x01;
 		
@@ -58,13 +59,10 @@ public class Parser {
 		if(0 != ii.get_blockcntr()) {
 			l_pi.print(EMsgType.MSG_WARNING, null, "some of.if/.ifdef/.ifndef not correctly closed(cntr:" + ii.get_blockcntr() + ")");
 		}
-		l_pi.print("Exit " + l_file.getCanonicalPath());
+//		l_pi.print("Exit " + l_file.getCanonicalPath());
 	}
 	
 	public static boolean line_parse(ProgInfo l_pi, Line l_line) {
-		if(l_line.get_text().contains("ldi yh,high(15360)")) {
-			int t = 0;
-		}
 		l_line.parse();
 		l_pi.set_line(l_line);
 		

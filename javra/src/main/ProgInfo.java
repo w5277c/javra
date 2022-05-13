@@ -9,34 +9,36 @@ import JAObjects.JAObject;
 import common.Macro;
 import enums.EDevice;
 import enums.EMsgType;
-import enums.EPass;
 import enums.ESegmentType;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 public class ProgInfo {
-	private	LinkedList<String>			lib_paths	= new LinkedList<>();
-	private	SegmentInfo						cseg			= new SegmentInfo(ESegmentType.CODE);
-	private	SegmentInfo						dseg			= new SegmentInfo(ESegmentType.DATA);
-	private	SegmentInfo						eseg			= new SegmentInfo(ESegmentType.EEPROM);
-	private	SegmentInfo						cur_seg		= cseg;
-	private	int								max_errors	= 1000;
-	private	int								error_cntr	= 0;
+	private	LinkedList<String>			lib_paths		= new LinkedList<>();
+	private	SegmentInfo						cseg				= new SegmentInfo(ESegmentType.CODE);
+	private	SegmentInfo						dseg				= new SegmentInfo(ESegmentType.DATA);
+	private	SegmentInfo						eseg				= new SegmentInfo(ESegmentType.EEPROM);
+	private	SegmentInfo						cur_seg			= cseg;
+	private	int								max_errors		= 1000;
+	private	int								error_cntr		= 0;
 	private	int								warning_cntr	= 0;
-	private	long								timestamp	= System.currentTimeMillis();
-	private	HashMap<String,Constant>	constants	= new HashMap<>();
-	private	HashMap<String,Macro>		macros		= new HashMap<>();
-	private	Macro								cur_macros	= null;
+	private	long								timestamp		= System.currentTimeMillis();
+	private	HashMap<String,Constant>	constants		= new HashMap<>();
+	private	HashMap<String,Label>		labels			= new HashMap<>();
+	private	HashMap<String,Macro>		macros			= new HashMap<>();
+	private	Macro								cur_macros		= null;
+	private	Macro								expand_macro	= null;
 	private	String							root_path;
-	private	EDevice							device		= null;
-	private	IncludeInfo						ii				= null;
-	private	HashMap<String,Integer>		registers	= new HashMap<>();
-	private	Line								cur_line		= null;
-	private	EPass								pass			= EPass.PASS_1;
-	private	boolean							list_on		= true;
-	private	boolean							listmac_on		= false;
+	private	EDevice							device			= null;
+	private	IncludeInfo						ii					= null;
+	private	HashMap<String,Integer>		registers		= new HashMap<>();
+	private	Line								cur_line			= null;
+	private	HashMap<String, Line>		unparsed			= new HashMap<>();
+	private	List								list				= new List("unnamed.lst");
 	
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
 //	private	EPass	pass;
@@ -73,28 +75,49 @@ public class ProgInfo {
 	}
 
 	public Constant get_constant(String l_name) {
-		if(null != cur_macros) {
-			Constant result = cur_macros.get_labels().get(l_name);
-			if(null != result) return result;
+		Constant result = null;
+		if(null != expand_macro) {
+			result = expand_macro.get_constant(l_name);
 		}
-		return constants.get(l_name);
+		if(null == result) {
+			result = constants.get(l_name);
+		}
+		return result;
 	}
 	public boolean add_constant(String l_name, long l_value, boolean l_redef) {
 		if(is_undefined(l_name, l_value, l_redef)) {
-			constants.put(l_name, new Constant(cur_line, l_name, l_value, l_redef));
+			Constant constatnt = new Constant(cur_line, l_name, l_value, l_redef);
+			if(null == cur_macros) {
+				constants.put(l_name, constatnt);
+			}
+			else {
+				cur_macros.add_constant(constatnt);
+			}
 			return true;
 		}
 		return false;
 	}
+	
+	public Label get_label(String l_name) {
+		Label result = null;
+		if(null != expand_macro) {
+			result = expand_macro.get_label(l_name);
+		}
+		if(null == result) {
+			result = labels.get(l_name);
+		}
+		return result;
+	}
 	public boolean add_label(String l_name) {
 		if(is_undefined(l_name, false)) {
-			long addr = get_cur_segment().get_datablock().get_addr();
+			int addr = get_cur_segment().get_cur_datablock().get_waddr();
 			if(null == cur_macros) {
-				constants.put(l_name, new Constant(cur_line, l_name, addr));
+				labels.put(l_name, new Label(cur_line, l_name, addr));
 			}
 			else {
-				cur_macros.get_labels().put(l_name, new Constant(cur_line, l_name, addr));
+				cur_macros.add_label(new Label(cur_line, l_name, addr));
 			}
+			list.push_label(addr, l_name);
 			return true;
 		}
 		return false;
@@ -186,7 +209,10 @@ public class ProgInfo {
 		}
 		return false;
 	}
-	
+	public void open_macro(String l_name) {
+		cur_macros = macros.get(l_name);
+	}
+
 	public HashMap<String, Macro> get_macros() {
 		return macros;
 	}
@@ -218,10 +244,6 @@ public class ProgInfo {
 	}
 	public Line get_cur_line() {
 		return cur_line;
-	}
-	
-	public EPass get_pass() {
-		return pass;
 	}
 	
 	public Integer get_register(String l_name) {
@@ -270,6 +292,11 @@ public class ProgInfo {
 			print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, " at '" + constant.get_line().get_location() + "'");
 			return false;
 		}
+		Label label = get_label(l_name);
+		if(null != label) {
+			print(EMsgType.MSG_ERROR, "Label '", l_name, "' ", JAObject.MSG_ALREADY_DEFINED, " at " + label.get_line().get_location());
+			return false;
+		}
 		Integer register_id = get_register(l_name);
 		if(null != register_id) {
 			print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, " as 'r" + Integer.toString(register_id) + "'");
@@ -286,16 +313,36 @@ public class ProgInfo {
 		return true;
 	}
 	
-	public boolean is_list_on() {
-		return list_on;
+	public List get_list() {
+		return list;
 	}
-	public void set_list_on(boolean l_is_on) {
-		list_on = l_is_on;
+
+	public Macro get_expand_macro() {
+		return expand_macro;
 	}
-	public boolean is_listmac_on() {
-		return listmac_on;
+	public void set_expand_macro(Macro l_macro) {
+		expand_macro = l_macro;
 	}
-	public void set_listmac_on(boolean l_is_on) {
-		listmac_on = l_is_on;
+
+	public void put_unparsed() {
+		if(null == unparsed.get(cur_line.get_location())) {
+			cur_line.set_addr(get_cseg().get_cur_datablock().get_waddr());
+			unparsed.put(cur_line.get_location(), cur_line);
+		}
+	}
+	
+	public int  unparsed_qnt() { 
+		return unparsed.size();
+	}
+	public LinkedList<Line> pull_unparsed() {
+		LinkedList<Line> result = new LinkedList<Line>(unparsed.values());
+		unparsed.clear();
+		Collections.sort(result, new Comparator<Line>() {
+			@Override
+			public int compare(Line o1, Line o2) {
+				return o1.get_addr().compareTo(o2.get_addr());
+			}
+		});
+		return result;
 	}
 }

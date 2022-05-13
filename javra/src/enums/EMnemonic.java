@@ -182,14 +182,14 @@ public enum EMnemonic {
 
 	private	int		id;
 	private	String	name;
-	private	int		word;
+	private	int		opcode;
 	private	int		opcode_wsize;
 	private	int		flags;
 	
-	private EMnemonic(String l_name, int l_opcode_wsize, int l_word, int l_flags) {
+	private EMnemonic(String l_name, int l_opcode_wsize, int l_opcode, int l_flags) {
 		name = l_name;
-		word = l_word;
 		opcode_wsize = l_opcode_wsize;
+		opcode = l_opcode;
 		flags = l_flags;
 	}
 	
@@ -203,6 +203,19 @@ public enum EMnemonic {
 	
 	public int get_opcode_wsize() {
 		return opcode_wsize;
+	}
+	
+	public int get_flags() {
+		return flags;
+	}
+	
+	public int get_opcode() {
+		return opcode;
+	}
+	
+	@Override
+	public String toString() {
+		return name.toUpperCase();
 	}
 	
 	public static EMnemonic fromName(String l_name) {

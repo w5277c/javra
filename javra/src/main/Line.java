@@ -11,8 +11,8 @@ public class Line {
 	private	String	text;
 	private	String	key;
 	private	String	value;
-	
-	
+	private	Integer	addr;
+		
 	public Line(String l_filename, int l_number, String l_text) {
 		filename = l_filename;
 		line_number = l_number;
@@ -46,6 +46,13 @@ public class Line {
 	}
 	public String get_value() {
 		return value;
+	}
+	
+	public Integer get_addr() {
+		return addr;
+	}
+	public void set_addr(int l_addr) {
+		addr = l_addr;
 	}
 	
 	public String get_location() {
