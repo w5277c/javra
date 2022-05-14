@@ -12,10 +12,11 @@ import enums.EOperator;
 import java.util.LinkedList;
 import main.Constant;
 import main.Label;
+import main.Line;
 import main.ProgInfo;
 
 public class Expr {
-	public static Long parse(ProgInfo l_pi, String l_expr) {
+	public static Long parse(ProgInfo l_pi, Line l_line, String l_expr) {
 		Long result = null;
 		int count = 0x00;
 		String unary = "";
@@ -38,7 +39,7 @@ public class Expr {
 					}
 				}
 				if(null == operator) {
-					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_ILLEGAL_OPERATOR, _expr.substring(0x00, 0x01));
+					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ILLEGAL_OPERATOR, _expr.substring(0x00, 0x01));
 					break;
 				}
 				_expr = _expr.substring(operator.get_text().length()).trim();
@@ -55,7 +56,7 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 				}
@@ -67,7 +68,7 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 				}
@@ -79,7 +80,7 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 				}
@@ -91,7 +92,7 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 				}
@@ -103,7 +104,7 @@ public class Expr {
 						_expr = _expr.substring(pos).trim();
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 						break;
 					}
 					
@@ -111,12 +112,12 @@ public class Expr {
 				else if(_expr.startsWith("(")) {
 					int length = par_length(_expr, 0x01);
 					if(-1 == length) {
-						l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_MISSING, ")");
+						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, ")");
 						break;
 					}
-					result = parse(l_pi, _expr.substring(0x01, 0x01 + length));
+					result = parse(l_pi, l_line, _expr.substring(0x01, 0x01 + length));
 					if(null == result) {
-						//l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+						//l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 						return null;
 						//break;
 					}
@@ -138,26 +139,26 @@ public class Expr {
 						if(_expr.startsWith("(")) {
 							int length = par_length(_expr, 0x01);
 							if(-1 == length) {
-								l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_MISSING, ")");
+								l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, ")");
 								break;
 							}
-							Long tmp = parse(l_pi, _expr.substring(0x01, 0x01+length));
+							Long tmp = parse(l_pi, l_line, _expr.substring(0x01, 0x01+length));
 							if(null != tmp) {
-								result = do_function(l_pi, func, tmp);
+								result = do_function(l_pi, l_line, func, tmp);
 								_expr = _expr.substring(0x02+length).trim();
 								if(null == result) {
-									l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+									l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 									break;
 								}
 							}
 							else {
-								//l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+								//l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 								//break;
 								return null;
 							}
 						}
 						else {
-							l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_MISSING, "(");
+							l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, "(");
 							break;
 						}
 					}
@@ -172,13 +173,13 @@ public class Expr {
 								result = (long)label.get_addr();
 							}
 							else {
-								l_pi.put_unparsed();
+								l_line.set_unparsed();
 							}
 						}
 					}
 				}
 				else {
-					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 					break;
 				}
 				if(null != result) {
@@ -210,7 +211,7 @@ public class Expr {
 					EOperator op = operators.get(index);
 					if(op.get_priority() == priority) {
 						try {
-							Long _result = calc(l_pi, elemets.get(index), op, elemets.get(index+0x01));
+							Long _result = calc(l_pi, l_line, elemets.get(index), op, elemets.get(index+0x01));
 							operators.remove(index);
 							elemets.set(index, _result);
 							elemets.remove(index+0x01);
@@ -225,24 +226,24 @@ public class Expr {
 			return elemets.get(0x00);
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 		}
 		return null;
 	}
 
-	private static long calc(ProgInfo l_pi, long l_left, EOperator l_op, Long l_right) {
+	private static long calc(ProgInfo l_pi, Line l_line, long l_left, EOperator l_op, Long l_right) {
 		switch(l_op) {
 			case OP_MUL:
 				return l_left*l_right;
 			case OP_DIV:
 				if(0 == l_right) {
-					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_DIVISION_BY_ZERO);
+					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_DIVISION_BY_ZERO);
 					return 0;
 				}
 				return l_left/l_right;
 			case OP_MOD:
 				if(0 == l_right) {
-					l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_DIVISION_BY_ZERO, "(modulus operator)");
+					l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_DIVISION_BY_ZERO, "(modulus operator)");
 					return 0;
 				}
 				return l_left%l_right;
@@ -278,12 +279,12 @@ public class Expr {
 			case OP_LOGICAL_OR:
 				return (0x00 != l_left || 0x00 != l_right) ? 1l : 0l;
 			default:
-				l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_UNSUPPORTED);
+				l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_UNSUPPORTED);
 				return 0;
 		}
 	}
 
-	private static Long do_function(ProgInfo l_pi, EFunction l_func, Long l_value) {
+	private static Long do_function(ProgInfo l_pi, Line l_line, EFunction l_func, Long l_value) {
 		switch(l_func) {
 			case FUNC_LOW:
 			case FUNC_BYTE1:
@@ -311,7 +312,7 @@ public class Expr {
 				}
 				return i;
 			default:
-				l_pi.print(EMsgType.MSG_ERROR, JAObject.MSG_UNSUPPORTED);
+				l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_UNSUPPORTED);
 		}
 		return null;
 	}

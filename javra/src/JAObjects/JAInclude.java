@@ -12,9 +12,11 @@ import main.Parser;
 import main.ProgInfo;
 
 public class JAInclude extends JAObject {
-	public JAInclude(ProgInfo l_pi, Line l_line) throws Exception {
-		String filename = parse_string(l_line.get_value());
-		if(null == filename) filename = l_line.get_value().trim();
+	public JAInclude(ProgInfo l_pi, Line l_line, String l_value) throws Exception {
+		super(l_pi, l_line, l_value);
+		
+		String filename = parse_string(value);
+		if(null == filename) filename = value;
 		
 		if(null != filename) {
 			File file = new File(l_pi.get_root_path() + filename);
@@ -28,14 +30,14 @@ public class JAInclude extends JAObject {
 				}
 			}				
 			if(file.exists()) {
-				Parser parser = new Parser(l_pi, file);
+				Parser parser = new Parser(l_pi, filename, file);
 			}
 			else {
-				l_pi.print(EMsgType.MSG_ERROR, MSG_ABSENT_FILE);
+				l_pi.print(EMsgType.MSG_ERROR, line, MSG_ABSENT_FILE);
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
 	}
 }

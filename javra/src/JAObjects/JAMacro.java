@@ -10,20 +10,29 @@ import main.Line;
 import main.ProgInfo;
 
 public class JAMacro extends JAObject {
-	public JAMacro(ProgInfo l_pi, Line l_line, boolean l_start) throws Exception {
+	public JAMacro(ProgInfo l_pi, Line l_line, String l_value, boolean l_start) throws Exception {
+		super(l_pi, l_line, l_value);
+		
 		if(l_start) {
-			String name = l_line.get_value().trim().toLowerCase();
-			if(null != name) {
-				if(l_pi.is_undefined(name, false)) {
-					if(!l_pi.create_macro(name)) {
-						l_pi.print(EMsgType.MSG_ERROR, MSG_MISSING, "found no closing .macro");
+			if(!value.isEmpty()) {
+				if(l_pi.is_undefined(line, value, false)) {
+					if(!l_pi.create_macro(line, value)) {
+						l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING, "found no closing .macro");
 					}
 				}
 			}
+			else {
+				l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
+			}
 		}
 		else {
-			if(!l_pi.close_macro()) {
-				l_pi.print(EMsgType.MSG_ERROR, MSG_MISSING, "no .MACRO found before .endmacro");
+			if(value.isEmpty()) {
+				if(!l_pi.close_macro()) {
+					l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING, "no .MACRO found before .endmacro");
+				}
+			}
+			else {
+				l_pi.print(EMsgType.MSG_ERROR, line, MSG_DIRECTIVE_GARBAGE);
 			}
 		}
 	}

@@ -33,7 +33,13 @@ TODO: Навести порядок с заполнением памяти в Da
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import JAObjects.JAList;
+import JAObjects.JAListMac;
+import JAObjects.JAMacro;
+import JAObjects.JANoList;
+import JAObjects.JAObject;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.LinkedList;
 import output.IntelHexBuilder;
 
@@ -58,8 +64,41 @@ public class Javra {
 			}
 		}
 		
-		Parser parser = new Parser(pi, new File(filename));
+		Parser parser = new Parser(pi, filename, new File(filename));
+		FileOutputStream fos = null;
+		try {
+			boolean list_on = true;
+			boolean listmac = false;
+			fos = new FileOutputStream(new File("noname.lst"));
+			for(JAObject obj : pi.get_objects()) {
+				if(obj instanceof JAList) {
+					list_on = true;
+				}
+				else if(obj instanceof JANoList) {
+					list_on = false;
+				}
+				else if(obj instanceof JAListMac) {
+					listmac = true;
+				}
+				
+				if((list_on && !(obj instanceof JAMacro)) || (listmac && (obj instanceof JAMacro))) {
+					obj.write_list(fos);
+				}
+			}
+			fos.flush();
+			fos.close();
+		}
+		catch(Exception ex) {
+			if(null != fos) {
+				try {
+					fos.close();
+				}
+				catch(Exception ex2) {
+				}
+			}
+		}
 
+		
 		System.out.println("---ADDITIONAL PASS---");
 		boolean progress = true;
 		while(progress) {
@@ -102,7 +141,7 @@ public class Javra {
 
 			System.out.println("\nBuild success, wrns:" + pi.get_warning_cntr());
 		}
-		pi.get_list().close();
+//		pi.get_list().close();
 		
 	}
 	

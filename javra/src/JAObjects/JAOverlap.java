@@ -10,10 +10,14 @@ import main.Line;
 import main.ProgInfo;
 
 public class JAOverlap extends JAObject {
-	public JAOverlap(ProgInfo l_pi, Line l_line) {
-		if(!l_line.get_value().trim().isEmpty()) {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+	public JAOverlap(ProgInfo l_pi, Line l_line, String l_value) {
+		super(l_pi, l_line, l_value);
+		
+		if(value.isEmpty()) {
+			l_pi.get_cur_segment().set_overlap(true);
 		}
-		l_pi.get_cur_segment().set_overlap(true);
+		else {
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_DIRECTIVE_GARBAGE);
+		}
 	}
 }

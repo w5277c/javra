@@ -10,13 +10,14 @@ import main.Line;
 import main.ProgInfo;
 
 public class JAElse extends JAObject {
-	public JAElse(ProgInfo l_pi) throws Exception {
-		String tmp = l_pi.get_cur_line().get_value().trim().toLowerCase();
-		if(tmp.isEmpty()) {
-			l_pi.get_ii().block_skip_invert(l_pi.get_cur_line());
+	public JAElse(ProgInfo l_pi, Line l_line, String l_value) throws Exception {
+		super(l_pi, l_line, l_value);
+		
+		if(value.isEmpty()) {
+			l_pi.get_ii().block_skip_invert(line);
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_DIRECTIVE_GARBAGE);
 		}
 	}
 }

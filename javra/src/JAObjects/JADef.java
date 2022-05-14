@@ -10,46 +10,45 @@ package JAObjects;
 
 import common.Macro;
 import enums.EMsgType;
+import java.io.OutputStream;
 import main.Constant;
 import main.Line;
 import main.ProgInfo;
 
 public class JADef extends JAObject {
-	private	String	name;
-	
-	public JADef(ProgInfo l_pi, Line l_line) {
-		String parts[] = l_line.get_value().split("=");
-		String tmp = parts[0x00].trim().toLowerCase();
-		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
-			name = tmp;
-
+	public JADef(ProgInfo l_pi, Line l_line, String l_value) {
+		super(l_pi, l_line, l_value);
+		
+		String parts[] = value.split("=");
+		String name = parts[0x00].trim();
+		if(0x02 == parts.length && !name.isEmpty() && name.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 			Constant constant = l_pi.get_constant(name);
 			if(null == constant) {
 				if(!name.startsWith("r") || name.length() <= 0x01 || name.length() > 0x03 || !name.substring(0x01).replaceAll("\\d", "").isEmpty()) {
 					Macro macros = l_pi.get_macros().get(name);
 					if(null == macros) {
-						Integer register = l_pi.get_register(parts[0x01].trim().toLowerCase());
+						Integer register = l_pi.get_register(parts[0x01].trim());
 						if(null == register) {
-							l_pi.print(EMsgType.MSG_ERROR, MSG_WRONG_REGISTER);
+							l_pi.print(EMsgType.MSG_ERROR, line, MSG_WRONG_REGISTER);
 						}
 						else {
-							l_pi.put_register(name, register);
+							l_pi.put_register(line, name, register);
 						}
 					}
 					else {
-						l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
+						l_pi.print(EMsgType.MSG_ERROR, line, MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
 					}
 				}
 				else {
-					l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED);
+					l_pi.print(EMsgType.MSG_ERROR, line, MSG_ALREADY_DEFINED);
 				}
 			}
 			else {
-				l_pi.print(EMsgType.MSG_ERROR, MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
+				l_pi.print(EMsgType.MSG_ERROR, line, MSG_ALREADY_DEFINED, "at '" + constant.get_line().get_location() + "'");
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_SYNTAX);
 		}
 	}
 }

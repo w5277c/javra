@@ -11,22 +11,24 @@ import main.Line;
 import main.ProgInfo;
 
 public class JASet extends JAObject {
-	public JASet(ProgInfo l_pi, Line l_line) {
-		String parts[] = l_line.get_value().split("=");
-		String tmp = parts[0x00].trim().toLowerCase();
+	public JASet(ProgInfo l_pi, Line l_line, String l_value) {
+		super(l_pi, l_line, l_value);
+		
+		String parts[] = value.split("=");
+		String tmp = parts[0x00].trim();
 		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 			String name = tmp;
-			tmp = parts[0x01].trim().toLowerCase();
-			Long num = Expr.parse(l_pi, tmp);
+			tmp = parts[0x01].trim();
+			Long num = Expr.parse(l_pi, line, tmp);
 			if(null != num) {
-				l_pi.add_constant(name, num, true);
+				l_pi.add_constant(line, name, num, true);
 			}
 			else {
-				l_pi.put_unparsed();
+				line.set_unparsed();
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_SYNTAX);
 		}
 	}
 }

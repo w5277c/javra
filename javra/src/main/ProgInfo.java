@@ -36,9 +36,9 @@ public class ProgInfo {
 	private	EDevice							device			= null;
 	private	IncludeInfo						ii					= null;
 	private	HashMap<String,Integer>		registers		= new HashMap<>();
-	private	Line								cur_line			= null;
 	private	HashMap<String, Line>		unparsed			= new HashMap<>();
-	private	List								list				= new List("unnamed.lst");
+	
+	private	LinkedList<JAObject>			objects			= new LinkedList<>();
 	
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
 //	private	EPass	pass;
@@ -84,9 +84,9 @@ public class ProgInfo {
 		}
 		return result;
 	}
-	public boolean add_constant(String l_name, long l_value, boolean l_redef) {
-		if(is_undefined(l_name, l_value, l_redef)) {
-			Constant constatnt = new Constant(cur_line, l_name, l_value, l_redef);
+	public boolean add_constant(Line l_line, String l_name, long l_value, boolean l_redef) {
+		if(is_undefined(l_line, l_name, l_value, l_redef)) {
+			Constant constatnt = new Constant(l_line, l_name, l_value, l_redef);
 			if(null == cur_macros) {
 				constants.put(l_name, constatnt);
 			}
@@ -108,16 +108,15 @@ public class ProgInfo {
 		}
 		return result;
 	}
-	public boolean add_label(String l_name) {
-		if(is_undefined(l_name, false)) {
+	public boolean add_label(Line l_line, String l_name) {
+		if(is_undefined(l_line, l_name, false)) {
 			int addr = get_cur_segment().get_cur_block().get_addr();
 			if(null == cur_macros) {
-				labels.put(l_name, new Label(cur_line, l_name, addr));
+				labels.put(l_name, new Label(l_line, l_name, addr));
 			}
 			else {
-				cur_macros.add_label(new Label(cur_line, l_name, addr));
+				cur_macros.add_label(new Label(l_line, l_name, addr));
 			}
-			list.push_label(addr, l_name);
 			return true;
 		}
 		return false;
@@ -134,25 +133,25 @@ public class ProgInfo {
 	public EDevice get_device() {
 		return device;
 	}
-	public void set_device(EDevice l_device) {
+	public void set_device(Line l_line, EDevice l_device) {
 		if(null == device) {
 			device = l_device;
 
-			if(!add_constant("prog_flash", device.get_flash_size(), false)) {
-				print(EMsgType.MSG_ERROR, "PROG_FLASH already defined");
+			if(!add_constant(l_line, "prog_flash", device.get_flash_size(), false)) {
+				print(EMsgType.MSG_ERROR, l_line, "PROG_FLASH already defined");
 			}
-			if(!add_constant("ram_start", device.get_ram_start(), false)) {
-				print(EMsgType.MSG_ERROR, "RAM_START already defined");
+			if(!add_constant(l_line, "ram_start", device.get_ram_start(), false)) {
+				print(EMsgType.MSG_ERROR, l_line, "RAM_START already defined");
 			}
-			if(!add_constant("ram_end", device.get_ram_start() + device.get_ram_size() - 0x01, false)) {
-				print(EMsgType.MSG_ERROR, "RAM_END already defined");
+			if(!add_constant(l_line, "ram_end", device.get_ram_start() + device.get_ram_size() - 0x01, false)) {
+				print(EMsgType.MSG_ERROR, l_line, "RAM_END already defined");
 			}
-			if(!add_constant("eeprom_size", device.get_eeprom_size(), false)) {
-				print(EMsgType.MSG_ERROR, "EEPROM_SIZE already defined");
+			if(!add_constant(l_line, "eeprom_size", device.get_eeprom_size(), false)) {
+				print(EMsgType.MSG_ERROR, l_line, "EEPROM_SIZE already defined");
 			}
 		}
 		else {
-			print(EMsgType.MSG_ERROR, "More than one .DEVICE definition");
+			print(EMsgType.MSG_ERROR, l_line, "More than one .DEVICE definition");
 		}
 	}
 
@@ -163,7 +162,7 @@ public class ProgInfo {
 		System.out.println();
 	}
 
-	public void print(EMsgType l_msg_type, String... l_messages) {
+	public void print(EMsgType l_msg_type, Line l_line, String... l_messages) {
 		System.out.print(l_msg_type);
 		if(EMsgType.MSG_ERROR == l_msg_type) {
 			error_cntr++;
@@ -174,15 +173,15 @@ public class ProgInfo {
 			warning_cntr++;
 			System.out.print("[" + warning_cntr + "]");
 		}
-		if(null != cur_line && EMsgType.MSG_DMESSAGE != l_msg_type && EMsgType.MSG_DWARNING != l_msg_type && EMsgType.MSG_DERROR != l_msg_type) {
-			System.out.print("line " + cur_line.get_number());
+		if(null != l_line && EMsgType.MSG_DMESSAGE != l_msg_type && EMsgType.MSG_DWARNING != l_msg_type && EMsgType.MSG_DERROR != l_msg_type) {
+			System.out.print(" " + l_line.get_filename() + "(" + l_line.get_number() + ")");
 		}
 		System.out.print(": ");
 		for(String msg : l_messages) {
 			System.out.print(msg);
 		}
-		if(null != cur_line && EMsgType.MSG_DMESSAGE != l_msg_type && EMsgType.MSG_DWARNING != l_msg_type && EMsgType.MSG_DERROR != l_msg_type) {
-			System.out.print(" " + cur_line.get_text().trim());
+		if(null != l_line && EMsgType.MSG_DMESSAGE != l_msg_type && EMsgType.MSG_DWARNING != l_msg_type && EMsgType.MSG_DERROR != l_msg_type) {
+			System.out.print(" " + l_line.get_text().trim());
 		}
 		System.out.println();
 	}
@@ -201,9 +200,9 @@ public class ProgInfo {
 		return ii;
 	}
 	
-	public boolean create_macro(String l_name) {
+	public boolean create_macro(Line l_line, String l_name) {
 		if(null == cur_macros) {
-			cur_macros = new Macro(cur_line, l_name);
+			cur_macros = new Macro(l_line, l_name);
 			macros.put(l_name, cur_macros);
 			return true;
 		}
@@ -239,13 +238,6 @@ public class ProgInfo {
 		return max_errors;
 	}
 
-	public void set_line(Line l_line) {
-		cur_line = l_line;
-	}
-	public Line get_cur_line() {
-		return cur_line;
-	}
-	
 	public Integer get_register(String l_name) {
 		if(l_name.startsWith("r") && l_name.length() > 0x01 && l_name.length() <= 0x03 && l_name.substring(0x01).replaceAll("\\d", "").isEmpty()) {
 			return Integer.parseInt(l_name.substring(0x01));
@@ -271,40 +263,40 @@ public class ProgInfo {
 
 		return registers.get(l_name);
 	}
-	public void put_register(String l_name, int l_register_id) {
+	public void put_register(Line l_line, String l_name, int l_register_id) {
 		if(registers.values().contains(l_register_id)) {
-			print(EMsgType.MSG_WARNING, l_name + "(r" + l_register_id + ") already assigned");
+			print(EMsgType.MSG_WARNING, l_line, l_name + "(r" + l_register_id + ") already assigned");
 		}
 		registers.put(l_name, l_register_id);
 	}
-	public void remove_register(String l_name) {
+	public void remove_register(Line l_line, String l_name) {
 		if(null == registers.remove(l_name)) {
-			print(EMsgType.MSG_WARNING, l_name + " register not defined");
+			print(EMsgType.MSG_WARNING, l_line, l_name + " register not defined");
 		}
 	}
 	
-	public boolean is_undefined(String l_name,boolean l_redef) {
-		return is_undefined(l_name, null, l_redef);
+	public boolean is_undefined(Line l_line, String l_name,boolean l_redef) {
+		return is_undefined(l_line, l_name, null, l_redef);
 	}
-	public boolean is_undefined(String l_name, Long l_value, boolean l_redef) {
+	public boolean is_undefined(Line l_line, String l_name, Long l_value, boolean l_redef) {
 		Constant constant = get_constant(l_name);
 		if(null != constant && (!l_redef || !constant.is_redef()) && (null == l_value || l_value != constant.get_value())) {
-			print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, " at '" + constant.get_line().get_location() + "'");
+			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " at '" + constant.get_line().get_location() + "'");
 			return false;
 		}
 		Label label = get_label(l_name);
 		if(null != label) {
-			print(EMsgType.MSG_ERROR, "Label '", l_name, "' ", JAObject.MSG_ALREADY_DEFINED, " at " + label.get_line().get_location());
+			print(EMsgType.MSG_ERROR, l_line, "Label '", l_name, "' ", JAObject.MSG_ALREADY_DEFINED, " at " + label.get_line().get_location());
 			return false;
 		}
 		Integer register_id = get_register(l_name);
 		if(null != register_id) {
-			print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, " as 'r" + Integer.toString(register_id) + "'");
+			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " as 'r" + Integer.toString(register_id) + "'");
 			return false;
 		}
 		Macro macros = get_macros().get(l_name);
 		if(null != macros) {
-			print(EMsgType.MSG_ERROR, JAObject.MSG_ALREADY_DEFINED, " at '" + macros.get_line().get_location() + "'");
+			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " at '" + macros.get_line().get_location() + "'");
 			return false;
 		}
 		
@@ -313,10 +305,6 @@ public class ProgInfo {
 		return true;
 	}
 	
-	public List get_list() {
-		return list;
-	}
-
 	public Macro get_expand_macro() {
 		return expand_macro;
 	}
@@ -324,13 +312,13 @@ public class ProgInfo {
 		expand_macro = l_macro;
 	}
 
-	public void put_unparsed() {
-		if(null == unparsed.get(cur_line.get_location())) {
-			cur_line.set_addr(get_cseg().get_cur_block().get_addr());
-			unparsed.put(cur_line.get_location(), cur_line);
+/*	public void put_unparsed(Line l_line) {
+		if(null == unparsed.get(l_line.get_location())) {
+//			l_line.set_addr(get_cseg().get_cur_block().get_addr());
+			unparsed.put(l_line.get_location(), l_line);
 		}
 	}
-	
+*/	
 	public int  unparsed_qnt() { 
 		return unparsed.size();
 	}
@@ -340,9 +328,16 @@ public class ProgInfo {
 		Collections.sort(result, new Comparator<Line>() {
 			@Override
 			public int compare(Line o1, Line o2) {
-				return o1.get_addr().compareTo(o2.get_addr());
+				return 0;//return o1.get_addr().compareTo(o2.get_addr());
 			}
 		});
 		return result;
+	}
+
+	public void add_object(JAObject l_obj) {
+		objects.add(l_obj);
+	}
+	public LinkedList<JAObject> get_objects() {
+		return objects;
 	}
 }

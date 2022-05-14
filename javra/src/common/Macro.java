@@ -38,7 +38,7 @@ public class Macro {
 					params.add("r" + register);
 				}
 				else {
-					Long value = Expr.parse(l_pi, _str);
+					Long value = Expr.parse(l_pi, line, _str);
 					if(null != value) {
 						params.add(value.toString());
 					}
@@ -51,7 +51,7 @@ public class Macro {
 		}
 		
 		if(10 < params.size()) {
-			l_pi.print(EMsgType.MSG_WARNING, "AVRASM2 only supportrts 10 parameters");
+			l_pi.print(EMsgType.MSG_WARNING, line, "AVRASM2 only supportrts 10 parameters");
 		}
 		
 		for(Line m_line : body) {
@@ -62,7 +62,7 @@ public class Macro {
 				}
 			}
 
-			Parser.line_parse(l_pi, new Line(l_pi.get_cur_line().get_filename(), l_pi.get_cur_line().get_number(), str));
+			Parser.line_parse(l_pi, new Line(line.get_filename(), line.get_number(), str));
 		}
 		
 		l_pi.set_expand_macro(null);		

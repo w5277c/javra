@@ -5,14 +5,19 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
+import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
 
 public class JAUndef extends JAObject {
-	private	String	name;
-	
-	public JAUndef(ProgInfo l_pi, Line l_line) {
-		name = l_line.get_value().trim().toLowerCase();
-		l_pi.remove_register(name);
+	public JAUndef(ProgInfo l_pi, Line l_line, String l_value) {
+		super(l_pi, l_line, l_value);
+		
+		if(!value.isEmpty()) {
+			l_pi.remove_register(line, value);
+		}
+		else {
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
+		}
 	}
 }

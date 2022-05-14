@@ -10,10 +10,11 @@ import main.Line;
 import main.ProgInfo;
 
 public class JAList extends JAObject {
-	public JAList(ProgInfo l_pi, Line l_line) {
-		if(!l_line.get_value().trim().isEmpty()) {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+	public JAList(ProgInfo l_pi, Line l_line, String l_value) {
+		super(l_pi, l_line, l_value);
+		
+		if(!value.isEmpty()) {
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_DIRECTIVE_GARBAGE);
 		}
-		l_pi.get_list().set_list_on(true);
 	}
 }

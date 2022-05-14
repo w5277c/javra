@@ -5,24 +5,24 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
-import JAObjects.JAObject;
 import enums.EDevice;
 import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
 
 public class JADevice extends JAObject {
-	public JADevice(ProgInfo l_pi, Line l_line) throws Exception {
-		String tmp = l_line.get_value().trim().toLowerCase();
-		if(!tmp.isEmpty()) {
+	public JADevice(ProgInfo l_pi, Line l_line, String l_value) throws Exception {
+		super(l_pi, l_line, l_value);
+		
+		if(!value.isEmpty()) {
 			EDevice device = null;
 			try {
-				device = EDevice.valueOf("DEV_" + tmp.toUpperCase());
+				device = EDevice.valueOf("DEV_" + value.toUpperCase());
 			}
 			catch(Exception ex) {
 			}
 			if(null != device) {
-				l_pi.set_device(device);
+				l_pi.set_device(line, device);
 			}
 			else {
 				StringBuilder sb = new StringBuilder("\t");
@@ -33,11 +33,11 @@ public class JADevice extends JAObject {
 						sb.append("\n\t");
 					}
 				}
-				l_pi.print(EMsgType.MSG_ERROR, "Unknown .DEVICE: " + tmp + ", supported:\n" + sb.toString().substring(0x00, sb.length()-0x01));
+				l_pi.print(EMsgType.MSG_ERROR, line, "Unknown .DEVICE: " + value + ", supported:\n" + sb.toString().substring(0x00, sb.length()-0x01));
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX, "needs operand");
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
 	}
 }

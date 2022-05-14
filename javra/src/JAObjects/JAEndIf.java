@@ -5,19 +5,19 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
-import JAObjects.JAObject;
 import enums.EMsgType;
 import main.Line;
 import main.ProgInfo;
 
 public class JAEndIf extends JAObject {
-	public JAEndIf(ProgInfo l_pi, Line l_line) throws Exception {
-		String tmp = l_line.get_value().trim().toLowerCase();
-		if(tmp.isEmpty()) {
-			l_pi.get_ii().block_end(l_line);
+	public JAEndIf(ProgInfo l_pi, Line l_line, String l_value) throws Exception {
+		super(l_pi, l_line, l_value);
+		
+		if(value.isEmpty()) {
+			l_pi.get_ii().block_end(line);
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_DIRECTIVE_GARBAGE);
 		}
 	}
 }

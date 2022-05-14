@@ -8,14 +8,14 @@ package main;
 import java.util.LinkedList;
 
 public class IncludeInfo {
-	private	String					name;
+	private	String					filename;
 	private	boolean					block_success	= false;
 	private	boolean					elseif_skip		= false;
 	private	LinkedList<Boolean>	block_skip		= new LinkedList<>();
 	private	int						block_cntr		= 0;
 	
-	public IncludeInfo(String l_name) {
-		name = l_name;
+	public IncludeInfo(String l_filename) {
+		filename = l_filename;
 	}
 	
 	public boolean is_blockskip() {
@@ -59,7 +59,7 @@ public class IncludeInfo {
 		return  block_cntr;
 	}
 	
-	public String get_name() {
-		return name;
+	public String get_filename() {
+		return filename;
 	}
 }

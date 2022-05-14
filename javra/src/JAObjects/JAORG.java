@@ -12,16 +12,23 @@ import main.Line;
 import main.ProgInfo;
 
 public class JAORG extends JAObject {
-	public JAORG(ProgInfo l_pi, Line l_line) {
-		Long addr = Expr.parse(l_pi, l_line.get_value().trim().toLowerCase());
-		if(null == addr) {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_NUMBER);
+	public JAORG(ProgInfo l_pi, Line l_line, String l_value) {
+		super(l_pi, l_line, l_value);
+		
+		if(!value.isEmpty()) {
+			Long addr = Expr.parse(l_pi, line, value);
+			if(null == addr) {
+				l_pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_NUMBER);
+			}
+			else {
+				DataBlock exist_datablock = l_pi.get_cur_segment().set_block(addr.intValue());
+				if(null != exist_datablock) {
+					l_pi.print(EMsgType.MSG_ERROR, line, "ORG " + addr + " already defined");
+				}
+			}
 		}
 		else {
-			DataBlock exist_datablock = l_pi.get_cur_segment().set_block(addr.intValue());
-			if(null != exist_datablock) {
-				l_pi.print(EMsgType.MSG_ERROR, "ORG " + addr + " already defined");
-			}
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
 	}
 }

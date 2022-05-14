@@ -9,14 +9,12 @@ public class Line {
 	private	String	filename;
 	private	int		line_number;
 	private	String	text;
-	private	String	key;
-	private	String	value;
-	private	Integer	addr;
-		
+	private	boolean	unparsed	= false;
+	
 	public Line(String l_filename, int l_number, String l_text) {
 		filename = l_filename;
 		line_number = l_number;
-		text = l_text;
+		text = l_text.replaceAll("\\s+", " ").trim();
 	}
 	
 	public void append(String l_text) {
@@ -35,27 +33,14 @@ public class Line {
 		return text;
 	}
 	
-	public void parse() {
-		String[] parts = text.split("\\s", 0x02);
-		key = parts[0x00];
-		value = (parts.length > 0x01 ? parts[0x01] : "");
-	}
-	
-	public String get_key() {
-		return key;
-	}
-	public String get_value() {
-		return value;
-	}
-	
-	public Integer get_addr() {
-		return addr;
-	}
-	public void set_addr(int l_addr) {
-		addr = l_addr;
-	}
-	
 	public String get_location() {
 		return filename + ":" + line_number;
+	}
+	
+	public boolean is_unparsed() {
+		return unparsed;
+	}
+	public void set_unparsed() {
+		unparsed = true;
 	}
 }

@@ -18,11 +18,9 @@ public class Parser {
 	public	static	final	String	COMMENT2		= ";";
 	public	static	final	String	MULTILINE	= "\\";
 
-	public Parser(ProgInfo l_pi, File l_file) throws Exception {
-		IncludeInfo ii = l_pi.exch_ii(new IncludeInfo(l_file.getName()));
-		l_pi.get_list().push_include(l_file.getName());
+	public Parser(ProgInfo l_pi, String l_filename, File l_file) throws Exception {
+		IncludeInfo ii = l_pi.exch_ii(new IncludeInfo(l_filename));
 
-//		l_pi.print("Enter " + l_file.getCanonicalPath());
 		Scanner scanner = new Scanner(l_file, StandardCharsets.UTF_8.name());
 		int line_number = 0x01;
 		
@@ -39,7 +37,7 @@ public class Parser {
 			}
 			
 			if(null == line) {
-				line = new Line(l_file.getName(), line_number++, str);
+				line = new Line(l_filename, line_number++, str);
 				if(!line_parse(l_pi, line)) {
 					break;
 				}
@@ -59,20 +57,20 @@ public class Parser {
 		if(0 != ii.get_blockcntr()) {
 			l_pi.print(EMsgType.MSG_WARNING, null, "some of.if/.ifdef/.ifndef not correctly closed(cntr:" + ii.get_blockcntr() + ")");
 		}
-//		l_pi.print("Exit " + l_file.getCanonicalPath());
 	}
 	
 	public static boolean line_parse(ProgInfo l_pi, Line l_line) {
-		l_line.parse();
-		l_pi.set_line(l_line);
-		
 		Macro cur_macros = l_pi.get_cur_macros();
-		if(null != cur_macros && !l_line.get_key().equalsIgnoreCase(".endmacro") && !l_line.get_key().equalsIgnoreCase(".endm")) {
+		if(null != cur_macros && !l_line.get_text().equalsIgnoreCase(".endmacro") && !l_line.get_text().equalsIgnoreCase(".endm")) {
 			cur_macros.get_body().add(l_line);
 		}
 		else {
 			try {
 				JAObject jaobj = JAObject.parse(l_pi, l_line);
+				if(null != jaobj) {
+					l_pi.add_object(jaobj);
+				}
+				
 				if(jaobj instanceof JAExit) {
 					return false;
 				}

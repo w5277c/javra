@@ -9,28 +9,29 @@ package JAObjects;
 
 import common.Expr;
 import enums.EMsgType;
+import main.Line;
 import main.ProgInfo;
 
 public class JAIf extends JAObject {
-	public JAIf(ProgInfo l_pi) throws Exception {
-		String tmp = l_pi.get_cur_line().get_value().trim().toLowerCase();
-		if(!tmp.isEmpty()) {
+	public JAIf(ProgInfo l_pi, Line l_line, String l_value) throws Exception {
+		super(l_pi, l_line, l_value);
+		
+		if(!value.isEmpty()) {
 			if(l_pi.get_ii().is_blockskip()) {
-				l_pi.get_ii().block_start(l_pi.get_cur_line(), false);
+				l_pi.get_ii().block_start(line, false);
 			}
 			else {
-				Long _tmp = Expr.parse(l_pi, tmp);
+				Long _tmp = Expr.parse(l_pi, line, value);
 				if(null == _tmp) {
-					//l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
-					l_pi.put_unparsed();
+					line.set_unparsed();
 				}
 				else {
-					l_pi.get_ii().block_start(l_pi.get_cur_line(), 0x00 == _tmp);
+					l_pi.get_ii().block_start(line, 0x00 == _tmp);
 				}
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
 	}
 }
