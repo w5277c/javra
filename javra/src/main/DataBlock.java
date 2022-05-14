@@ -5,50 +5,55 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 public class DataBlock {
-	private	int			wstart;
-	private	int			woffset	= 0;
-	private	int			wlength	= 0;
-	private	byte[]		bdata		= new byte[0x40];
+	protected	int			start;
+	protected	int			offset	= 0;
+	protected	int			length	= 0;
+	protected	byte[]		data		= new byte[0x40];
+	protected	int			overlap	= 0;
 	
-	public DataBlock(int l_wstart) {
-		wstart = l_wstart;
+	public DataBlock(int l_start) {
+		start = l_start;
 	}
 
-	public void write_opcode(int l_opcode) {
-		ByteBuffer bb = ByteBuffer.allocate(Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN);
-		bb.putInt(l_opcode);
-		write(bb.array(), 0x01);
-	}
-	
-	public void write(byte[] l_bdata, int l_wsize) {
-		if((bdata.length - (woffset*2)) < (l_wsize*2)) {
-			byte[] _data = new byte[woffset*2 + l_wsize*2 + 0x40];
-			System.arraycopy(bdata, 0x00, _data, 0x00, woffset*2);
-			bdata = _data;
+	public void write(byte[] l_bdata, int l_size) {
+		if((data.length - offset) < l_size) {
+			byte[] _data = new byte[offset + l_size + 0x40];
+			System.arraycopy(data, 0x00, _data, 0x00, offset);
+			data = _data;
 		}
-		System.arraycopy(l_bdata, 0x00, bdata, woffset*2, l_wsize*2);
-		woffset += l_wsize;
-		if(woffset > wlength) {
-			wlength = woffset;
+		System.arraycopy(l_bdata, 0x00, data, offset, l_size);
+		offset += l_size;
+		if(offset > length) {
+			length = offset;
 		}
 	}
 
-	public int get_waddr() {
-		return wstart + woffset;
+	public int get_addr() {
+		return start + offset;
 	}
-	public void set_waddr(int l_waddr) {
-		woffset = l_waddr-wstart;
-	}
-
-	public int get_wlength() {
-		return wlength;
+	public void set_addr(int l_addr) {
+		offset = l_addr-start;
 	}
 
-	public long get_wstart() {
-		return wstart;
+	public int get_length() {
+		return length;
+	}
+
+	public int get_start() {
+		return start;
+	}
+
+	public void set_overlap(int l_addr) {
+		int delta = (start + length - 0x01) - l_addr;
+		overlap = (0 < delta ? delta : 0);
+	}
+
+	public int get_overlap() {
+		return overlap;
+	}
+	
+	public byte[] get_data() {
+		return data;
 	}
 }

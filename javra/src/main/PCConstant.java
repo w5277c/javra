@@ -24,6 +24,6 @@ public class PCConstant extends Constant {
 		if(ESegmentType.CODE != pi.get_cur_segment().get_type()) {
 			pi.print(EMsgType.MSG_WARNING, "got PC request in not CSEG");
 		}
-		return pi.get_cseg().get_cur_datablock().get_waddr();
+		return pi.get_cseg().get_cur_block().get_addr();
 	}
 }

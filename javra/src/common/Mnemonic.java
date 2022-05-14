@@ -7,7 +7,6 @@ package common;
 
 import enums.EMnemonic;
 import enums.EMsgType;
-import java.util.concurrent.atomic.AtomicBoolean;
 import main.ProgInfo;
 
 public class Mnemonic {
@@ -38,7 +37,7 @@ public class Mnemonic {
 				int t =1;
 			}
 
-			l_pi.get_cseg().set_waddr(l_pi.get_cur_line().get_addr());
+			l_pi.get_cseg().set_addr(l_pi.get_cur_line().get_addr());
 		}
 
 		
@@ -112,7 +111,7 @@ public class Mnemonic {
 					if(garbage_check(l_pi, em, param1, param2, 1)) {
 						Long value = Expr.parse(l_pi, param1);
 						if(null != value) {
-							value -= (l_pi.get_cseg().get_cur_datablock().get_waddr() + 0x01);
+							value -= (l_pi.get_cseg().get_cur_block().get_addr() + 0x01);
 							if(em.get_id() <= EMnemonic.MN_BRID.get_id()) {
 								if(range_check(l_pi, value, 0x40, true)) {
 									opcode1 = (int)((value & 0x7f) << 3);
@@ -141,7 +140,7 @@ public class Mnemonic {
 						if(null != opcode1) {
 							Long value = Expr.parse(l_pi, param2);
 							if(null != value) {
-								value -= l_pi.get_cseg().get_cur_datablock().get_waddr();
+								value -= l_pi.get_cseg().get_cur_block().get_addr();
 								if(range_check(l_pi, value, 0x40, true)) {
 									opcode1 |= (int)(((value & 0x7f) << 0x03));
 								}
@@ -231,11 +230,11 @@ public class Mnemonic {
 		}
 		opcode1 |= em.get_opcode();
 
-		l_pi.get_list().push_opcode(l_pi.get_cseg().get_cur_datablock().get_waddr(), opcode1, opcode2, em.toString() + " " + l_value);
+		l_pi.get_list().push_opcode(l_pi.get_cseg().get_cur_block().get_addr(), opcode1, opcode2, em.toString() + " " + l_value);
 		
-		l_pi.get_cseg().get_cur_datablock().write_opcode(opcode1);
+		l_pi.get_cseg().get_cur_block().write_opcode(opcode1);
 		if(null != opcode2) {
-			l_pi.get_cseg().get_cur_datablock().write_opcode(opcode2);
+			l_pi.get_cseg().get_cur_block().write_opcode(opcode2);
 		}
 //TODO ...
 
@@ -287,7 +286,7 @@ public class Mnemonic {
 			l_pi.print(EMsgType.MSG_ERROR, " address ouf of range (0 <= " + l_offset + " <= " + (l_range-0x01) + ")");
 			return false;
 		}
-		int pc = l_pi.get_cseg().get_cur_datablock().get_waddr();
+		int pc = l_pi.get_cseg().get_cur_block().get_addr();
 		if(l_relative && (0 > (pc+l_offset) || l_pi.get_device().get_flash_size() <= (pc+l_offset))) {
 			l_pi.print(EMsgType.MSG_ERROR, " address ouf of flash range '" + (pc+l_offset) + "'");
 			return false;

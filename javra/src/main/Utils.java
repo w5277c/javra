@@ -1,27 +1,24 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.05.2022	konstantin@5277.ru			Начало
+14.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package JAObjects;
+package main;
 
-import common.Expr;
-import enums.EMsgType;
-import main.DataBlock;
-import main.Line;
-import main.ProgInfo;
+public class Utils {
+   public static String printHexBinary(byte[] l_bytes) {
+      if(null == l_bytes || 0 == l_bytes.length) {
+         return "";
+      }
 
-public class JAORG extends JAObject {
-	public JAORG(ProgInfo l_pi, Line l_line) {
-		Long addr = Expr.parse(l_pi, l_line.get_value().trim().toLowerCase());
-		if(null == addr) {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_NUMBER);
-		}
-		else {
-			DataBlock exist_datablock = l_pi.get_cur_segment().set_block(addr.intValue());
-			if(null != exist_datablock) {
-				l_pi.print(EMsgType.MSG_ERROR, "ORG " + addr + " already defined");
-			}
-		}
-	}
+      StringBuilder result = new StringBuilder();
+      for(int pos = 0; pos < l_bytes.length; pos++) {
+         String num = Integer.toHexString(l_bytes[pos] & 0xff).toLowerCase();
+         if(num.length() < 0x02) {
+            result.append("0");
+         }
+         result.append(num);
+      }
+      return result.toString();
+   }
 }

@@ -1,27 +1,12 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.05.2022	konstantin@5277.ru			Начало
+14.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package JAObjects;
+package output;
 
-import common.Expr;
-import enums.EMsgType;
-import main.DataBlock;
-import main.Line;
-import main.ProgInfo;
+import java.io.IOException;
 
-public class JAORG extends JAObject {
-	public JAORG(ProgInfo l_pi, Line l_line) {
-		Long addr = Expr.parse(l_pi, l_line.get_value().trim().toLowerCase());
-		if(null == addr) {
-			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_NUMBER);
-		}
-		else {
-			DataBlock exist_datablock = l_pi.get_cur_segment().set_block(addr.intValue());
-			if(null != exist_datablock) {
-				l_pi.print(EMsgType.MSG_ERROR, "ORG " + addr + " already defined");
-			}
-		}
-	}
+public interface HexBuilder {
+	public void push(byte[] l_data, int l_address, int l_length) throws IOException;
 }

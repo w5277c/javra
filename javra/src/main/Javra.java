@@ -35,6 +35,7 @@ package main;
 
 import java.io.File;
 import java.util.LinkedList;
+import output.IntelHexBuilder;
 
 public class Javra {
 	public	static	final	String	VERSION	= "0.0.1";
@@ -49,10 +50,7 @@ public class Javra {
 			if(arg.equals("-l") && args.length > args_pos) {
 				pi.get_lib_paths().add(args[args_pos++]);
 			}
-			else {
-				System.out.println("invalid params " + args[args_pos-0x01]);
-			}
-			if(arg.equals("-f") && args.length > args_pos) {
+			else if(arg.equals("-f") && args.length > args_pos) {
 				filename = args[args_pos++];
 			}
 			else {
@@ -82,9 +80,30 @@ public class Javra {
 			System.out.println("\nBuild fail, wrns:" + pi.get_warning_cntr() + ", errs:" + pi.get_error_cntr() + "/" + pi.get_max_errors());
 		}
 		else {
-			System.out.println("\nBuild sucess, wrns:" + pi.get_warning_cntr());
+			System.out.println();
+			if(!pi.get_cseg().is_empty()) {
+				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_cseg.hex");
+				pi.get_cseg().build(pi, hex_builder);
+				hex_builder.close();
+				pi.get_cseg().print_stat(pi);
+			}
+			if(!pi.get_dseg().is_empty()) {
+				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_dseg.hex");
+				pi.get_cseg().build(pi, hex_builder);
+				hex_builder.close();
+				pi.get_dseg().print_stat(pi);
+			}
+			if(!pi.get_eseg().is_empty()) {
+				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_eseg.hex");
+				pi.get_cseg().build(pi, hex_builder);
+				hex_builder.close();
+				pi.get_eseg().print_stat(pi);
+			}
+
+			System.out.println("\nBuild success, wrns:" + pi.get_warning_cntr());
 		}
 		pi.get_list().close();
+		
 	}
 	
 }

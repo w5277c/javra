@@ -64,7 +64,7 @@ public class JAData extends JAObject {
 			if(0x00 != (offset%0x02)) {
 				l_pi.print(EMsgType.MSG_WARNING, "A .DB segment with an odd number of bytes is detected. A zero byte is added.");
 			}
-			l_pi.get_cur_segment().get_cur_datablock().write(data, offset/2 + (offset%0x02));
+			l_pi.get_cur_segment().get_cur_block().write(data, offset/2 + (offset%0x02));
 		}
 		else {
 			l_pi.print(EMsgType.MSG_ERROR, MSG_INVALID_SYNTAX);

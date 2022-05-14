@@ -19,7 +19,7 @@ import java.util.LinkedList;
 
 public class ProgInfo {
 	private	LinkedList<String>			lib_paths		= new LinkedList<>();
-	private	SegmentInfo						cseg				= new SegmentInfo(ESegmentType.CODE);
+	private	CodeSegmentInfo				cseg				= new CodeSegmentInfo();
 	private	SegmentInfo						dseg				= new SegmentInfo(ESegmentType.DATA);
 	private	SegmentInfo						eseg				= new SegmentInfo(ESegmentType.EEPROM);
 	private	SegmentInfo						cur_seg			= cseg;
@@ -64,7 +64,7 @@ public class ProgInfo {
 	public SegmentInfo get_cur_segment() {
 		return cur_seg;
 	}
-	public SegmentInfo get_cseg() {
+	public CodeSegmentInfo get_cseg() {
 		return cseg;
 	}
 	public SegmentInfo get_dseg() {
@@ -110,7 +110,7 @@ public class ProgInfo {
 	}
 	public boolean add_label(String l_name) {
 		if(is_undefined(l_name, false)) {
-			int addr = get_cur_segment().get_cur_datablock().get_waddr();
+			int addr = get_cur_segment().get_cur_block().get_addr();
 			if(null == cur_macros) {
 				labels.put(l_name, new Label(cur_line, l_name, addr));
 			}
@@ -326,7 +326,7 @@ public class ProgInfo {
 
 	public void put_unparsed() {
 		if(null == unparsed.get(cur_line.get_location())) {
-			cur_line.set_addr(get_cseg().get_cur_datablock().get_waddr());
+			cur_line.set_addr(get_cseg().get_cur_block().get_addr());
 			unparsed.put(cur_line.get_location(), cur_line);
 		}
 	}
