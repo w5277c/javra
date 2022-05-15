@@ -32,14 +32,18 @@ public class JAObject {
 	public	final	static	String	REGEX_CONST_NAME			= "[_|a-z][_\\d|a-z]*";
 	public	final	static	String	REGEX_LABEL_NAME			= "[_|a-z][_\\d|a-z]*:";
 	
-	protected	ProgInfo	pi;
-	protected	Line		line;
-	protected	String	value;
+	protected					ProgInfo	pi;
+	protected					Line		line;
+	protected					String	value;
+	
 	
 	protected JAObject(ProgInfo l_pi, Line l_line, String l_value) {
 		pi = l_pi;
 		line = l_line;
 		value = l_value;
+	}
+	
+	public void parse() {
 	}
 	
 	public static JAObject parse(ProgInfo l_pi, Line l_line) throws Exception {
@@ -67,7 +71,6 @@ public class JAObject {
 					case ".elseif":
 						return new JAElseIf(l_pi, l_line, value);
 					default:
-						int g = 0;
 				}
 			}
 			else {
@@ -93,6 +96,7 @@ public class JAObject {
 					case ".else":
 						return new JAElse(l_pi, l_line, value);
 					case ".elseif":
+					case ".elif":
 						return new JAElseIf(l_pi, l_line, value);
 					case ".message":
 						return new JAMessage(l_pi, l_line, value, EMsgType.MSG_DMESSAGE);
@@ -130,7 +134,7 @@ public class JAObject {
 					case ".nooverlap":
 						return new JANoOverlap(l_pi, l_line, value);
 
-						//TODO .byte, .cseg, .dseg, .eseg, .csegsize(for AT94K), .elif
+						//TODO .byte, .cseg, .dseg, .eseg, .csegsize(for AT94K),
 						
 					default:
 						if(name.startsWith("#")) {
@@ -159,40 +163,6 @@ public class JAObject {
 		}
 		return null;
 	}
-	
-	protected Long parse_addr(String l_value) {
-		try {
-			if(l_value.toLowerCase().startsWith("0x")) {
-				return Long.parseLong(l_value.substring(0x02), 0x10);
-			}
-			else {
-				return Long.parseLong(l_value);
-			}
-		}
-		catch(Exception ex) {
-		}
-		return null;
-	}
-	
-	protected Long parse_num(String l_value) {
-		try {
-			if(l_value.toLowerCase().startsWith("0x")) {
-				return Long.parseLong(l_value.substring(0x02), 0x10);
-			}
-			else if(l_value.toLowerCase().startsWith("0b")) {
-				return Long.parseLong(l_value.substring(0x02), 0x02);
-			}
-			else {
-				return Long.parseLong(l_value);
-			}
-			//TODO ADD OCT
-		}
-		catch(Exception ex) {
-		}
-		return null;
-	}
-	
-
 	
 	protected String parse_string(String l_value) {
 		try {

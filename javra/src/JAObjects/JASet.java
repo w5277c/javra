@@ -14,21 +14,28 @@ public class JASet extends JAObject {
 	public JASet(ProgInfo l_pi, Line l_line, String l_value) {
 		super(l_pi, l_line, l_value);
 		
+		parse();
+	}
+	
+	@Override
+	public void parse() {
+		line.set_unparsed(false);
+		
 		String parts[] = value.split("=");
 		String tmp = parts[0x00].trim();
 		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 			String name = tmp;
 			tmp = parts[0x01].trim();
-			Long num = Expr.parse(l_pi, line, tmp);
+			Long num = Expr.parse(pi, line, tmp);
 			if(null != num) {
-				l_pi.add_constant(line, name, num, true);
+				pi.add_constant(line, name, num, true);
 			}
 			else {
-				line.set_unparsed();
+				line.set_unparsed(true);
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_SYNTAX);
+			pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_SYNTAX);
 		}
 	}
 }

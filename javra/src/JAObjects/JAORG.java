@@ -15,20 +15,27 @@ public class JAORG extends JAObject {
 	public JAORG(ProgInfo l_pi, Line l_line, String l_value) {
 		super(l_pi, l_line, l_value);
 		
+		parse();
+	}
+	
+	@Override
+	public void parse() {
+		line.set_unparsed(false);
+		
 		if(!value.isEmpty()) {
-			Long addr = Expr.parse(l_pi, line, value);
+			Long addr = Expr.parse(pi, line, value);
 			if(null == addr) {
-				l_pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_NUMBER);
+				pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_NUMBER);
 			}
 			else {
-				DataBlock exist_datablock = l_pi.get_cur_segment().set_block(addr.intValue());
+				DataBlock exist_datablock = pi.get_cur_segment().set_block(addr.intValue());
 				if(null != exist_datablock) {
-					l_pi.print(EMsgType.MSG_ERROR, line, "ORG " + addr + " already defined");
+					pi.print(EMsgType.MSG_ERROR, line, "ORG " + addr + " already defined");
 				}
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
+			pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
 	}
 }

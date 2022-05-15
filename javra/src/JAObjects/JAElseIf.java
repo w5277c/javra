@@ -14,17 +14,24 @@ public class JAElseIf extends JAObject {
 	public JAElseIf(ProgInfo l_pi, Line l_line, String l_value) throws Exception {
 		super(l_pi, l_line, l_value);
 		
+		parse();
+	}
+	
+	@Override
+	public void parse() {
+		line.set_unparsed(false);
+		
 		if(!value.isEmpty()) {
-			Long value = Expr.parse(l_pi, line, this.value);
-			if(null != value) {
-				line.set_unparsed();
+			Long _value = Expr.parse(pi, line, value);
+			if(null == _value) {
+				line.set_unparsed(true);
 			}
 			else {
-				l_pi.get_ii().block_elseif(0x00 == value);
+				pi.get_ii().block_elseif(0x00 == _value);
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
+			pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
 	}
 }

@@ -47,6 +47,7 @@ public class IntelHexBuilder implements HexBuilder {
       Row.write(fos, Row.EXT_SEGMENT, 0x0000, new byte[]{0x00, 0x00}, 0x0000, 0x02);
 	}
 	
+	@Override
 	public void push(byte[] l_data, int l_address, int l_length) throws IOException {
       for(int offset = 0x00; offset < l_length; offset+=0x10) {
          Row.write(fos, Row.DATA, l_address + offset, l_data, offset, (l_length - offset) >= 0x10 ? 0x10 : (l_length - offset));

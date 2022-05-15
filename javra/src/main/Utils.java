@@ -7,12 +7,19 @@ package main;
 
 public class Utils {
    public static String printHexBinary(byte[] l_bytes) {
-      if(null == l_bytes || 0 == l_bytes.length) {
+		if(null == l_bytes) {
+         return "";
+      }
+      return printHexBinary(l_bytes, 0, l_bytes.length);
+   }
+	
+   public static String printHexBinary(byte[] l_bytes, int l_offset, int l_length) {
+      if(null == l_bytes || 0 == l_length) {
          return "";
       }
 
       StringBuilder result = new StringBuilder();
-      for(int pos = 0; pos < l_bytes.length; pos++) {
+      for(int pos = l_offset; pos < l_length; pos++) {
          String num = Integer.toHexString(l_bytes[pos] & 0xff).toLowerCase();
          if(num.length() < 0x02) {
             result.append("0");
@@ -21,4 +28,5 @@ public class Utils {
       }
       return result.toString();
    }
+
 }

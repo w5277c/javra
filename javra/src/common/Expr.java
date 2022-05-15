@@ -173,7 +173,7 @@ public class Expr {
 								result = (long)label.get_addr();
 							}
 							else {
-								l_line.set_unparsed();
+								l_line.set_unparsed(true);
 							}
 						}
 					}

@@ -13,8 +13,18 @@ import main.Line;
 import main.ProgInfo;
 
 public class JAMessage extends JAObject {
+	private	EMsgType	msg_type;
+	
 	public JAMessage(ProgInfo l_pi, Line l_line, String l_value, EMsgType l_msg_type) throws Exception {
 		super(l_pi, l_line, l_value);
+		
+		msg_type = l_msg_type;
+		parse();
+	}
+	
+	@Override
+	public void parse() {
+		line.set_unparsed(false);
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -29,7 +39,7 @@ public class JAMessage extends JAObject {
 						}
 					}
 					if(-1 == str_length) {
-						l_pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_INVALID_SYNTAX);
+						pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_INVALID_SYNTAX);
 						sb = null;
 						break;
 					}
@@ -41,29 +51,29 @@ public class JAMessage extends JAObject {
 				else {
 					int expr_length = value.indexOf(',');
 					if(-1 == expr_length) {
-						Long expr = Expr.parse(l_pi, line, value.toLowerCase().trim().toLowerCase());
+						Long expr = Expr.parse(pi, line, value.toLowerCase().trim().toLowerCase());
 						if(null != expr) {
 							sb.append(expr);
 						}
 						else {
-							line.set_unparsed();
+							line.set_unparsed(true);
 						}
 						value = "";
 					}
 					else {
-						Long expr = Expr.parse(l_pi, line, value.substring(0x00, expr_length).trim().toLowerCase());
+						Long expr = Expr.parse(pi, line, value.substring(0x00, expr_length).trim().toLowerCase());
 						if(null != expr) {
 							sb.append(expr);
 						}
 						else {
-							line.set_unparsed();
+							line.set_unparsed(true);
 						}
 						value = value.substring(expr_length);
 					}
 				}
 				if(!value.isEmpty()) {
 					if(',' != value.charAt(0x00)) {
-						l_pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_INVALID_SYNTAX);
+						pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_INVALID_SYNTAX);
 						sb = null;
 						break;
 					}
@@ -71,7 +81,7 @@ public class JAMessage extends JAObject {
 				}
 			}
 			if(null != sb && !line.is_unparsed()) {
-				l_pi.print(l_msg_type, line, sb.toString());
+				pi.print(msg_type, line, sb.toString());
 			}
 		}
 		else {

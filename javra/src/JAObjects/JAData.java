@@ -10,19 +10,32 @@ import enums.EMsgType;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import main.DataBlock;
 import main.Line;
 import main.ProgInfo;
+import main.Utils;
 
 public class JAData extends JAObject {
-	private	int	size;
+	private	int			size;
+	private	DataBlock	block		= null;
+	private	int			address;
+	private	byte[]		data;
+	private	int			offset;
 	
 	public JAData(ProgInfo l_pi, Line l_line, String l_value, int l_size) {
 		super(l_pi, l_line, l_value);
 		
 		size = l_size;
 		
-		byte[] data	= new byte[0x40];
-		int offset = 0x00;
+		parse();
+	}
+	
+	@Override
+	public void parse() {
+		line.set_unparsed(false);
+		
+		data = new byte[0x40];
+		offset = 0x00;
 		
 		String parts[] = value.split(",");
 		if(0x00 != parts.length) {
@@ -44,31 +57,47 @@ public class JAData extends JAObject {
 					}
 				}
 				else {
-					Long value = Expr.parse(l_pi, line, tmp);
-					if(null != value) {
-						if((data.length-offset) < l_size) {
-							byte[] _tmp = new byte[offset + l_size + 0x40];
-							System.arraycopy(data, 0x00, _tmp, 0x00, offset);
-							data = _tmp;
-						}
-						ByteBuffer bb = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.LITTLE_ENDIAN);
-						bb.putLong(value);
-						System.arraycopy(bb.array(), 0x00, data, offset, l_size);
-						offset+=l_size;
+					Long value = Expr.parse(pi, line, tmp);
+					if(null == value) {
+						line.set_unparsed(true);
+						value = 0l;
 					}
-					else {
-						line.set_unparsed();
+					if((data.length-offset) < size) {
+						byte[] _tmp = new byte[offset + size + 0x40];
+						System.arraycopy(data, 0x00, _tmp, 0x00, offset);
+						data = _tmp;
 					}
+					ByteBuffer bb = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.LITTLE_ENDIAN);
+					bb.putLong(value);
+					System.arraycopy(bb.array(), 0x00, data, offset, size);
+					offset+=size;
 				}
 			}
 
-			if(0x00 != (offset%0x02)) {
-				l_pi.print(EMsgType.MSG_WARNING, line, "A .DB segment with an odd number of bytes is detected. A zero byte is added.");
+			if(null == block) {
+				if(0x00 != (offset%0x02)) {
+					pi.print(EMsgType.MSG_WARNING, line, "A .DB segment with an odd number of bytes is detected. A zero byte is added.");
+				}
+
+				block = pi.get_cur_segment().get_cur_block();
+				address = block.get_addr();
+				block.write(data, offset/2 + (offset%0x02));
 			}
-			l_pi.get_cur_segment().get_cur_block().write(data, offset/2 + (offset%0x02));
+			else {
+				block.set_addr(address);
+				block.write(data, offset/2 + (offset%0x02));
+			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
+			pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
 	}
+	
+	@Override
+	public void write_list(OutputStream l_os) throws Exception {
+		super.write_list(l_os);
+		
+		l_os.write(("C:" + String.format("%06X", address) + " " + Utils.printHexBinary(data, 0x00, offset).toUpperCase() + "\n").getBytes("UTF-8"));
+	}
+
 }

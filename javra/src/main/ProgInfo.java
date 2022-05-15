@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-07.03.2022	konstantin@5277.ru			Начало
+07.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
@@ -12,8 +12,6 @@ import enums.EMsgType;
 import enums.ESegmentType;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -36,12 +34,9 @@ public class ProgInfo {
 	private	EDevice							device			= null;
 	private	IncludeInfo						ii					= null;
 	private	HashMap<String,Integer>		registers		= new HashMap<>();
-	private	HashMap<String, Line>		unparsed			= new HashMap<>();
-	
 	private	LinkedList<JAObject>			objects			= new LinkedList<>();
 	
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
-//	private	EPass	pass;
 
 	public ProgInfo() throws IOException {
 		root_path = new java.io.File(".").getCanonicalPath();
@@ -53,11 +48,7 @@ public class ProgInfo {
 	}
 	
 	
-/*	public EPass get_pass() {
-		return pass;
-	}
-	
-	public boolean get_segment_overlap() {
+/*public boolean get_segment_overlap() {
 		return segment_overlap;
 	}*/
 	
@@ -310,28 +301,6 @@ public class ProgInfo {
 	}
 	public void set_expand_macro(Macro l_macro) {
 		expand_macro = l_macro;
-	}
-
-/*	public void put_unparsed(Line l_line) {
-		if(null == unparsed.get(l_line.get_location())) {
-//			l_line.set_addr(get_cseg().get_cur_block().get_addr());
-			unparsed.put(l_line.get_location(), l_line);
-		}
-	}
-*/	
-	public int  unparsed_qnt() { 
-		return unparsed.size();
-	}
-	public LinkedList<Line> pull_unparsed() {
-		LinkedList<Line> result = new LinkedList<Line>(unparsed.values());
-		unparsed.clear();
-		Collections.sort(result, new Comparator<Line>() {
-			@Override
-			public int compare(Line o1, Line o2) {
-				return 0;//return o1.get_addr().compareTo(o2.get_addr());
-			}
-		});
-		return result;
 	}
 
 	public void add_object(JAObject l_obj) {

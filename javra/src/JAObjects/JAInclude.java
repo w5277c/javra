@@ -30,7 +30,7 @@ public class JAInclude extends JAObject {
 				}
 			}				
 			if(file.exists()) {
-				Parser parser = new Parser(l_pi, filename, file);
+				new Parser(l_pi, filename, file);
 			}
 			else {
 				l_pi.print(EMsgType.MSG_ERROR, line, MSG_ABSENT_FILE);

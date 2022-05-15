@@ -1,9 +1,8 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-07.03.2022	konstantin@5277.ru			Начало
+07.05.2022	konstantin@5277.ru			Начало
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-TODO: Проверять количество параметров в каждой директиве
 TODO:
 1. #pragma warning range byte option
 2. #pragma overlap option
@@ -24,12 +23,8 @@ TODO: поддержка #
 TODO: Pre-defined Macros
 
 
-TODO: Навести порядок с заполнением памяти в DataBlock с учетом PASS
-
--f /home/kostas/repos/w5277c/javra/javra/test.asm
-
-//-l /home/kostas/repos/w5277c/core5277/ -f main.asm
-/media/kostas/repos/w5277c/5277.ru/firmware/solid_relay_x4_v1.0
+TODO: CSEG,DSEG,ESEG
+TODO: args parsing
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
@@ -65,6 +60,33 @@ public class Javra {
 		}
 		
 		Parser parser = new Parser(pi, filename, new File(filename));
+
+		System.out.println("---ADDITIONAL PASS---");
+
+		int unparsed = 0;
+		boolean progress = true;
+		while(progress) {
+			progress = false;
+			unparsed = 0;
+			for(JAObject obj : new LinkedList<>(pi.get_objects())) {
+				if(obj.get_line().is_unparsed()) {
+					
+					obj.parse();
+					
+					if(!obj.get_line().is_unparsed()) {
+						progress = true;
+					}
+					else {
+						unparsed++;
+					}
+				}
+			}
+		}
+		
+		if(0 != unparsed) {
+			System.out.println("\nSome lines not parsed: " + unparsed);
+		}
+
 		FileOutputStream fos = null;
 		try {
 			boolean list_on = true;
@@ -89,6 +111,7 @@ public class Javra {
 			fos.close();
 		}
 		catch(Exception ex) {
+			ex.printStackTrace();
 			if(null != fos) {
 				try {
 					fos.close();
@@ -98,22 +121,13 @@ public class Javra {
 			}
 		}
 
-		
-		System.out.println("---ADDITIONAL PASS---");
-		boolean progress = true;
-		while(progress) {
-			progress = false;
-			LinkedList<Line> unparesed = pi.pull_unparsed();
-			for(Line line : unparesed) {
-				if(line.get_text().equalsIgnoreCase("JMP main")) {
-					int t =1;
-				}
-				Parser.line_parse(pi, line);
-			}
-			if(pi.unparsed_qnt() < unparesed.size()) {
-				progress = true;
+
+		for(JAObject obj : new LinkedList<>(pi.get_objects())) {
+			if(obj.get_line().is_unparsed()) {
+				System.out.println("Unparsed: " + obj.get_line().get_text());
 			}
 		}
+
 		
 		if(0 != pi.get_error_cntr()) {
 			System.out.println("\nBuild fail, wrns:" + pi.get_warning_cntr() + ", errs:" + pi.get_error_cntr() + "/" + pi.get_max_errors());

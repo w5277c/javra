@@ -28,6 +28,8 @@ public class Macro {
 	}
 	
 	public void parse(ProgInfo l_pi, String l_value) {
+		line.set_unparsed(false);
+		
 		l_pi.set_expand_macro(this);
 		
 		LinkedList<String> params = new LinkedList<>();

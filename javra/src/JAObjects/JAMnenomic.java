@@ -24,7 +24,7 @@ public class JAMnenomic extends JAObject {
 	private	static	final	int	IND_MZ	= 0x08;	//-Z
 
 	private	EMnemonic	em;
-	private	int			address;
+	private	Integer		address		= null;
 	private	Integer		opcode1		= 0x00;
 	private	Integer		opcode2		= null;
 
@@ -32,30 +32,25 @@ public class JAMnenomic extends JAObject {
 		super(l_pi, l_line, l_value);
 
 		em = l_em;
-
-		parse(value);
+		parse();
 	}
 	
 	
-	public void parse(String l_value) {
-		String[] params = l_value.split(",");
-
-		address = pi.get_cseg().get_cur_block().get_addr();
+	@Override
+	public void parse() {
+		line.set_unparsed(false);
 		
-//System.out.println(	"@@@ " + String.format("%04X", pi.get_cseg().get_cur_datablock().get_waddr()) +
-//									": " + l_em.get_name() + " " + l_value);
-		
-/*		if(null != line.get_addr()) {
-			if(line.get_text().equalsIgnoreCase("BREQ _C5_DISPATCHER_EVENT__CHECK_WAITTIME")) {
-				int t =1;
-			}
+		String[] params = value.split(",");
 
-			pi.get_cseg().set_addr(line.get_addr());
+		if(null == address) {
+			address = pi.get_cseg().get_cur_block().get_addr();
 		}
-*/
+		else {
+			pi.get_cseg().set_addr(address);
+		}
 		
 		if(0x02 < params.length) {
-			pi.print(EMsgType.MSG_ERROR, line, "Garbage after instruction " + em + ":" + l_value);
+			pi.print(EMsgType.MSG_ERROR, line, "Garbage after instruction " + em + ":" + value);
 		}
 		else {
 			String param1 = (0x00 < params.length ? params[0x00].toLowerCase().replaceAll("\\s", "") : null);
@@ -139,6 +134,7 @@ public class JAMnenomic extends JAObject {
 					}
 				}
 				else if(em.get_id() <= EMnemonic.MN_CALL.get_id()) {
+					opcode2 = 0;//Пишем два слова даже если не смогли распарсить
 					if(garbage_check(pi, em, param1, param2, 1)) {
 						Long value = Expr.parse(pi, line, param1);
 						if(range_check(pi, value, 0x400000, false)) {
@@ -234,6 +230,8 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
+				
+				//TODO ...
 
 			}
 
@@ -247,15 +245,13 @@ public class JAMnenomic extends JAObject {
 		if(null != opcode2) {
 			pi.get_cseg().get_cur_block().write_opcode(opcode2);
 		}
-//TODO ...
-
 	}
 	
 	private boolean constrange_check(ProgInfo pi, EMnemonic l_em, Long l_value, int l_min, int l_max) {
 		if(null == l_value) return false;
 
 		if(l_min > l_value || l_max < l_value) {
-			pi.print(	EMsgType.MSG_ERROR, line, l_em + " Constan out of range(" + l_min + " <= " + l_value + " <=" + l_max + ")");
+			pi.print(EMsgType.MSG_ERROR, line, l_em + " Constan out of range(" + l_min + " <= " + l_value + " <=" + l_max + ")");
 			return false;
 		}
 		return true;
@@ -265,7 +261,7 @@ public class JAMnenomic extends JAObject {
 		if(null == l_register) return false;
 
 		if(l_min > l_register || l_max < l_register) {
-			pi.print(	EMsgType.MSG_ERROR, line, l_em + " register out of range(r" + l_min + " - r" + l_max + ")");
+			pi.print(EMsgType.MSG_ERROR, line, l_em + " register out of range(r" + l_min + " - r" + l_max + ")");
 			return false;
 		}
 		return true;

@@ -16,22 +16,29 @@ public class JAIf extends JAObject {
 	public JAIf(ProgInfo l_pi, Line l_line, String l_value) throws Exception {
 		super(l_pi, l_line, l_value);
 		
+		parse();
+	}
+	
+	@Override
+	public void parse() {
+		line.set_unparsed(false);
+		
 		if(!value.isEmpty()) {
-			if(l_pi.get_ii().is_blockskip()) {
-				l_pi.get_ii().block_start(line, false);
+			if(pi.get_ii().is_blockskip()) {
+				pi.get_ii().block_start(line, false);
 			}
 			else {
-				Long _tmp = Expr.parse(l_pi, line, value);
+				Long _tmp = Expr.parse(pi, line, value);
 				if(null == _tmp) {
-					line.set_unparsed();
+					line.set_unparsed(true);
 				}
 				else {
-					l_pi.get_ii().block_start(line, 0x00 == _tmp);
+					pi.get_ii().block_start(line, 0x00 == _tmp);
 				}
 			}
 		}
 		else {
-			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
+			pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
 	}
 }
