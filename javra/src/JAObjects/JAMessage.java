@@ -24,7 +24,7 @@ public class JAMessage extends JAObject {
 	
 	@Override
 	public void parse() {
-		line.set_unparsed(false);
+		super.parse();
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -56,7 +56,7 @@ public class JAMessage extends JAObject {
 							sb.append(expr);
 						}
 						else {
-							line.set_unparsed(true);
+							expr_fail = true;
 						}
 						value = "";
 					}
@@ -66,7 +66,7 @@ public class JAMessage extends JAObject {
 							sb.append(expr);
 						}
 						else {
-							line.set_unparsed(true);
+							expr_fail = true;
 						}
 						value = value.substring(expr_length);
 					}
@@ -80,7 +80,7 @@ public class JAMessage extends JAObject {
 					value = value.substring(0x01).trim();
 				}
 			}
-			if(null != sb && !line.is_unparsed()) {
+			if(null != sb && !expr_fail) {
 				pi.print(msg_type, line, sb.toString());
 			}
 		}

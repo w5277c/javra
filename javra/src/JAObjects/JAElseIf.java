@@ -19,12 +19,12 @@ public class JAElseIf extends JAObject {
 	
 	@Override
 	public void parse() {
-		line.set_unparsed(false);
+		super.parse();
 		
 		if(!value.isEmpty()) {
 			Long _value = Expr.parse(pi, line, value);
 			if(null == _value) {
-				line.set_unparsed(true);
+				expr_fail = true;
 			}
 			else {
 				pi.get_ii().block_elseif(0x00 == _value);

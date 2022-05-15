@@ -21,19 +21,19 @@ public class JAIf extends JAObject {
 	
 	@Override
 	public void parse() {
-		line.set_unparsed(false);
+		super.parse();
 		
 		if(!value.isEmpty()) {
 			if(pi.get_ii().is_blockskip()) {
 				pi.get_ii().block_start(line, false);
 			}
 			else {
-				Long _tmp = Expr.parse(pi, line, value);
-				if(null == _tmp) {
-					line.set_unparsed(true);
+				Long _value = Expr.parse(pi, line, value);
+				if(null == _value) {
+					expr_fail = true;
 				}
 				else {
-					pi.get_ii().block_start(line, 0x00 == _tmp);
+					pi.get_ii().block_start(line, 0x00 == _value);
 				}
 			}
 		}

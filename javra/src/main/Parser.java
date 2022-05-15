@@ -6,7 +6,7 @@
 package main;
 
 import JAObjects.JAExit;
-import common.Macro;
+import JAObjects.JAMacro;
 import JAObjects.JAObject;
 import enums.EMsgType;
 import java.io.File;
@@ -38,8 +38,14 @@ public class Parser {
 			
 			if(null == line) {
 				line = new Line(l_filename, line_number++, str);
-				if(!line_parse(l_pi, line)) {
-					break;
+				
+				JAObject jaobj = line_parse(l_pi, line);
+				if(null != jaobj) {
+					l_pi.add_object(jaobj);
+					
+					if(jaobj instanceof JAExit) {
+						break;
+					}
 				}
 			}
 			else {
@@ -59,28 +65,21 @@ public class Parser {
 		}
 	}
 	
-	public static boolean line_parse(ProgInfo l_pi, Line l_line) {
-		Macro cur_macros = l_pi.get_cur_macros();
-		if(null != cur_macros && !l_line.get_text().equalsIgnoreCase(".endmacro") && !l_line.get_text().equalsIgnoreCase(".endm")) {
-			cur_macros.get_body().add(l_line);
+	public static JAObject line_parse(ProgInfo l_pi, Line l_line) {
+		JAMacro cur_macro = l_pi.get_cur_macros();
+		if(null != cur_macro && !l_line.get_text().equalsIgnoreCase(".endmacro") && !l_line.get_text().equalsIgnoreCase(".endm")) {
+			cur_macro.add_line(l_line);
 		}
 		else {
 			try {
-				JAObject jaobj = JAObject.parse(l_pi, l_line);
-				if(null != jaobj) {
-					l_pi.add_object(jaobj);
-				}
-				
-				if(jaobj instanceof JAExit) {
-					return false;
-				}
+				return JAObject.parse(l_pi, l_line);
 			}
 			catch(Exception ex) {
 				System.out.println("Exception at " + l_line.get_location());
 				ex.printStackTrace();
 			}
 		}
-		return !l_pi.is_terminating();
+		return null;
 	}
 	
 	public static int get_pos(String l_str, String... l_substrs) {

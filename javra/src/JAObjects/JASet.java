@@ -19,19 +19,17 @@ public class JASet extends JAObject {
 	
 	@Override
 	public void parse() {
-		line.set_unparsed(false);
+		super.parse();
 		
 		String parts[] = value.split("=");
-		String tmp = parts[0x00].trim();
-		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
-			String name = tmp;
-			tmp = parts[0x01].trim();
-			Long num = Expr.parse(pi, line, tmp);
+		String name = parts[0x00].trim();
+		if(0x02 == parts.length && !name.isEmpty() && name.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
+			Long num = Expr.parse(pi, line, parts[0x01].trim());
 			if(null != num) {
 				pi.add_constant(line, name, num, true);
 			}
 			else {
-				line.set_unparsed(true);
+				expr_fail = true;
 			}
 		}
 		else {

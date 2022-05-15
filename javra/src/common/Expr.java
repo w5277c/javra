@@ -17,7 +17,7 @@ import main.ProgInfo;
 
 public class Expr {
 	public static Long parse(ProgInfo l_pi, Line l_line, String l_expr) {
-		Long result = null;
+		Long result = 0l;
 		int count = 0x00;
 		String unary = "";
 		boolean first_flag = true;
@@ -28,6 +28,7 @@ public class Expr {
 		while(!_expr.isEmpty()) {
 			if(first_flag && (_expr.startsWith("!") || _expr.startsWith("~") || _expr.startsWith("-"))) {
 				unary = _expr.substring(0x00, 0x01);
+				_expr = _expr.substring(0x01);
 				first_flag = false;
 			}
 			else if ((count%2) == 0x01) {
@@ -118,8 +119,7 @@ public class Expr {
 					result = parse(l_pi, l_line, _expr.substring(0x01, 0x01 + length));
 					if(null == result) {
 						//l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
-						return null;
-						//break;
+						return 0l;
 					}
 					_expr = _expr.substring(length+0x02).trim();
 				}
@@ -154,7 +154,7 @@ public class Expr {
 							else {
 								//l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 								//break;
-								return null;
+								return 0l;
 							}
 						}
 						else {
@@ -173,7 +173,8 @@ public class Expr {
 								result = (long)label.get_addr();
 							}
 							else {
-								l_line.set_unparsed(true);
+								//UNKNOWN CONSTANT HERE!
+								return null;
 							}
 						}
 					}
@@ -220,7 +221,9 @@ public class Expr {
 							ex.printStackTrace();
 						}
 					}
-					index++;
+					else {
+						index++;
+					}
 				}
 			}
 			return elemets.get(0x00);
@@ -228,7 +231,7 @@ public class Expr {
 		else {
 			l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 		}
-		return null;
+		return 0l;
 	}
 
 	private static long calc(ProgInfo l_pi, Line l_line, long l_left, EOperator l_op, Long l_right) {

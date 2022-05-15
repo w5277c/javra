@@ -69,11 +69,11 @@ public class Javra {
 			progress = false;
 			unparsed = 0;
 			for(JAObject obj : new LinkedList<>(pi.get_objects())) {
-				if(obj.get_line().is_unparsed()) {
+				if(obj.is_expr_fail()) {
 					
 					obj.parse();
 					
-					if(!obj.get_line().is_unparsed()) {
+					if(!obj.is_expr_fail()) {
 						progress = true;
 					}
 					else {
@@ -85,6 +85,11 @@ public class Javra {
 		
 		if(0 != unparsed) {
 			System.out.println("\nSome lines not parsed: " + unparsed);
+		}
+		for(JAObject obj : new LinkedList<>(pi.get_objects())) {
+			if(obj.is_expr_fail()) {
+				System.out.println("Unparsed: " + obj.get_line().get_text());
+			}
 		}
 
 		FileOutputStream fos = null;
@@ -121,14 +126,6 @@ public class Javra {
 			}
 		}
 
-
-		for(JAObject obj : new LinkedList<>(pi.get_objects())) {
-			if(obj.get_line().is_unparsed()) {
-				System.out.println("Unparsed: " + obj.get_line().get_text());
-			}
-		}
-
-		
 		if(0 != pi.get_error_cntr()) {
 			System.out.println("\nBuild fail, wrns:" + pi.get_warning_cntr() + ", errs:" + pi.get_error_cntr() + "/" + pi.get_max_errors());
 		}

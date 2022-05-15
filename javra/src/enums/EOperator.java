@@ -12,8 +12,8 @@ public enum EOperator {
 	OP_GREATER_OR_EQUAL(">=", 7),
 	OP_EQUALX2("==", 6),
 	OP_NOT_EQUAL("!=", 6),
-	OP_BITWISE_AND("&&", 5),
-	OP_BITWISE_OR("||", 3),
+	OP_LOGICAL_AND("&&", 2),
+	OP_LOGICAL_OR("||", 1),
 	OP_MUL("*", 10),
 	OP_DIV("/", 10),
 	OP_MOD("%", 10),
@@ -23,8 +23,8 @@ public enum EOperator {
 	OP_GREATER_THAN(">", 7),
 	OP_EQUAL("=", 6),
 	OP_BITWISE_XOR("^", 4),
-	OP_LOGICAL_AND("&", 2),
-	OP_LOGICAL_OR("|", 1);
+	OP_BITWISE_AND("&", 5),
+	OP_BITWISE_OR("|", 3);
 	
 	private	String	text;
 	private	int		priority;

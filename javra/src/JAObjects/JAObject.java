@@ -9,7 +9,6 @@ package JAObjects;
 import enums.EMnemonic;
 import enums.EMsgType;
 import main.Line;
-import common.Macro;
 import java.io.OutputStream;
 import main.ProgInfo;
 
@@ -35,7 +34,7 @@ public class JAObject {
 	protected					ProgInfo	pi;
 	protected					Line		line;
 	protected					String	value;
-	
+	protected					boolean	expr_fail	= false;
 	
 	protected JAObject(ProgInfo l_pi, Line l_line, String l_value) {
 		pi = l_pi;
@@ -44,6 +43,7 @@ public class JAObject {
 	}
 	
 	public void parse() {
+		expr_fail = false;
 	}
 	
 	public static JAObject parse(ProgInfo l_pi, Line l_line) throws Exception {
@@ -149,9 +149,9 @@ public class JAObject {
 								return new JAMnenomic(l_pi, l_line, value, em);
 							}
 							else {
-								Macro macro = l_pi.get_macros().get(name);
+								JAMacro macro = l_pi.get_macro(name);
 								if(null != macro) {
-									macro.parse(l_pi, value);
+									return new JAMacroBlock(l_pi, l_line, value, macro);
 								}
 								else {
 									l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME);
@@ -179,8 +179,16 @@ public class JAObject {
 	public Line get_line() {
 		return line;
 	}
+	public void set_line(Line l_line) {
+		line = l_line;
+	}
 	
 	public void write_list(OutputStream l_os) throws Exception {
 		l_os.write((line.get_text() + "\n").getBytes("UTF-8"));
 	}
+	
+	public boolean is_expr_fail() {
+		return expr_fail;
+	}
+
 }

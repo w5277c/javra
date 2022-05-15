@@ -32,7 +32,7 @@ public class JAData extends JAObject {
 	
 	@Override
 	public void parse() {
-		line.set_unparsed(false);
+		super.parse();
 		
 		data = new byte[0x40];
 		offset = 0x00;
@@ -59,7 +59,7 @@ public class JAData extends JAObject {
 				else {
 					Long value = Expr.parse(pi, line, tmp);
 					if(null == value) {
-						line.set_unparsed(true);
+						expr_fail = true;
 						value = 0l;
 					}
 					if((data.length-offset) < size) {
@@ -83,7 +83,8 @@ public class JAData extends JAObject {
 				address = block.get_addr();
 				block.write(data, offset/2 + (offset%0x02));
 			}
-			else {
+			
+			if(!expr_fail) {
 				block.set_addr(address);
 				block.write(data, offset/2 + (offset%0x02));
 			}

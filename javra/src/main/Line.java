@@ -8,8 +8,8 @@ package main;
 public class Line {
 	private	String	filename;
 	private	int		line_number;
+	private	int		subline_number = 0;
 	private	String	text;
-	private	boolean	unparsed	= false;
 	
 	public Line(String l_filename, int l_number, String l_text) {
 		filename = l_filename;
@@ -17,14 +17,24 @@ public class Line {
 		text = l_text.replaceAll("\\s+", " ").trim();
 	}
 	
+	public Line(String l_filename, int l_number, int l_subline_number, String l_text) {
+		filename = l_filename;
+		line_number = l_number;
+		text = l_text.replaceAll("\\s+", " ").trim();
+	}
+
 	public void append(String l_text) {
 		text = text + l_text;
 	}
 	
-	public int get_number() {
+	public int get_line_number() {
 		return line_number;
 	}
 	
+	public int get_subline_number() {
+		return subline_number;
+	}
+
 	public String get_filename() {
 		return filename;
 	}
@@ -34,13 +44,6 @@ public class Line {
 	}
 	
 	public String get_location() {
-		return filename + ":" + line_number;
-	}
-	
-	public boolean is_unparsed() {
-		return unparsed;
-	}
-	public void set_unparsed(boolean l_unparsed) {
-		unparsed = l_unparsed;
+		return filename + ":" + line_number + (0 == subline_number ? "" : "." + subline_number);
 	}
 }

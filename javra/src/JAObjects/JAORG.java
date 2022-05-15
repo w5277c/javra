@@ -20,12 +20,12 @@ public class JAORG extends JAObject {
 	
 	@Override
 	public void parse() {
-		line.set_unparsed(false);
+		super.parse();
 		
 		if(!value.isEmpty()) {
 			Long addr = Expr.parse(pi, line, value);
 			if(null == addr) {
-				pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_NUMBER);
+				expr_fail = true;
 			}
 			else {
 				DataBlock exist_datablock = pi.get_cur_segment().set_block(addr.intValue());

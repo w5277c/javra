@@ -5,8 +5,8 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import JAObjects.JAMacro;
 import JAObjects.JAObject;
-import common.Macro;
 import enums.EDevice;
 import enums.EMsgType;
 import enums.ESegmentType;
@@ -27,9 +27,9 @@ public class ProgInfo {
 	private	long								timestamp		= System.currentTimeMillis();
 	private	HashMap<String,Constant>	constants		= new HashMap<>();
 	private	HashMap<String,Label>		labels			= new HashMap<>();
-	private	HashMap<String,Macro>		macros			= new HashMap<>();
-	private	Macro								cur_macros		= null;
-	private	Macro								expand_macro	= null;
+	private	HashMap<String,JAMacro>		macros			= new HashMap<>();
+	private	JAMacro							cur_macro		= null;
+	private	JAMacro							expand_macro	= null;
 	private	String							root_path;
 	private	EDevice							device			= null;
 	private	IncludeInfo						ii					= null;
@@ -78,11 +78,11 @@ public class ProgInfo {
 	public boolean add_constant(Line l_line, String l_name, long l_value, boolean l_redef) {
 		if(is_undefined(l_line, l_name, l_value, l_redef)) {
 			Constant constatnt = new Constant(l_line, l_name, l_value, l_redef);
-			if(null == cur_macros) {
+			if(null == cur_macro) {
 				constants.put(l_name, constatnt);
 			}
 			else {
-				cur_macros.add_constant(constatnt);
+				cur_macro.add_constant(constatnt);
 			}
 			return true;
 		}
@@ -102,11 +102,11 @@ public class ProgInfo {
 	public boolean add_label(Line l_line, String l_name) {
 		if(is_undefined(l_line, l_name, false)) {
 			int addr = get_cur_segment().get_cur_block().get_addr();
-			if(null == cur_macros) {
+			if(null == cur_macro) {
 				labels.put(l_name, new Label(l_line, l_name, addr));
 			}
 			else {
-				cur_macros.add_label(new Label(l_line, l_name, addr));
+				cur_macro.add_label(new Label(l_line, l_name, addr));
 			}
 			return true;
 		}
@@ -165,7 +165,7 @@ public class ProgInfo {
 			System.out.print("[" + warning_cntr + "]");
 		}
 		if(null != l_line && EMsgType.MSG_DMESSAGE != l_msg_type && EMsgType.MSG_DWARNING != l_msg_type && EMsgType.MSG_DERROR != l_msg_type) {
-			System.out.print(" " + l_line.get_filename() + "(" + l_line.get_number() + ")");
+			System.out.print(" " + l_line.get_filename() + "(" + l_line.get_line_number() + ")");
 		}
 		System.out.print(": ");
 		for(String msg : l_messages) {
@@ -191,29 +191,34 @@ public class ProgInfo {
 		return ii;
 	}
 	
-	public boolean create_macro(Line l_line, String l_name) {
-		if(null == cur_macros) {
-			cur_macros = new Macro(l_line, l_name);
-			macros.put(l_name, cur_macros);
+	public boolean create_macro(JAMacro l_macro, String l_name) {
+		if(null == cur_macro) {
+			cur_macro = l_macro; 
+			macros.put(l_name, cur_macro);
 			return true;
 		}
 		return false;
 	}
-	public void open_macro(String l_name) {
-		cur_macros = macros.get(l_name);
+	
+//	public void open_macro(String l_name) {
+//		cur_macro = macros.get(l_name);
+//	}
+
+//	public HashMap<String, JAMacro> get_macros() {
+//		return macros;
+//	}
+	
+	public JAMacro get_macro(String l_name) {
+		return macros.get(l_name);
 	}
 
-	public HashMap<String, Macro> get_macros() {
-		return macros;
-	}
-
-	public Macro get_cur_macros() {
-		return cur_macros;
+	public JAMacro get_cur_macros() {
+		return cur_macro;
 	}
 	
 	public boolean close_macro() {
-		if(null != cur_macros) {
-			cur_macros = null;
+		if(null != cur_macro) {
+			cur_macro = null;
 			return true;
 		}
 		return false;
@@ -285,9 +290,9 @@ public class ProgInfo {
 			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " as 'r" + Integer.toString(register_id) + "'");
 			return false;
 		}
-		Macro macros = get_macros().get(l_name);
-		if(null != macros) {
-			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " at '" + macros.get_line().get_location() + "'");
+		JAMacro macro = get_macro(l_name);
+		if(null != macro) {
+			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " at '" + macro.get_line().get_location() + "'");
 			return false;
 		}
 		
@@ -296,12 +301,12 @@ public class ProgInfo {
 		return true;
 	}
 	
-	public Macro get_expand_macro() {
-		return expand_macro;
-	}
-	public void set_expand_macro(Macro l_macro) {
-		expand_macro = l_macro;
-	}
+//	public Macro get_expand_macro() {
+//		return expand_macro;
+//	}
+//	public void set_expand_macro(JAMacro l_macro) {
+//		expand_macro = l_macro;
+//	}
 
 	public void add_object(JAObject l_obj) {
 		objects.add(l_obj);

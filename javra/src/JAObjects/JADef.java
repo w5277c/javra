@@ -5,10 +5,8 @@
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 TODO: #define SQR(X) ((X)*(X))
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
 package JAObjects;
 
-import common.Macro;
 import enums.EMsgType;
 import main.Constant;
 import main.Line;
@@ -23,14 +21,16 @@ public class JADef extends JAObject {
 	
 	@Override
 	public void parse() {
+		super.parse();
+
 		String parts[] = value.split("=");
 		String name = parts[0x00].trim();
 		if(0x02 == parts.length && !name.isEmpty() && name.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 			Constant constant = pi.get_constant(name);
 			if(null == constant) {
 				if(!name.startsWith("r") || name.length() <= 0x01 || name.length() > 0x03 || !name.substring(0x01).replaceAll("\\d", "").isEmpty()) {
-					Macro macros = pi.get_macros().get(name);
-					if(null == macros) {
+					JAMacro macro = pi.get_macro(name);
+					if(null == macro) {
 						Integer register = pi.get_register(parts[0x01].trim());
 						if(null == register) {
 							pi.print(EMsgType.MSG_ERROR, line, MSG_WRONG_REGISTER);
@@ -40,7 +40,7 @@ public class JADef extends JAObject {
 						}
 					}
 					else {
-						pi.print(EMsgType.MSG_ERROR, line, MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
+						pi.print(EMsgType.MSG_ERROR, line, MSG_ALREADY_DEFINED, "at '" + macro.get_line().get_location() + "'");
 					}
 				}
 				else {

@@ -8,7 +8,6 @@ package JAObjects;
 import common.Expr;
 import enums.EMsgType;
 import main.Line;
-import common.Macro;
 import main.ProgInfo;
 
 public class JAEQU extends JAObject {
@@ -20,32 +19,33 @@ public class JAEQU extends JAObject {
 	
 	@Override
 	public void parse() {
-		line.set_unparsed(false);
+		super.parse();
 		
 		String parts[] = value.split("=");
-		String tmp = parts[0x00].trim();
-		if(0x02 == parts.length && !tmp.isEmpty() && tmp.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
-			String name = tmp;
+		String name = parts[0x00].trim();
+		if(0x02 == parts.length && !name.isEmpty() && name.replaceAll(REGEX_CONST_NAME, "").isEmpty()) {
 
 			Integer register_id = pi.get_register(name);
 			if(null != register_id) {
 				pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_ALREADY_DEFINED, "as 'r" + Integer.toString(register_id) + "'");
 				return;
 			}
-			Macro macros = pi.get_macros().get(name);
-			if(null != macros) {
-				pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_ALREADY_DEFINED, "at '" + macros.get_line().get_location() + "'");
+			JAMacro macro = pi.get_macro(name);
+			if(null != macro) {
+				pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_ALREADY_DEFINED, "at '" + macro.get_line().get_location() + "'");
 				return;
 			}
 
-			tmp = parts[0x01].trim();
-			Long num = Expr.parse(pi, line, tmp);
-			if(null != num) {
-				pi.add_constant(line, name, num, false);
+			Long _value = Expr.parse(pi, line, parts[0x01].trim());
+			if(null != _value) {
+				pi.add_constant(line, name, _value, false);
+			}
+			else {
+				expr_fail = true;
 			}
 		}
 		else {
-			line.set_unparsed(true);
+			pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_SYNTAX);
 		}
 	}
 }

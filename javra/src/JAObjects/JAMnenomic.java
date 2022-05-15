@@ -38,7 +38,7 @@ public class JAMnenomic extends JAObject {
 	
 	@Override
 	public void parse() {
-		line.set_unparsed(false);
+		super.parse();
 		
 		String[] params = value.split(",");
 
@@ -131,6 +131,9 @@ public class JAMnenomic extends JAObject {
 								}
 							}
 						}
+						else {
+							expr_fail = true;
+						}
 					}
 				}
 				else if(em.get_id() <= EMnemonic.MN_CALL.get_id()) {
@@ -153,6 +156,9 @@ public class JAMnenomic extends JAObject {
 								if(range_check(pi, value, 0x40, true)) {
 									opcode1 |= (int)(((value & 0x7f) << 0x03));
 								}
+							}
+							else {
+								expr_fail = true;
 							}
 						}
 					}
@@ -230,7 +236,95 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
-				
+				else if(em.get_id() <= EMnemonic.MN_CBR.get_id()) {
+					if(garbage_check(pi, em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, em, param1);
+						if(regrange_check(pi, em, register1, 16, 31)) {
+							opcode1 = (int)((register1 & 0x0f) << 0x04);
+							Long value = Expr.parse(pi, line, param2);
+							if(null != value) {
+								if(-128 > value || 255 < value) {
+									pi.print(EMsgType.MSG_WARNING, line, " Constant out of range (-128 <= " + value + " <= 255). Will be masked");
+								}
+								if(em.get_id() <= EMnemonic.MN_CBR.get_id()) value = ~value;
+								opcode1 |= (int)(((value & 0xf0) << 0x04) | (value & 0x0f));
+							}
+						}
+					}
+				}
+				else if(em.get_id() <= EMnemonic.MN_BLD.get_id()) {
+					if(garbage_check(pi, em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, em, param1);
+						if(null != register1) {
+							opcode1 = (int)(register1 << 0x04);
+							Integer bitnum = get_bitnum(pi, em, param2);
+							if(null != bitnum) {
+								opcode1 |= bitnum;
+							}
+						}
+					}
+				}
+				else if(em.get_id() == EMnemonic.MN_IN.get_id()) {
+					if(garbage_check(pi, em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, em, param1);
+						if(regrange_check(pi, em, register1, 0, 31)) {
+							opcode1 = (int)(register1 << 0x04);
+							Long value = Expr.parse(pi, line, param2);
+							if(iorange_check(pi, value, 0, 0x3f)) {
+								opcode1 |= (int)(((value & 0x30) << 0x05) | (value & 0x0f));
+							}
+						}
+					}
+				}
+				else if(em.get_id() == EMnemonic.MN_OUT.get_id()) {
+					if(garbage_check(pi, em, param1, param2, 2)) {
+						Long value = Expr.parse(pi, line, param1);
+						if(iorange_check(pi, value, 0, 0x3f)) {
+							opcode1 |= (int)(((value & 0x30) << 0x05) | (value & 0x0f));
+							Integer register1 = get_register(pi, em, param2);
+							opcode1 = (int)(register1 << 0x04);
+						}
+					}
+				}
+				else if(em.get_id() <= EMnemonic.MN_CBI.get_id()) {
+					if(garbage_check(pi, em, param1, param2, 2)) {
+						Long value = Expr.parse(pi, line, param1);
+						if(iorange_check(pi, value, 0, 0x1f)) {
+							opcode1 = (int)(value << 0x03);
+							Integer bitnum = get_bitnum(pi, em, param2);
+							if(null != bitnum) {
+								opcode1 |= bitnum;
+							}
+						}
+					}
+				}
+				else if(em.get_id() == EMnemonic.MN_LDS.get_id()) {
+					opcode2 = 0;
+					if(garbage_check(pi, em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, em, param1);
+						if(null != register1) {
+							opcode1 = (int)(register1 << 0x04);
+							Long value = Expr.parse(pi, line, param2);
+							if(sramrange_check(pi, value, 0, 0xffff)) {
+								opcode2 = value.intValue();
+							}
+						}
+					}
+				}
+				else if(em.get_id() == EMnemonic.MN_STS.get_id()) {
+					opcode2 =0;
+					if(garbage_check(pi, em, param1, param1, 2)) {
+						Long value = Expr.parse(pi, line, param1);
+						if(sramrange_check(pi, value, 0, 0xffff)) {
+							opcode2 = value.intValue();
+							Integer register1 = get_register(pi, em, param2);
+							if(null != register1) {
+								opcode1 = (int)(register1 << 0x04);
+							}
+						}
+					}
+				}
+
 				//TODO ...
 
 			}
@@ -248,7 +342,10 @@ public class JAMnenomic extends JAObject {
 	}
 	
 	private boolean constrange_check(ProgInfo pi, EMnemonic l_em, Long l_value, int l_min, int l_max) {
-		if(null == l_value) return false;
+		if(null == l_value) {
+			expr_fail = true;
+			return false;
+		}
 
 		if(l_min > l_value || l_max < l_value) {
 			pi.print(EMsgType.MSG_ERROR, line, l_em + " Constan out of range(" + l_min + " <= " + l_value + " <=" + l_max + ")");
@@ -281,8 +378,39 @@ public class JAMnenomic extends JAObject {
 		return result;
 	}
 	
+	private boolean sramrange_check(ProgInfo pi, Long l_offset, int l_min, int l_max) {
+		if(null == l_offset) {
+			expr_fail = true;
+			return false;
+		}
+		if(l_max < l_offset || l_min > l_offset) {
+			pi.print(EMsgType.MSG_ERROR, line, " SRAM address ouf of range (" + l_min + " <= " + l_offset + " <= " + l_max + ")");
+			return false;
+		}
+		
+		int size = (pi.get_device().get_ram_size() + pi.get_device().get_ram_start());
+		if(size <= l_offset) {
+			pi.print(EMsgType.MSG_ERROR, line, " SRAM address ouf of range '" + (l_offset) + " > " + size + "'");
+			return false;
+		}
+		return true;
+	}
+
+	private boolean iorange_check(ProgInfo pi, Long l_offset, int l_min, int l_max) {
+		if(null == l_offset) {
+			expr_fail = true;
+			return false;
+		}
+		if(l_max < l_offset || l_min > l_offset) {
+			pi.print(EMsgType.MSG_ERROR, line, " I/O ouf of range (" + l_min + " <= " + l_offset + " <= " + l_max + ")");
+			return false;
+		}
+		return true;
+	}
+
 	private boolean range_check(ProgInfo pi, Long l_offset, int l_range, boolean l_relative) {
 		if(null == l_offset) {
+			expr_fail = true;
 			return false;
 		}
 		if(l_relative && ((l_range-0x01) < l_offset || (l_range*(-1)) > l_offset)) {
@@ -384,11 +512,12 @@ public class JAMnenomic extends JAObject {
 	@Override
 	public void write_list(OutputStream l_os) throws Exception {
 		if(null == opcode2) {
-			l_os.write(("C:" + String.format("%06X", address) + " " + String.format("%04X", opcode1) + "\t" + line.get_text() + "\n").getBytes("UTF-8"));
+			l_os.write(	("C:" + String.format("%06X", address) + " " + String.format("%04X", opcode1) + "\t" +
+							line.get_text() + "\n").getBytes("UTF-8"));
 		}
 		else {
 			l_os.write(	("C:" + String.format("%06X", address) + " " + String.format("%04X", opcode1) + " " + String.format("%04X", opcode2) + "\t" +
-								line.get_text() + "\n").getBytes("UTF-8"));
+							line.get_text() + "\n").getBytes("UTF-8"));
 		}
 	}
 }
