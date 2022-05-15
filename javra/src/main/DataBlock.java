@@ -19,6 +19,12 @@ public class DataBlock {
 		start = l_start;
 	}
 
+	public void allocate(int l_size) {
+		offset += l_size;
+		if(offset > length) {
+			length = offset;
+		}
+	}
 	public void write_opcode(int l_opcode) {
 		ByteBuffer bb = ByteBuffer.allocate(Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN);
 		bb.putInt(l_opcode);
@@ -37,7 +43,7 @@ public class DataBlock {
 			length = offset;
 		}
 	}
-
+	
 	public int get_address() {
 		return start + offset;
 	}

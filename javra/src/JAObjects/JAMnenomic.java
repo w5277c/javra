@@ -8,7 +8,9 @@ package JAObjects;
 import common.Expr;
 import enums.EMsgType;
 import enums.EMnemonic;
+import enums.ESegmentType;
 import java.io.OutputStream;
+import main.CodeBlock;
 import main.Line;
 import main.ProgInfo;
 
@@ -32,6 +34,7 @@ public class JAMnenomic extends JAObject {
 		super(l_pi, l_line, l_value);
 
 		em_id = l_em.get_id();
+
 		parse();
 	}
 	
@@ -43,10 +46,10 @@ public class JAMnenomic extends JAObject {
 		String[] params = value.split(",");
 
 		if(null == address) {
-			address = pi.get_cseg().get_cur_block().get_address();
+			address = pi.get_cseg().get_cur_block(line).get_address();
 		}
 		else {
-			pi.get_cseg().set_addr(address);
+			pi.get_cseg().set_addr(line, address);
 		}
 		
 		if(0x02 < params.length) {
@@ -119,7 +122,7 @@ public class JAMnenomic extends JAObject {
 					if(garbage_check(pi, em_id, param1, param2, 1)) {
 						Long value = Expr.parse(pi, line, param1);
 						if(null != value) {
-							value -= (pi.get_cseg().get_cur_block().get_address() + 0x01);
+							value -= (pi.get_cseg().get_cur_block(line).get_address() + 0x01);
 							if(em_id <= EMnemonic.MN_BRID.get_id()) {
 								if(range_check(pi, value, 0x40, true)) {
 									opcode1 = (int)((value & 0x7f) << 3);
@@ -152,7 +155,7 @@ public class JAMnenomic extends JAObject {
 						if(null != opcode1) {
 							Long value = Expr.parse(pi, line, param2);
 							if(null != value) {
-								value -= pi.get_cseg().get_cur_block().get_address();
+								value -= pi.get_cseg().get_cur_block(line).get_address();
 								if(range_check(pi, value, 0x40, true)) {
 									opcode1 |= (int)(((value & 0x7f) << 0x03));
 								}
@@ -414,9 +417,9 @@ public class JAMnenomic extends JAObject {
 		}
 		opcode1 |= EMnemonic.fromId(em_id).get_opcode();
 
-		pi.get_cseg().get_cur_block().write_opcode(opcode1);
+		pi.get_segment().get_cur_block(line).write_opcode(opcode1);
 		if(null != opcode2) {
-			pi.get_cseg().get_cur_block().write_opcode(opcode2);
+			pi.get_segment().get_cur_block(line).write_opcode(opcode2);
 		}
 	}
 	
@@ -500,7 +503,7 @@ public class JAMnenomic extends JAObject {
 			l_pi.print(EMsgType.MSG_ERROR, line, " address ouf of range (0 <= " + l_offset + " <= " + (l_range-0x01) + ")");
 			return false;
 		}
-		int pc = l_pi.get_cseg().get_cur_block().get_address();
+		int pc = l_pi.get_cseg().get_cur_block(line).get_address();
 		if(l_relative && (0 > (pc+l_offset) || l_pi.get_device().get_flash_size() <= (pc+l_offset))) {
 			l_pi.print(EMsgType.MSG_ERROR, line, " address ouf of flash range '" + (pc+l_offset) + "'");
 			return false;

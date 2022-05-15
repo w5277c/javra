@@ -18,9 +18,9 @@ import java.util.LinkedList;
 
 public class ProgInfo {
 	private	LinkedList<String>			lib_paths		= new LinkedList<>();
-	private	SegmentInfo						cseg				= new SegmentInfo(ESegmentType.CODE);
-	private	SegmentInfo						dseg				= new SegmentInfo(ESegmentType.DATA);
-	private	SegmentInfo						eseg				= new SegmentInfo(ESegmentType.EEPROM);
+	private	SegmentInfo						cseg				= new SegmentInfo(this, ESegmentType.CODE);
+	private	SegmentInfo						dseg				= new SegmentInfo(this, ESegmentType.DATA);
+	private	SegmentInfo						eseg				= new SegmentInfo(this, ESegmentType.EEPROM);
 	private	SegmentInfo						segment			= cseg;
 	private	int								max_errors		= 10;
 	private	int								error_cntr		= 0;
@@ -103,7 +103,7 @@ public class ProgInfo {
 	}
 	public boolean add_label(Line l_line, String l_name) {
 		if(is_undefined(l_line, l_name, false)) {
-			int addr = get_segment().get_cur_block().get_address();
+			int addr = get_segment().get_cur_block(l_line).get_address();
 			if(null == cur_macroblock) {
 				labels.put(l_name, new Label(l_line, l_name, addr));
 			}

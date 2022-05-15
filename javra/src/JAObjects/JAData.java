@@ -2,14 +2,18 @@
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 09.05.2022	konstantin@5277.ru			Начало
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+TODO: поддержка других кодировок, KOI8-R...
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
 import common.Expr;
 import enums.EMsgType;
+import enums.ESegmentType;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import main.CodeBlock;
 import main.DataBlock;
 import main.Line;
 import main.ProgInfo;
@@ -26,8 +30,13 @@ public class JAData extends JAObject {
 		super(l_pi, l_line, l_value);
 		
 		size = l_size;
-		
-		parse();
+
+		if(ESegmentType.DATA == pi.get_segment().get_type()) {
+			pi.print(EMsgType.MSG_ERROR, line, "Can't use .DB/.DW/.DD directives in data segment (.DSEG) !");
+		}
+		else {
+			parse();
+		}
 	}
 	
 	@Override
@@ -79,14 +88,15 @@ public class JAData extends JAObject {
 					pi.print(EMsgType.MSG_WARNING, line, "A .DB segment with an odd number of bytes is detected. A zero byte is added.");
 				}
 
-				block = pi.get_segment().get_cur_block();
+				block = pi.get_segment().get_cur_block(line);
 				address = block.get_address();
-				block.write(data, offset/2 + (offset%0x02));
+				
+				block.write(data, (block instanceof CodeBlock ? offset/2 + (offset%0x02) : offset));
 			}
 			
 			if(!expr_fail) {
 				block.set_addr(address);
-				block.write(data, offset/2 + (offset%0x02));
+				block.write(data, (block instanceof CodeBlock ? offset/2 + (offset%0x02) : offset));
 			}
 		}
 		else {

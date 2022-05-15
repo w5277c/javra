@@ -133,8 +133,16 @@ public class JAObject {
 						return new JAOverlap(l_pi, l_line, value);
 					case ".nooverlap":
 						return new JANoOverlap(l_pi, l_line, value);
+					case ".byte":
+						return new JAByte(l_pi, l_line, value);
+					case ".cseg":
+						return new JACSeg(l_pi, l_line, value);
+					case ".dseg":
+						return new JADSeg(l_pi, l_line, value);
+					case ".eseg":
+						return new JAESeg(l_pi, l_line, value);
 
-						//TODO .byte, .cseg, .dseg, .eseg, .csegsize(for AT94K),
+						//TODO .csegsize(for AT94K),
 						
 					default:
 						if(name.startsWith("#")) {

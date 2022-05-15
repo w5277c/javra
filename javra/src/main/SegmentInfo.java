@@ -5,6 +5,8 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import static JAObjects.JAObject.MSG_UNSUPPORTED;
+import enums.EMsgType;
 import enums.ESegmentType;
 import java.io.IOException;
 import java.util.Collections;
@@ -14,12 +16,14 @@ import java.util.LinkedList;
 import output.HexBuilder;
 
 public class SegmentInfo {
+	protected	ProgInfo							pi;
 	protected	ESegmentType					type;
 	protected	HashMap<Integer,DataBlock>	blocks		= new HashMap<>();
 	protected	DataBlock						cur_block	= null;
 	protected	boolean							overlap		= false;
 	
-	public SegmentInfo(ESegmentType l_type) {
+	public SegmentInfo(ProgInfo l_pi, ESegmentType l_type) {
+		pi = l_pi;
 		type = l_type;
 	}
 
@@ -27,10 +31,59 @@ public class SegmentInfo {
 		return type;
 	}
 	
-	public DataBlock get_cur_block() {
+	private DataBlock create(Line l_line, Integer l_address) {
+		if(ESegmentType.DATA == type) {
+			if(null == pi.get_device()) {
+				pi.print(EMsgType.MSG_WARNING, l_line, "No .DEVICE definition found. Cannot make useful address range check !");
+				return new DataBlock(null == l_address ? 0x0000 : l_address);
+			}
+			else {
+				if(l_address < pi.get_device().get_ram_start() || l_address > (pi.get_device().get_ram_start() + pi.get_device().get_ram_size())) {
+					pi.print(EMsgType.MSG_ERROR, l_line,	"SRAM address ouf of range (" + pi.get_device().get_ram_start() + " <= " + l_address +
+																		" <= " + (pi.get_device().get_ram_start() + pi.get_device().get_ram_size()) + ")");
+					return new DataBlock(pi.get_device().get_ram_start());
+				}
+				else {
+					return new DataBlock(null == l_address ? pi.get_device().get_ram_start() : l_address);
+				}
+			}
+		}
+		else if(ESegmentType.EEPROM == type) {
+			if(null == pi.get_device()) {
+				pi.print(EMsgType.MSG_WARNING, l_line, "No .DEVICE definition found. Cannot make useful address range check !");
+				return new DataBlock(null == l_address ? 0x0000 : l_address);
+			}
+			else {
+				if(0 > l_address || l_address > pi.get_device().get_eeprom_size()) {
+					pi.print(EMsgType.MSG_ERROR, l_line, "EEPROM address ouf of range (0 <= " + l_address + " <= " +	(pi.get_device().get_eeprom_size()) + ")");
+					return new DataBlock(0x0000);
+				}
+				else {
+					return new DataBlock(null == l_address ? 0x0000 : l_address);
+				}
+			}
+		}
+		else {
+			if(null == pi.get_device()) {
+				pi.print(EMsgType.MSG_WARNING, l_line, "No .DEVICE definition found. Cannot make useful address range check !");
+				return new CodeBlock(null == l_address ? 0x0000 : l_address);
+			}
+			else {
+				if(0 > l_address || l_address > pi.get_device().get_flash_size()) {
+					pi.print(EMsgType.MSG_ERROR, l_line, "EEPROM address ouf of range (0 <= " + l_address + " <= " +	(pi.get_device().get_flash_size()) + ")");
+					return new CodeBlock(0x0000);
+				}
+				else {
+					return new CodeBlock(null == l_address ? 0x0000 : l_address);
+				}
+			}
+		}
+	}
+	
+	public DataBlock get_cur_block(Line l_line) {
 		if(null == cur_block) {
-			cur_block = (ESegmentType.CODE == type ? new CodeBlock(0x0000) : new DataBlock(0x0000));
-			blocks.put(0x0000, cur_block);
+			cur_block = create(l_line, 0x0000);
+			blocks.put(cur_block.get_address(), cur_block);
 		}
 		return cur_block;
 	}
@@ -42,10 +95,10 @@ public class SegmentInfo {
 		overlap = l_is_on;
 	}
 
-	public void set_addr(int l_addr) {
+	public void set_addr(Line l_line, int l_addr) {
 		if(null == cur_block) {
-			cur_block = (ESegmentType.CODE == type ? new CodeBlock(0x0000) : new DataBlock(l_addr));
-			blocks.put(0x0000, cur_block);
+			cur_block = create(l_line, l_addr);
+			blocks.put(cur_block.get_address(), cur_block);
 		}
 
 		DataBlock datablock = null;
@@ -63,32 +116,34 @@ public class SegmentInfo {
 			cur_block.set_addr(l_addr);
 		}
 		else {
-			cur_block = (ESegmentType.CODE == type ? new CodeBlock(l_addr) : new DataBlock(l_addr));
-			blocks.put(l_addr, cur_block);
+			cur_block = create(l_line, l_addr);
+			blocks.put(cur_block.get_address(), cur_block);
 		}
 	}
 
 	public void build(ProgInfo l_pi, HexBuilder l_builder) throws IOException {
-		LinkedList<DataBlock> sorted = new LinkedList<>(blocks.values());
-		Collections.sort(sorted, new Comparator<DataBlock>() {
-			@Override
-			public int compare(DataBlock o1, DataBlock o2) {
-				if(o1.get_start() == o2.get_start()) {
-					return Integer.compare(o1.get_length(), o2.get_length());
+		if(ESegmentType.DATA != type) {
+			LinkedList<DataBlock> sorted = new LinkedList<>(blocks.values());
+			Collections.sort(sorted, new Comparator<DataBlock>() {
+				@Override
+				public int compare(DataBlock o1, DataBlock o2) {
+					if(o1.get_start() == o2.get_start()) {
+						return Integer.compare(o1.get_length(), o2.get_length());
+					}
+					return Integer.compare(o1.get_start(), o2.get_start());
 				}
-				return Integer.compare(o1.get_start(), o2.get_start());
+			});
+			for(int index=0; index<(sorted.size()-0x01);index++) {
+				DataBlock block1 = sorted.get(index);
+				DataBlock block2 = sorted.get(index+0x01);
+				if((block1.get_start() + block1.get_length()-0x01) >= block2.get_start()) {
+					block1.set_overlap(block2.get_start());
+				}
 			}
-		});
-		for(int index=0; index<(sorted.size()-0x01);index++) {
-			DataBlock block1 = sorted.get(index);
-			DataBlock block2 = sorted.get(index+0x01);
-			if((block1.get_start() + block1.get_length()-0x01) >= block2.get_start()) {
-				block1.set_overlap(block2.get_start());
+
+			for(DataBlock block : sorted) {
+				l_builder.push(block.get_data(), block.get_start(), block.get_length() - block.get_overlap());
 			}
-		}
-		
-		for(DataBlock block : sorted) {
-			l_builder.push(block.get_data(), block.get_start(), block.get_length() - block.get_overlap());
 		}
 	}
 	

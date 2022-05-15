@@ -6,10 +6,10 @@
 package main;
 
 public class Constant {
-	private	Line		line;
-	private	String	name;
-	private	long		value;
-	private	boolean	redef;
+	protected	Line		line;
+	protected	String	name;
+	protected	long		value;
+	protected	boolean	redef;
 	
 	public Constant(Line l_line, String l_name, long l_value, boolean l_redef) {
 		line = l_line;

@@ -18,7 +18,7 @@ public class JAORG extends JAObject {
 		if(!value.isEmpty()) {
 			Long _address = Expr.parse(pi, line, value);
 			if(null != _address) {
-				pi.get_segment().set_addr(_address.intValue());
+				pi.get_segment().set_addr(line, _address.intValue());
 			}
 			else {
 				pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_UNKNOWN_LEXEME, " '" + line.get_failpart() + "'");

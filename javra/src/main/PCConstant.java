@@ -9,8 +9,6 @@ import enums.EMsgType;
 import enums.ESegmentType;
 
 public class PCConstant extends Constant {
-	private	Line		line;
-	private	String	name;
 	private	ProgInfo	pi;
 	
 	public PCConstant(ProgInfo l_pi) {
@@ -24,6 +22,6 @@ public class PCConstant extends Constant {
 		if(ESegmentType.CODE != pi.get_segment().get_type()) {
 			pi.print(EMsgType.MSG_WARNING, line, "got PC request in not CSEG");
 		}
-		return pi.get_cseg().get_cur_block().get_address();
+		return pi.get_cseg().get_cur_block(line).get_address();
 	}
 }
