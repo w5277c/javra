@@ -15,23 +15,13 @@ public class JAORG extends JAObject {
 	public JAORG(ProgInfo l_pi, Line l_line, String l_value) {
 		super(l_pi, l_line, l_value);
 		
-		parse();
-	}
-	
-	@Override
-	public void parse() {
-		super.parse();
-		
 		if(!value.isEmpty()) {
-			Long addr = Expr.parse(pi, line, value);
-			if(null == addr) {
-				expr_fail = true;
+			Long _address = Expr.parse(pi, line, value);
+			if(null != _address) {
+				pi.get_segment().set_addr(_address.intValue());
 			}
 			else {
-				DataBlock exist_datablock = pi.get_cur_segment().set_block(addr.intValue());
-				if(null != exist_datablock) {
-					pi.print(EMsgType.MSG_ERROR, line, "ORG " + addr + " already defined");
-				}
+				pi.print(EMsgType.MSG_ERROR, line, JAObject.MSG_UNKNOWN_LEXEME, " '" + line.get_failpart() + "'");
 			}
 		}
 		else {

@@ -28,20 +28,33 @@ TODO: args parsing
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import JAObjects.JAData;
 import JAObjects.JAList;
 import JAObjects.JAListMac;
 import JAObjects.JAMacro;
+import JAObjects.JAMnenomic;
 import JAObjects.JANoList;
 import JAObjects.JAObject;
+import enums.EMsgType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.LinkedList;
+import java.util.Locale;
 import output.IntelHexBuilder;
 
 public class Javra {
 	public	static	final	String	VERSION	= "0.0.1";
 	
 	public static void main(String[] args) throws Exception {
+		long timestamp = System.currentTimeMillis();
+		
+		System.out.println("JAVRA Java AVR macro assembler Version " + VERSION);
+		System.out.println("Licensed by GPL-3.0-or-later");
+		System.out.println();
+		System.out.println("WARNING! The project is not finished yet, it is under development.");
+		System.out.println("!!!It is not recommended to use!!!");
+		System.out.println();
+		
 		ProgInfo pi = new ProgInfo();
 		
 		String filename = "";
@@ -59,15 +72,12 @@ public class Javra {
 			}
 		}
 		
-		Parser parser = new Parser(pi, filename, new File(filename));
+		new Parser(pi, filename, new File(filename));
 
-		System.out.println("---ADDITIONAL PASS---");
-
-		int unparsed = 0;
+		
 		boolean progress = true;
 		while(progress) {
 			progress = false;
-			unparsed = 0;
 			for(JAObject obj : new LinkedList<>(pi.get_objects())) {
 				if(obj.is_expr_fail()) {
 					
@@ -76,27 +86,24 @@ public class Javra {
 					if(!obj.is_expr_fail()) {
 						progress = true;
 					}
-					else {
-						unparsed++;
-					}
 				}
 			}
 		}
 		
-		if(0 != unparsed) {
-			System.out.println("\nSome lines not parsed: " + unparsed);
-		}
 		for(JAObject obj : new LinkedList<>(pi.get_objects())) {
+			if(pi.get_error_cntr() >= pi.get_max_errors()) {
+				break;
+			}
 			if(obj.is_expr_fail()) {
-				System.out.println("Unparsed: " + obj.get_line().get_text());
+				pi.print(EMsgType.MSG_ERROR, obj.get_line(), JAObject.MSG_UNKNOWN_LEXEME, " '" + obj.get_line().get_failpart() + "'");
 			}
 		}
 
-		FileOutputStream fos = null;
+		FileOutputStream list_fos = null;
 		try {
 			boolean list_on = true;
 			boolean listmac = false;
-			fos = new FileOutputStream(new File("noname.lst"));
+			list_fos = new FileOutputStream(new File("noname.lst"));
 			for(JAObject obj : pi.get_objects()) {
 				if(obj instanceof JAList) {
 					list_on = true;
@@ -109,17 +116,17 @@ public class Javra {
 				}
 				
 				if((list_on && !(obj instanceof JAMacro)) || (listmac && (obj instanceof JAMacro))) {
-					obj.write_list(fos);
+					obj.write_list(list_fos);
 				}
 			}
-			fos.flush();
-			fos.close();
+			list_fos.flush();
+			list_fos.close();
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
-			if(null != fos) {
+			if(null != list_fos) {
 				try {
-					fos.close();
+					list_fos.close();
 				}
 				catch(Exception ex2) {
 				}
@@ -127,7 +134,7 @@ public class Javra {
 		}
 
 		if(0 != pi.get_error_cntr()) {
-			System.out.println("\nBuild fail, wrns:" + pi.get_warning_cntr() + ", errs:" + pi.get_error_cntr() + "/" + pi.get_max_errors());
+			System.out.println("\nBuild FAIL, warnings:" + pi.get_warning_cntr() + ", errors:" + pi.get_error_cntr() + "/" + pi.get_max_errors());
 		}
 		else {
 			System.out.println();
@@ -150,10 +157,9 @@ public class Javra {
 				pi.get_eseg().print_stat(pi);
 			}
 
-			System.out.println("\nBuild success, wrns:" + pi.get_warning_cntr());
+			System.out.println("\nBuild SUCCESS, warnings:" + pi.get_warning_cntr());
+			float time = (System.currentTimeMillis() - timestamp) / 1000f;
+			System.out.println("(parsed: " + Parser.get_line_qnt() + " lines, total time: " + String.format(Locale.US, "%.2f", time) + " s)");
 		}
-//		pi.get_list().close();
-		
 	}
-	
 }

@@ -1,29 +1,23 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-09.05.2022	konstantin@5277.ru			Начало
+15.05.2022	konstantin@5277.ru			Начало
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-package main;
+package JAObjects;
 
 import enums.EMsgType;
-import enums.ESegmentType;
+import main.Line;
+import main.ProgInfo;
 
-public class PCConstant extends Constant {
-	private	Line		line;
-	private	String	name;
-	private	ProgInfo	pi;
-	
-	public PCConstant(ProgInfo l_pi) {
-		super(new Line("", 0, ""), "pc", 0);
+public class JADSeg extends JAObject {
+	public JADSeg(ProgInfo l_pi, Line l_line, String l_value) {
+		super(l_pi, l_line, l_value);
 		
-		pi = l_pi;
-	}
-	
-	@Override
-	public long get_value() {
-		if(ESegmentType.CODE != pi.get_segment().get_type()) {
-			pi.print(EMsgType.MSG_WARNING, line, "got PC request in not CSEG");
+		if(!value.isEmpty()) {
+			l_pi.print(EMsgType.MSG_ERROR, line, MSG_DIRECTIVE_GARBAGE);
 		}
-		return pi.get_cseg().get_cur_block().get_address();
+		else {
+			pi.set_segment(pi.get_dseg());
+		}
 	}
 }

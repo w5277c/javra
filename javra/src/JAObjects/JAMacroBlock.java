@@ -8,16 +8,21 @@ package JAObjects;
 import common.Expr;
 import enums.EMsgType;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
+import main.Constant;
+import main.Label;
 import main.Line;
 import main.Parser;
 import main.ProgInfo;
 
 public class JAMacroBlock extends JAObject {
-	private	JAMacro					macro;
-	private	Integer					address;
-	private	LinkedList<JAObject>	objects	= new LinkedList<>();
-	
+	private	JAMacro							macro;
+	private	Integer							address;
+	private	LinkedList<JAObject>			objects		= new LinkedList<>();
+	private	HashMap<String,Constant>	constants	= new HashMap<>();
+	private	HashMap<String,Label>		labels		= new HashMap<>();
+
 	public JAMacroBlock(ProgInfo l_pi, Line l_line, String l_value, JAMacro l_macro) {
 		super(l_pi, l_line, l_value);
 		
@@ -52,7 +57,7 @@ public class JAMacroBlock extends JAObject {
 		}
 
 		if(null == address) {
-			address = pi.get_cseg().get_cur_block().get_addr();
+			address = pi.get_cseg().get_cur_block().get_address();
 		}
 		else {
 			pi.get_cseg().get_cur_block().set_addr(address);
@@ -72,20 +77,33 @@ public class JAMacroBlock extends JAObject {
 					str = str.replaceAll("@" + param_id, params.get(param_id));
 				}
 			}
-			if(str.contains("?_c5_suspend__body?")) {
-				int t =1;
-			}
 			
+			pi.set_macroblock(this);
 			JAObject obj = Parser.line_parse(pi, new Line(line.get_filename(), line.get_line_number(), index, str));
 			if(null != obj) {
 				objects.add(obj);
 			}
+			pi.set_macroblock(null);
 		}
+	}
+	
+	public Label get_label(String l_name) {
+		return labels.get(l_name);
+	}
+	public void add_label(Label l_label) {
+		labels.put(l_label.get_name(), l_label);
+	}
+	
+	public Constant get_constant(String l_name) {
+		return constants.get(l_name);
+	}
+	public void add_constant(Constant l_constant) {
+		constants.put(l_constant.get_name(), l_constant);
 	}
 	
 	@Override
 	public void write_list(OutputStream l_os) throws Exception {
-		l_os.write(("C:" + String.format("%06X", address) + "   + " + line.get_text() + "\n").getBytes("UTF-8"));
+		l_os.write(("C:" + String.format("%06X", pi.get_segment().get_cur_block().get_address()) + "   + " + line.get_text() + "\n").getBytes("UTF-8"));
 		for(JAObject obj : objects) {
 			obj.write_list(l_os);
 		}

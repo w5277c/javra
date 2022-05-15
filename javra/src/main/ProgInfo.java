@@ -6,6 +6,7 @@
 package main;
 
 import JAObjects.JAMacro;
+import JAObjects.JAMacroBlock;
 import JAObjects.JAObject;
 import enums.EDevice;
 import enums.EMsgType;
@@ -17,19 +18,18 @@ import java.util.LinkedList;
 
 public class ProgInfo {
 	private	LinkedList<String>			lib_paths		= new LinkedList<>();
-	private	CodeSegmentInfo				cseg				= new CodeSegmentInfo();
+	private	SegmentInfo						cseg				= new SegmentInfo(ESegmentType.CODE);
 	private	SegmentInfo						dseg				= new SegmentInfo(ESegmentType.DATA);
 	private	SegmentInfo						eseg				= new SegmentInfo(ESegmentType.EEPROM);
-	private	SegmentInfo						cur_seg			= cseg;
-	private	int								max_errors		= 1000;
+	private	SegmentInfo						segment			= cseg;
+	private	int								max_errors		= 10;
 	private	int								error_cntr		= 0;
 	private	int								warning_cntr	= 0;
-	private	long								timestamp		= System.currentTimeMillis();
 	private	HashMap<String,Constant>	constants		= new HashMap<>();
 	private	HashMap<String,Label>		labels			= new HashMap<>();
 	private	HashMap<String,JAMacro>		macros			= new HashMap<>();
 	private	JAMacro							cur_macro		= null;
-	private	JAMacro							expand_macro	= null;
+	private	JAMacroBlock					cur_macroblock	= null;
 	private	String							root_path;
 	private	EDevice							device			= null;
 	private	IncludeInfo						ii					= null;
@@ -47,15 +47,17 @@ public class ProgInfo {
 		constants.put("pc", new PCConstant(this));
 	}
 	
-	
 /*public boolean get_segment_overlap() {
 		return segment_overlap;
 	}*/
 	
-	public SegmentInfo get_cur_segment() {
-		return cur_seg;
+	public SegmentInfo get_segment() {
+		return segment;
 	}
-	public CodeSegmentInfo get_cseg() {
+	public void set_segment(SegmentInfo l_segment) {
+		segment = l_segment;
+	}
+	public SegmentInfo get_cseg() {
 		return cseg;
 	}
 	public SegmentInfo get_dseg() {
@@ -67,8 +69,8 @@ public class ProgInfo {
 
 	public Constant get_constant(String l_name) {
 		Constant result = null;
-		if(null != expand_macro) {
-			result = expand_macro.get_constant(l_name);
+		if(null != cur_macroblock) {
+			result = cur_macroblock.get_constant(l_name);
 		}
 		if(null == result) {
 			result = constants.get(l_name);
@@ -78,11 +80,11 @@ public class ProgInfo {
 	public boolean add_constant(Line l_line, String l_name, long l_value, boolean l_redef) {
 		if(is_undefined(l_line, l_name, l_value, l_redef)) {
 			Constant constatnt = new Constant(l_line, l_name, l_value, l_redef);
-			if(null == cur_macro) {
+			if(null == cur_macroblock) {
 				constants.put(l_name, constatnt);
 			}
 			else {
-				cur_macro.add_constant(constatnt);
+				cur_macroblock.add_constant(constatnt);
 			}
 			return true;
 		}
@@ -91,8 +93,8 @@ public class ProgInfo {
 	
 	public Label get_label(String l_name) {
 		Label result = null;
-		if(null != expand_macro) {
-			result = expand_macro.get_label(l_name);
+		if(null != cur_macroblock) {
+			result = cur_macroblock.get_label(l_name);
 		}
 		if(null == result) {
 			result = labels.get(l_name);
@@ -101,12 +103,12 @@ public class ProgInfo {
 	}
 	public boolean add_label(Line l_line, String l_name) {
 		if(is_undefined(l_line, l_name, false)) {
-			int addr = get_cur_segment().get_cur_block().get_addr();
-			if(null == cur_macro) {
+			int addr = get_segment().get_cur_block().get_address();
+			if(null == cur_macroblock) {
 				labels.put(l_name, new Label(l_line, l_name, addr));
 			}
 			else {
-				cur_macro.add_label(new Label(l_line, l_name, addr));
+				cur_macroblock.add_label(new Label(l_line, l_name, addr));
 			}
 			return true;
 		}
@@ -171,9 +173,6 @@ public class ProgInfo {
 		for(String msg : l_messages) {
 			System.out.print(msg);
 		}
-		if(null != l_line && EMsgType.MSG_DMESSAGE != l_msg_type && EMsgType.MSG_DWARNING != l_msg_type && EMsgType.MSG_DERROR != l_msg_type) {
-			System.out.print(" " + l_line.get_text().trim());
-		}
 		System.out.println();
 	}
 	
@@ -200,19 +199,11 @@ public class ProgInfo {
 		return false;
 	}
 	
-//	public void open_macro(String l_name) {
-//		cur_macro = macros.get(l_name);
-//	}
-
-//	public HashMap<String, JAMacro> get_macros() {
-//		return macros;
-//	}
-	
 	public JAMacro get_macro(String l_name) {
 		return macros.get(l_name);
 	}
 
-	public JAMacro get_cur_macros() {
+	public JAMacro get_cur_macro() {
 		return cur_macro;
 	}
 	
@@ -301,12 +292,12 @@ public class ProgInfo {
 		return true;
 	}
 	
-//	public Macro get_expand_macro() {
-//		return expand_macro;
-//	}
-//	public void set_expand_macro(JAMacro l_macro) {
-//		expand_macro = l_macro;
-//	}
+	public JAMacroBlock get_macroblock() {
+		return cur_macroblock;
+	}
+	public void set_macroblock(JAMacroBlock l_macroblock) {
+		cur_macroblock = l_macroblock;
+	}
 
 	public void add_object(JAObject l_obj) {
 		objects.add(l_obj);

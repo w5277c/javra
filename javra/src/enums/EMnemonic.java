@@ -171,12 +171,14 @@ public enum EMnemonic {
 	public	final static	int	DF_NO_EIJMP	= 0x4000; /* No EIJMP instruction */
 	public	final static	int	DF_AVR8L		= 0x8000; /* Also known as AVRrc (reduced core)? * ATtiny4,5,9,10,20,40,102,104: No ADIW, SBIW; one word LDS/STS */
 	
-	private static final Map<String, EMnemonic> ids = new HashMap<String, EMnemonic>();
+	private static final Map<String, EMnemonic>	by_name	= new HashMap<>();
+	private static final Map<Integer, EMnemonic> by_id		= new HashMap<>();
    static {
       for (EMnemonic mnemonic : EMnemonic.values()) {
-         if(!ids.containsKey(mnemonic.get_name())) {
-				ids.put(mnemonic.get_name(), mnemonic);
+         if(!by_name.containsKey(mnemonic.get_name())) {
+				by_name.put(mnemonic.get_name(), mnemonic);
 			}
+			by_id.put(mnemonic.get_id(), mnemonic);
       }
    }
 
@@ -219,6 +221,9 @@ public enum EMnemonic {
 	}
 	
 	public static EMnemonic fromName(String l_name) {
-      return ids.get(l_name);
+      return by_name.get(l_name);
+   }
+	public static EMnemonic fromId(int l_id) {
+      return by_id.get(l_id);
    }
 }

@@ -14,11 +14,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Parser {
-	public	static	final	String	COMMENT1		= "//";
-	public	static	final	String	COMMENT2		= ";";
-	public	static	final	String	MULTILINE	= "\\";
-
+	public	static	final	String	COMMENT1			= "//";
+	public	static	final	String	COMMENT2			= ";";
+	public	static	final	String	COMMENT_START	= "/*";
+	public	static	final	String	COMMENT_END		= "*/";
+	public	static	final	String	MULTILINE		= "\\";
+	
+	private	static			int		line_cntr	= 0;
+	
 	public Parser(ProgInfo l_pi, String l_filename, File l_file) throws Exception {
+		boolean comment_block = false;
+		
 		IncludeInfo ii = l_pi.exch_ii(new IncludeInfo(l_filename));
 
 		Scanner scanner = new Scanner(l_file, StandardCharsets.UTF_8.name());
@@ -31,6 +37,26 @@ public class Parser {
 			if(-1 != comment_pos) {
 				str=str.substring(0x00, comment_pos).trim();
 			}
+			
+			if(!comment_block) {
+				comment_pos = get_pos(str, COMMENT_START);
+				if(-1 != comment_pos) {
+					str=str.substring(0x00, comment_pos).trim();
+					comment_block = true;
+				}
+			}
+			else {
+				comment_pos = get_pos(str, COMMENT_END);
+				if(-1 != comment_pos) {
+					str=str.substring(0, comment_pos).trim();
+					comment_block = false;
+				}
+				else {
+					line_number++;
+					continue;
+				}
+			}
+
 			if(str.isEmpty()) {
 				line_number++;
 				continue;
@@ -41,6 +67,8 @@ public class Parser {
 				
 				JAObject jaobj = line_parse(l_pi, line);
 				if(null != jaobj) {
+					line_cntr++;
+					
 					l_pi.add_object(jaobj);
 					
 					if(jaobj instanceof JAExit) {
@@ -66,7 +94,7 @@ public class Parser {
 	}
 	
 	public static JAObject line_parse(ProgInfo l_pi, Line l_line) {
-		JAMacro cur_macro = l_pi.get_cur_macros();
+		JAMacro cur_macro = l_pi.get_cur_macro();
 		if(null != cur_macro && !l_line.get_text().equalsIgnoreCase(".endmacro") && !l_line.get_text().equalsIgnoreCase(".endm")) {
 			cur_macro.add_line(l_line);
 		}
@@ -91,5 +119,9 @@ public class Parser {
 			}
 		}
 		return pos;
+	}
+	
+	public static int get_line_qnt() {
+		return line_cntr;
 	}
 }

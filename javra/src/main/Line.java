@@ -10,6 +10,7 @@ public class Line {
 	private	int		line_number;
 	private	int		subline_number = 0;
 	private	String	text;
+	private	String	failpart = null;
 	
 	public Line(String l_filename, int l_number, String l_text) {
 		filename = l_filename;
@@ -45,5 +46,14 @@ public class Line {
 	
 	public String get_location() {
 		return filename + ":" + line_number + (0 == subline_number ? "" : "." + subline_number);
+	}
+	
+	public String get_failpart() {
+		return failpart;
+	}
+	public void set_failpart(String l_failpart) {
+		if(null == failpart) {
+			failpart = l_failpart;
+		}
 	}
 }

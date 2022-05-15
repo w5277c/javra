@@ -5,6 +5,9 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 public class DataBlock {
 	protected	int			start;
 	protected	int			offset	= 0;
@@ -16,6 +19,12 @@ public class DataBlock {
 		start = l_start;
 	}
 
+	public void write_opcode(int l_opcode) {
+		ByteBuffer bb = ByteBuffer.allocate(Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN);
+		bb.putInt(l_opcode);
+		write(bb.array(), 0x02);
+	}
+	
 	public void write(byte[] l_bdata, int l_size) {
 		if((data.length - offset) < l_size) {
 			byte[] _data = new byte[offset + l_size + 0x40];
@@ -29,7 +38,7 @@ public class DataBlock {
 		}
 	}
 
-	public int get_addr() {
+	public int get_address() {
 		return start + offset;
 	}
 	public void set_addr(int l_addr) {

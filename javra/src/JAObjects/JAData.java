@@ -79,8 +79,8 @@ public class JAData extends JAObject {
 					pi.print(EMsgType.MSG_WARNING, line, "A .DB segment with an odd number of bytes is detected. A zero byte is added.");
 				}
 
-				block = pi.get_cur_segment().get_cur_block();
-				address = block.get_addr();
+				block = pi.get_segment().get_cur_block();
+				address = block.get_address();
 				block.write(data, offset/2 + (offset%0x02));
 			}
 			
@@ -92,6 +92,13 @@ public class JAData extends JAObject {
 		else {
 			pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
 		}
+	}
+	
+	public byte[] get_data() {
+		return data;
+	}
+	public int get_length() {
+		return offset;
 	}
 	
 	@Override

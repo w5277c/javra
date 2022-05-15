@@ -174,6 +174,7 @@ public class Expr {
 							}
 							else {
 								//UNKNOWN CONSTANT HERE!
+								l_line.set_failpart(name);
 								return null;
 							}
 						}
@@ -317,7 +318,7 @@ public class Expr {
 			default:
 				l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_UNSUPPORTED);
 		}
-		return null;
+		return 0l;
 	}
 
 	private static int par_length(String l_str, int l_pos) {

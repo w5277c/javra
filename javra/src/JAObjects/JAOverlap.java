@@ -14,7 +14,7 @@ public class JAOverlap extends JAObject {
 		super(l_pi, l_line, l_value);
 		
 		if(value.isEmpty()) {
-			l_pi.get_cur_segment().set_overlap(true);
+			l_pi.get_segment().set_overlap(true);
 		}
 		else {
 			l_pi.print(EMsgType.MSG_ERROR, line, MSG_DIRECTIVE_GARBAGE);

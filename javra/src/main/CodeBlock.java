@@ -13,6 +13,7 @@ public class CodeBlock extends DataBlock {
 		super(l_start);
 	}
 
+	@Override
 	public void write_opcode(int l_opcode) {
 		ByteBuffer bb = ByteBuffer.allocate(Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN);
 		bb.putInt(l_opcode);

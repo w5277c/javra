@@ -138,7 +138,7 @@ public class JAObject {
 						
 					default:
 						if(name.startsWith("#")) {
-							l_pi.print(EMsgType.MSG_WARNING, l_line, MSG_UNSUPPORTED);
+							l_pi.print(EMsgType.MSG_WARNING, l_line, MSG_UNSUPPORTED, name);
 						}
 						else if(name.replaceAll(REGEX_LABEL_NAME, "").isEmpty()) {
 							return new JALabel(l_pi, l_line, value, name.substring(0x00, name.length()-0x01));
@@ -154,7 +154,7 @@ public class JAObject {
 									return new JAMacroBlock(l_pi, l_line, value, macro);
 								}
 								else {
-									l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME);
+									l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME, " '" + name + "'");
 								}
 							}
 						}

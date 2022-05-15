@@ -12,13 +12,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import output.HexBuilder;
-import output.IntelHexBuilder;
 
 public class SegmentInfo {
 	protected	ESegmentType					type;
 	protected	HashMap<Integer,DataBlock>	blocks		= new HashMap<>();
 	protected	DataBlock						cur_block	= null;
-	protected	boolean							overlap			= false;
+	protected	boolean							overlap		= false;
 	
 	public SegmentInfo(ESegmentType l_type) {
 		type = l_type;
@@ -28,22 +27,9 @@ public class SegmentInfo {
 		return type;
 	}
 	
-	public DataBlock set_block(int l_addr) {
-		DataBlock datablock = blocks.get(l_addr);
-		if(null == datablock) {
-			cur_block = new DataBlock(l_addr); 
-			blocks.put(l_addr, cur_block);
-			return null;
-		}
-		else {
-			cur_block = datablock;
-			return datablock;
-		}
-	}
-	
 	public DataBlock get_cur_block() {
 		if(null == cur_block) {
-			cur_block = new DataBlock(0x0000);
+			cur_block = (ESegmentType.CODE == type ? new CodeBlock(0x0000) : new DataBlock(0x0000));
 			blocks.put(0x0000, cur_block);
 		}
 		return cur_block;
@@ -57,6 +43,11 @@ public class SegmentInfo {
 	}
 
 	public void set_addr(int l_addr) {
+		if(null == cur_block) {
+			cur_block = (ESegmentType.CODE == type ? new CodeBlock(0x0000) : new DataBlock(l_addr));
+			blocks.put(0x0000, cur_block);
+		}
+
 		DataBlock datablock = null;
 		for(DataBlock _datablock : blocks.values()) {
 			if(_datablock.get_start() <= l_addr && (_datablock.get_start()+_datablock.get_length()) > l_addr) {
@@ -64,13 +55,17 @@ public class SegmentInfo {
 				break;
 			}
 		}
-		if(null == datablock) {
-			datablock = cur_block;
+		if(null != datablock) {
+			cur_block = datablock;
+			cur_block.set_addr(l_addr);
+		}
+		else if(null == datablock && (cur_block.get_start() + cur_block.get_length()) == l_addr) {
+			cur_block.set_addr(l_addr);
 		}
 		else {
-			cur_block = datablock;
+			cur_block = (ESegmentType.CODE == type ? new CodeBlock(l_addr) : new DataBlock(l_addr));
+			blocks.put(l_addr, cur_block);
 		}
-		datablock.set_addr(l_addr);
 	}
 
 	public void build(ProgInfo l_pi, HexBuilder l_builder) throws IOException {
@@ -108,7 +103,7 @@ public class SegmentInfo {
 			total += (block.get_length() - block.get_overlap());
 		}
 		l_pi.print(" -----");
-		if(this instanceof CodeSegmentInfo) {
+		if(ESegmentType.CODE == type) {
 			l_pi.print(" Total\t:  " + total + " words (" + (total*2) + " bytes)");
 		}
 		else {
