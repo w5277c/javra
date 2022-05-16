@@ -103,7 +103,7 @@ public class JAMacroBlock extends JAObject {
 	
 	@Override
 	public void write_list(OutputStream l_os) throws Exception {
-		l_os.write(("C:" + String.format("%06X", pi.get_segment().get_cur_block(line).get_address()) + "   + " + line.get_text() + "\n").getBytes("UTF-8"));
+		l_os.write(("C:" + String.format("%06X", address) + "   + " + line.get_text() + "\n").getBytes("UTF-8"));
 		for(JAObject obj : objects) {
 			obj.write_list(l_os);
 		}
