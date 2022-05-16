@@ -253,6 +253,9 @@ public class JAMnenomic extends JAObject {
 								if(em_id == EMnemonic.MN_CBR.get_id()) value = ~value;
 								opcode1 |= (int)(((value & 0xf0) << 0x04) | (value & 0x0f));
 							}
+							else {
+								expr_fail = true;
+							}
 						}
 					}
 				}

@@ -5,7 +5,6 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
-import static JAObjects.JAObject.MSG_UNSUPPORTED;
 import enums.EMsgType;
 import enums.ESegmentType;
 import java.io.IOException;
@@ -136,13 +135,24 @@ public class SegmentInfo {
 			for(int index=0; index<(sorted.size()-0x01);index++) {
 				DataBlock block1 = sorted.get(index);
 				DataBlock block2 = sorted.get(index+0x01);
-				if((block1.get_start() + block1.get_length()-0x01) >= block2.get_start()) {
+/*				if((block1.get_start() + block1.get_length()) == block2.get_start()) {
+					block1.append(block2);
+					sorted.remove(block2);
+					index--;
+				}
+				else */
+			if((block1.get_start() + block1.get_length()-0x01) >= block2.get_start()) {
 					block1.set_overlap(block2.get_start());
 				}
 			}
 
-			for(DataBlock block : sorted) {
-				l_builder.push(block.get_data(), block.get_start(), block.get_length() - block.get_overlap());
+			for(DataBlock block : blocks.values()) {
+				if(ESegmentType.CODE == type) {
+					l_builder.push(block.get_data(), block.get_start()*2, block.get_length()*2 - block.get_overlap()*2);
+				}
+				else {
+					l_builder.push(block.get_data(), block.get_start(), block.get_length() - block.get_overlap());
+				}
 			}
 		}
 	}

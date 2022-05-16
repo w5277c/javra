@@ -33,4 +33,13 @@ public class CodeBlock extends DataBlock {
 			length = offset;
 		}
 	}
+	
+	@Override
+	public void append(DataBlock l_block) {
+		byte _data[] = new byte[length*2 + l_block.get_length()*2];
+		System.arraycopy(data, 0x00, _data, 0x00, length*2);
+		System.arraycopy(l_block.get_data(), 0x00, _data, length*2, l_block.get_length()*2);
+		data = _data;
+		length = data.length;
+	}
 }

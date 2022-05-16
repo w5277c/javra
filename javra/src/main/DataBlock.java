@@ -71,4 +71,12 @@ public class DataBlock {
 	public byte[] get_data() {
 		return data;
 	}
+
+	public void append(DataBlock l_block) {
+		byte _data[] = new byte[length + l_block.get_length()];
+		System.arraycopy(data, 0x00, _data, 0x00, length);
+		System.arraycopy(l_block.get_data(), 0x00, _data, length, l_block.get_length());
+		data = _data;
+		length = data.length;
+	}
 }

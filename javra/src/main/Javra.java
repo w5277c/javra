@@ -146,13 +146,13 @@ public class Javra {
 			}
 			if(!pi.get_dseg().is_empty()) {
 				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_dseg.hex");
-				pi.get_cseg().build(pi, hex_builder);
+				pi.get_dseg().build(pi, hex_builder);
 				hex_builder.close();
 				pi.get_dseg().print_stat(pi);
 			}
 			if(!pi.get_eseg().is_empty()) {
 				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_eseg.hex");
-				pi.get_cseg().build(pi, hex_builder);
+				pi.get_eseg().build(pi, hex_builder);
 				hex_builder.close();
 				pi.get_eseg().print_stat(pi);
 			}

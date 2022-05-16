@@ -154,7 +154,7 @@ public class Expr {
 							else {
 								//l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
 								//break;
-								return 0l;
+								return null;
 							}
 						}
 						else {

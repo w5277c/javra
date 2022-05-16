@@ -35,6 +35,7 @@ public class JAMacroBlock extends JAObject {
 	public void parse() {
 		super.parse();
 		
+		objects.clear();
 		LinkedList<String> params = new LinkedList<>();
 
 		if(null != value && !value.isEmpty()) {
