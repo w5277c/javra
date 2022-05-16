@@ -14,7 +14,7 @@ public class JAIfNDef extends JAObject {
 		super(l_pi, l_line, l_value);
 		
 		if(!value.isEmpty()) {
-			l_pi.get_ii().block_start(line, null != l_pi.get_constant(value));
+			l_pi.get_ii().block_start(line, !pi.is_undefined(l_line, value, null, false, true));
 		}
 		else {
 			l_pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);

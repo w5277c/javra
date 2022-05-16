@@ -266,24 +266,35 @@ public class ProgInfo {
 		return is_undefined(l_line, l_name, null, l_redef);
 	}
 	public boolean is_undefined(Line l_line, String l_name, Long l_value, boolean l_redef) {
+		return is_undefined(l_line, l_name, l_value, l_redef, false);
+	}
+	public boolean is_undefined(Line l_line, String l_name, Long l_value, boolean l_redef, boolean l_silent) {
 		Constant constant = get_constant(l_name);
 		if(null != constant && (!l_redef || !constant.is_redef()) && (null == l_value || l_value != constant.get_value())) {
-			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " at '" + constant.get_line().get_location() + "'");
+			if(!l_silent) {
+				print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " at '" + constant.get_line().get_location() + "'");
+			}
 			return false;
 		}
 		Label label = get_label(l_name);
 		if(null != label) {
-			print(EMsgType.MSG_ERROR, l_line, "Label '", l_name, "' ", JAObject.MSG_ALREADY_DEFINED, " at " + label.get_line().get_location());
+			if(!l_silent) {
+				print(EMsgType.MSG_ERROR, l_line, "Label '", l_name, "' ", JAObject.MSG_ALREADY_DEFINED, " at " + label.get_line().get_location());
+			}
 			return false;
 		}
 		Integer register_id = get_register(l_name);
 		if(null != register_id) {
-			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " as 'r" + Integer.toString(register_id) + "'");
+			if(!l_silent) {
+				print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " as 'r" + Integer.toString(register_id) + "'");
+			}
 			return false;
 		}
 		JAMacro macro = get_macro(l_name);
 		if(null != macro) {
-			print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " at '" + macro.get_line().get_location() + "'");
+			if(!l_silent) {
+				print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_ALREADY_DEFINED, " at '" + macro.get_line().get_location() + "'");
+			}
 			return false;
 		}
 		

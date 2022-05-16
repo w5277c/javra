@@ -109,11 +109,12 @@ public class JAMnenomic extends JAObject {
 				else if(em_id <= EMnemonic.MN_ROL.get_id()) {
 					if(garbage_check(pi, em_id, param1, param2, 1)) {
 						Integer register = get_register(pi, em_id, param1);
-						if(em_id == EMnemonic.MN_SER.get_id()) {
+						if(em_id == EMnemonic.MN_SER.get_id() && register < 16) {
 							regrange_check(pi, em_id, register, 16, 31);
+							register &= 0x0f;
 						}
 						opcode1 = (register << 0x04);
-						if(em_id == EMnemonic.MN_TST.get_id()) {
+						if(em_id >= EMnemonic.MN_TST.get_id()) {
 							opcode1 |= ((register & 0x10)<<0x05) | (register & 0x0f);
 						}
 					}
@@ -173,7 +174,7 @@ public class JAMnenomic extends JAObject {
 							opcode1 = (int)(register1 << 0x04);
 							Integer register2 = get_register(pi, em_id, param2);
 							if(null != register2) {
-								opcode1 = (int)(((register2 & 0x10) << 0x05) | (register2 & 0x0f));
+								opcode1 |= (int)(((register2 & 0x10) << 0x05) | (register2 & 0x0f));
 							}
 						}
 					}
@@ -249,7 +250,7 @@ public class JAMnenomic extends JAObject {
 								if(-128 > value || 255 < value) {
 									pi.print(EMsgType.MSG_WARNING, line, " Constant out of range (-128 <= " + value + " <= 255). Will be masked");
 								}
-								if(em_id <= EMnemonic.MN_CBR.get_id()) value = ~value;
+								if(em_id == EMnemonic.MN_CBR.get_id()) value = ~value;
 								opcode1 |= (int)(((value & 0xf0) << 0x04) | (value & 0x0f));
 							}
 						}
@@ -283,9 +284,9 @@ public class JAMnenomic extends JAObject {
 					if(garbage_check(pi, em_id, param1, param2, 2)) {
 						Long value = Expr.parse(pi, line, param1);
 						if(iorange_check(pi, value, 0, 0x3f)) {
-							opcode1 |= (int)(((value & 0x30) << 0x05) | (value & 0x0f));
+							opcode1 = (int)(((value & 0x30) << 0x05) | (value & 0x0f));
 							Integer register1 = get_register(pi, em_id, param2);
-							opcode1 = (int)(register1 << 0x04);
+							opcode1 |= (int)(register1 << 0x04);
 						}
 					}
 				}
@@ -374,7 +375,7 @@ public class JAMnenomic extends JAObject {
 							tmp = tmp.substring(0x01).trim();
 							Long value = Expr.parse(pi, line, tmp);
 							if(constrange_check(pi, em_id, value, 0, 63)) {
-								opcode1 = (int)((((value & 0x20) << 0x08) | ((value & 0x18) << 0x07) | (value & 0x07)));
+								opcode1 |= (int)((((value & 0x20) << 0x08) | ((value & 0x18) << 0x07) | (value & 0x07)));
 							}
 						}
 					}
@@ -601,11 +602,11 @@ public class JAMnenomic extends JAObject {
 	@Override
 	public void write_list(OutputStream l_os) throws Exception {
 		if(null == opcode2) {
-			l_os.write(	("C:" + String.format("%06X", address) + " " + String.format("%04X", opcode1) + "\t" +
+			l_os.write(	("C:" + String.format("%06X", address) + " " + String.format("%04X", opcode1) + "      \t" +
 							line.get_text() + "\n").getBytes("UTF-8"));
 		}
 		else {
-			l_os.write(	("C:" + String.format("%06X", address) + " " + String.format("%04X", opcode1) + " " + String.format("%04X", opcode2) + "\t" +
+			l_os.write(	("C:" + String.format("%06X", address) + " " + String.format("%04X", opcode1) + " " + String.format("%04X", opcode2) + " \t" +
 							line.get_text() + "\n").getBytes("UTF-8"));
 		}
 	}
