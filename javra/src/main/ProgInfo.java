@@ -17,12 +17,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class ProgInfo {
+	public	final	static	int			MAX_ERRORS		= 10;
 	private	LinkedList<String>			lib_paths		= new LinkedList<>();
 	private	SegmentInfo						cseg				= new SegmentInfo(this, ESegmentType.CODE);
 	private	SegmentInfo						dseg				= new SegmentInfo(this, ESegmentType.DATA);
 	private	SegmentInfo						eseg				= new SegmentInfo(this, ESegmentType.EEPROM);
 	private	SegmentInfo						segment			= cseg;
-	private	int								max_errors		= 10;
 	private	int								error_cntr		= 0;
 	private	int								warning_cntr	= 0;
 	private	HashMap<String,Constant>	constants		= new HashMap<>();
@@ -45,6 +45,7 @@ public class ProgInfo {
 		}
 		
 		constants.put("pc", new PCConstant(this));
+		constants.put("javra", new Constant(new Line("", 0, ""), "javra", 1));
 	}
 	
 /*public boolean get_segment_overlap() {
@@ -177,7 +178,7 @@ public class ProgInfo {
 	}
 	
 	public boolean is_terminating() {
-		return (max_errors == error_cntr);
+		return (MAX_ERRORS == error_cntr);
 	}
 
 	public IncludeInfo exch_ii(IncludeInfo l_ii) {
@@ -222,7 +223,7 @@ public class ProgInfo {
 		return warning_cntr;
 	}
 	public int get_max_errors() {
-		return max_errors;
+		return MAX_ERRORS;
 	}
 
 	public Integer get_register(String l_name) {

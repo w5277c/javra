@@ -28,13 +28,12 @@ TODO: args parsing
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
-import JAObjects.JAData;
 import JAObjects.JAList;
 import JAObjects.JAListMac;
 import JAObjects.JAMacro;
-import JAObjects.JAMnenomic;
 import JAObjects.JANoList;
 import JAObjects.JAObject;
+import enums.EDevice;
 import enums.EMsgType;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,18 +42,33 @@ import java.util.Locale;
 import output.IntelHexBuilder;
 
 public class Javra {
-	public	static	final	String	VERSION	= "0.0.1";
+	public	static	final	String	VERSION	= "0.1";
 	
 	public static void main(String[] args) throws Exception {
+		if(0x00 == args.length) {
+			show_help();
+			System.exit(0);
+		}
+		for(String arg : args) {
+			if(arg.equalsIgnoreCase("-h") || arg.equalsIgnoreCase("--help")) {
+				show_help();
+				System.exit(0);
+			}
+			else if(arg.equalsIgnoreCase("--version")) {
+				System.out.println("JAVRA version: " + VERSION);
+				System.exit(0);
+			}
+			else if(arg.equalsIgnoreCase("--devices")) {
+				for(EDevice device : EDevice.values()) {
+					//TODO
+				}
+			}
+		}
+		
+		//TODO args parsing
+		
 		long timestamp = System.currentTimeMillis();
-		
-		System.out.println("JAVRA Java AVR macro assembler Version " + VERSION);
-		System.out.println("Licensed by GPL-3.0-or-later");
-		System.out.println();
-		System.out.println("WARNING! The project is not finished yet, it is under development.");
-		System.out.println("!!!It is not recommended to use!!!");
-		System.out.println();
-		
+
 		ProgInfo pi = new ProgInfo();
 		
 		String filename = "";
@@ -147,7 +161,7 @@ public class Javra {
 			if(!pi.get_dseg().is_empty()) {
 				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_dseg.hex");
 				pi.get_dseg().build(pi, hex_builder);
-				hex_builder.close();
+				hex_builder.close();				
 				pi.get_dseg().print_stat(pi);
 			}
 			if(!pi.get_eseg().is_empty()) {
@@ -161,5 +175,28 @@ public class Javra {
 			float time = (System.currentTimeMillis() - timestamp) / 1000f;
 			System.out.println("(parsed: " + Parser.get_line_qnt() + " lines, total time: " + String.format(Locale.US, "%.2f", time) + " s)");
 		}
+	}
+
+	private static void show_help() {
+		System.out.println("JAVRA: Java AVR macro assembler Version " + VERSION + ", licensed by GPL-3.0-or-later.");
+		System.out.println();
+		System.out.println("JAVRA is an open source assembler for Atmel AVR microcontroller family which is based on the AVRA project.");
+		System.out.println("This project is distributed AS IS.\nThe author does not give any guarantees and is not responsible for the work " +
+									"of the program. \nHowever, author adheres to the golden rule of morality.");
+		System.out.println();
+		System.out.println("If necessary, you can find the project on https://github.com/w5277c/javra or write to konstantin@5277.ru");
+		System.out.println();
+		System.out.println("usage:");
+		System.out.println("avra\t[-o <filename>] output hex file name");
+		System.out.println("\t[--listfile/-l <filename>] output list file name");
+		System.out.println("\t[--mapfile/-m <filename>] output map file name");
+		System.out.println("\t[--define/-D <symbol>[=<value>]] define symbol ('javra' already defined)");
+		System.out.println("\t[--includepath/-I <dir>] additional include path");
+		System.out.println("\t[--listmac] list macro expansion in listfile");
+		System.out.println("\t[--max_errors <number>] maximum number of errors before exit (default: " + ProgInfo.MAX_ERRORS + ")");
+		System.out.println("\t[--devices] list out supported devices");
+		System.out.println("\t[--version] version information");
+		System.out.println("\t[--help/-h] this help text");
+		System.out.println("\t<file to assemble>");
 	}
 }
