@@ -84,11 +84,15 @@ public class Parser {
 			if(!str.endsWith(MULTILINE)) {
 				line = null;
 			}
+			
+			if(l_pi.is_terminating()) {
+				break;
+			}
 		}
 		scanner.close();
 		
 		ii = l_pi.exch_ii(ii);
-		if(0 != ii.get_blockcntr()) {
+		if(!l_pi.is_terminating() && 0 != ii.get_blockcntr()) {
 			l_pi.print(EMsgType.MSG_WARNING, null, "some of.if/.ifdef/.ifndef not correctly closed(cntr:" + ii.get_blockcntr() + ")");
 		}
 	}

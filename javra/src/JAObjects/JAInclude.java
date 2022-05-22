@@ -33,7 +33,7 @@ public class JAInclude extends JAObject {
 				new Parser(l_pi, filename, file);
 			}
 			else {
-				l_pi.print(EMsgType.MSG_ERROR, line, MSG_ABSENT_FILE);
+				l_pi.print(EMsgType.MSG_ERROR, line, MSG_ABSENT_FILE + " " + file.getAbsolutePath());
 			}
 		}
 		else {

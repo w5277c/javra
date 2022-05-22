@@ -12,6 +12,11 @@ public class Line {
 	private	String	text;
 	private	String	failpart = null;
 	
+	public Line() {
+		filename = "";
+		line_number = 0;
+		text = "";
+	}
 	public Line(String l_filename, int l_number, String l_text) {
 		filename = l_filename;
 		line_number = l_number;

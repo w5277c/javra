@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class ProgInfo {
-	public	final	static	int			MAX_ERRORS		= 10;
+	public	final	static	int			DEF_MAX_ERROS	= 10;
+	public	int								max_errors		= DEF_MAX_ERROS;
 	private	LinkedList<String>			lib_paths		= new LinkedList<>();
 	private	SegmentInfo						cseg				= new SegmentInfo(this, ESegmentType.CODE);
 	private	SegmentInfo						dseg				= new SegmentInfo(this, ESegmentType.DATA);
@@ -35,6 +36,7 @@ public class ProgInfo {
 	private	IncludeInfo						ii					= null;
 	private	HashMap<String,Integer>		registers		= new HashMap<>();
 	private	LinkedList<JAObject>			objects			= new LinkedList<>();
+	private	boolean							listmac			= false;
 	
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
 
@@ -178,7 +180,7 @@ public class ProgInfo {
 	}
 	
 	public boolean is_terminating() {
-		return (MAX_ERRORS == error_cntr);
+		return (max_errors <= error_cntr);
 	}
 
 	public IncludeInfo exch_ii(IncludeInfo l_ii) {
@@ -223,7 +225,10 @@ public class ProgInfo {
 		return warning_cntr;
 	}
 	public int get_max_errors() {
-		return MAX_ERRORS;
+		return max_errors;
+	}
+	public void set_max_errors(int l_max_errors) {
+		max_errors = l_max_errors;
 	}
 
 	public Integer get_register(String l_name) {
@@ -316,5 +321,12 @@ public class ProgInfo {
 	}
 	public LinkedList<JAObject> get_objects() {
 		return objects;
+	}
+	
+	public void set_listmac() {
+		listmac = true;
+	}
+	public boolean get_listmac() {
+		return listmac;
 	}
 }
