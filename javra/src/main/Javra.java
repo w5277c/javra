@@ -141,14 +141,15 @@ public class Javra {
 
 		pi.print("Assembly " + pi.get_root_path() + asm_filename + "\n...");
 		
+		int pos = asm_filename.lastIndexOf(".");
 		if(null == hex_filename) {
-			int pos = asm_filename.lastIndexOf(".");
-			if(-1 == pos) {
-				hex_filename = asm_filename + ".hex";
-			}
-			else {
-				hex_filename = asm_filename.substring(0, pos) + ".hex";
-			}
+			hex_filename = (-1 == pos ? asm_filename : asm_filename.substring(0, pos));
+		}
+		if(null == list_filename) {
+			list_filename = (-1 == pos ? asm_filename : asm_filename.substring(0, pos)) + ".lst";
+		}
+		if(null == map_filename) {
+			map_filename = (-1 == pos ? asm_filename : asm_filename.substring(0, pos)) + ".map";
 		}
 		
 		new Parser(pi, asm_filename, new File(asm_filename));
@@ -185,7 +186,7 @@ public class Javra {
 			try {
 				boolean list_on = true;
 				boolean listmac = pi.get_listmac();
-				list_fos = new FileOutputStream(new File("noname.lst"));
+				list_fos = new FileOutputStream(new File(list_filename));
 				for(JAObject obj : pi.get_objects()) {
 					if(obj instanceof JAList) {
 						list_on = true;
@@ -222,19 +223,19 @@ public class Javra {
 		else {
 			System.out.println();
 			if(!pi.get_cseg().is_empty()) {
-				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_cseg.hex");
+				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, hex_filename + "_cseg.hex");
 				pi.get_cseg().build(pi, hex_builder);
 				hex_builder.close();
 				pi.get_cseg().print_stat(pi);
 			}
 			if(!pi.get_dseg().is_empty()) {
-				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_dseg.hex");
+				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, hex_filename + "_dseg.hex");
 				pi.get_dseg().build(pi, hex_builder);
 				hex_builder.close();				
 				pi.get_dseg().print_stat(pi);
 			}
 			if(!pi.get_eseg().is_empty()) {
-				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, "nonamae_eseg.hex");
+				IntelHexBuilder hex_builder = new IntelHexBuilder(pi, hex_filename + "_eseg.hex");
 				pi.get_eseg().build(pi, hex_builder);
 				hex_builder.close();
 				pi.get_eseg().print_stat(pi);
