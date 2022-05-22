@@ -56,9 +56,9 @@ public class JAMnenomic extends JAObject {
 			pi.print(EMsgType.MSG_ERROR, line, "Garbage after instruction " + em_id + ":" + value);
 		}
 		else {
-			String param1 = (0x00 < params.length ? params[0x00].toLowerCase().replaceAll("\\s", "") : null);
+			String param1 = (0x00 < params.length ? params[0x00].trim() : null);
 			if(null != param1 && param1.isEmpty()) param1 = null;
-			String param2 = (0x01 < params.length ? params[0x01].toLowerCase().replaceAll("\\s", "") : null);
+			String param2 = (0x01 < params.length ? params[0x01].trim() : null);
 			if(null != param2 && param2.isEmpty()) param2 = null;
 
 			if(em_id <= EMnemonic.MN_BREAK.get_id()) {

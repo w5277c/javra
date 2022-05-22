@@ -243,7 +243,7 @@ public class Javra {
 			}
 
 			float time = (System.currentTimeMillis() - timestamp) / 1000f;
-			System.out.println("\n(parsed: " + Parser.get_line_qnt() + " lines, total time: " + String.format(Locale.US, "%.2f", time) + " s)");
+			System.out.println("\nparsed: " + Parser.get_line_qnt() + " lines, total time: " + String.format(Locale.US, "%.2f", time) + " s");
 			System.out.println("Build SUCCESS, warnings:" + pi.get_warning_cntr());
 			System.exit(0);
 		}

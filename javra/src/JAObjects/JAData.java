@@ -46,61 +46,75 @@ public class JAData extends JAObject {
 		data = new byte[0x40];
 		offset = 0x00;
 		
-		String parts[] = value.split(",");
-		if(0x00 != parts.length) {
-			for(String part : parts) {
-				String tmp = part.trim();
-				if(tmp.startsWith("\"") && tmp.endsWith("\"")) {
-					try {
-						byte[] _data = tmp.substring(0x01, tmp.length()-0x01).getBytes("ASCII");
-						if((data.length-offset) < _data.length) {
-							byte[] _tmp = new byte[offset + _data.length + 0x40];
-							System.arraycopy(data, 0x00, _tmp, 0x00, offset);
-							data = _tmp;
-						}
-						System.arraycopy(_data, 0x00, data, offset, _data.length);
-						offset+=_data.length;
-					}
-					catch(Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-				else {
-					Long value = Expr.parse(pi, line, tmp);
-					if(null == value) {
-						expr_fail = true;
-						value = 0l;
-					}
-					if((data.length-offset) < size) {
-						byte[] _tmp = new byte[offset + size + 0x40];
+		//TODO оттестировать и оптимизировать
+		while(null != value && !value.isEmpty()) {
+			int pos1 = value.indexOf("\"");
+			int pos2 = (-1 == pos1 ? -1 : value.substring(pos1+0x01).indexOf("\""));
+			
+			if(-1 != pos1 && -1 == pos2) {
+				pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_SYNTAX);
+				break;
+			}
+			String part;
+			if(-1 != pos1 && -1 != pos2) {
+				part = value.substring(pos1+0x01, pos1+pos2+0x01).trim();
+				value = value.substring(pos1+pos2+0x03).trim();
+				try {
+					byte[] _data = part.getBytes("ASCII");
+					if((data.length-offset) < _data.length) {
+						byte[] _tmp = new byte[offset + _data.length + 0x40];
 						System.arraycopy(data, 0x00, _tmp, 0x00, offset);
 						data = _tmp;
 					}
-					ByteBuffer bb = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.LITTLE_ENDIAN);
-					bb.putLong(value);
-					System.arraycopy(bb.array(), 0x00, data, offset, size);
-					offset+=size;
+					System.arraycopy(_data, 0x00, data, offset, _data.length);
+					offset+=_data.length;
+				}
+				catch(Exception ex) {
+					ex.printStackTrace();
 				}
 			}
-
-			if(null == block) {
-				if(0x00 != (offset%0x02)) {
-					pi.print(EMsgType.MSG_WARNING, line, "A .DB segment with an odd number of bytes is detected. A zero byte is added.");
+			else {
+				pos1 = value.indexOf(",");
+				if(-1 == pos1) {
+					part = value;
+					value = null;
+				}
+				else {
+					part = value.substring(0, pos1).trim();
+					value = value.substring(pos1+0x01).trim();
 				}
 
-				block = pi.get_segment().get_cur_block(line);
-				address = block.get_address();
-				
-				block.write(data, (block instanceof CodeBlock ? offset/2 + (offset%0x02) : offset));
-			}
-			
-			if(!expr_fail) {
-				block.set_addr(address);
-				block.write(data, (block instanceof CodeBlock ? offset/2 + (offset%0x02) : offset));
+				Long value = Expr.parse(pi, line, part);
+				if(null == value) {
+					expr_fail = true;
+					value = 0l;
+				}
+				if((data.length-offset) < size) {
+					byte[] _tmp = new byte[offset + size + 0x40];
+					System.arraycopy(data, 0x00, _tmp, 0x00, offset);
+					data = _tmp;
+				}
+				ByteBuffer bb = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.LITTLE_ENDIAN);
+				bb.putLong(value);
+				System.arraycopy(bb.array(), 0x00, data, offset, size);
+				offset+=size;
 			}
 		}
-		else {
-			pi.print(EMsgType.MSG_ERROR, line, MSG_MISSING_PARAMETERS);
+
+		if(null == block) {
+			if(0x00 != (offset%0x02)) {
+				pi.print(EMsgType.MSG_WARNING, line, "A .DB segment with an odd number of bytes is detected. A zero byte is added.");
+			}
+
+			block = pi.get_segment().get_cur_block(line);
+			address = block.get_address();
+
+			block.write(data, (block instanceof CodeBlock ? offset/2 + (offset%0x02) : offset));
+		}
+
+		if(!expr_fail) {
+			block.set_addr(address);
+			block.write(data, (block instanceof CodeBlock ? offset/2 + (offset%0x02) : offset));
 		}
 	}
 	
