@@ -241,9 +241,9 @@ public class Javra {
 				pi.get_eseg().print_stat(pi);
 			}
 
-			System.out.println("\nBuild SUCCESS, warnings:" + pi.get_warning_cntr());
 			float time = (System.currentTimeMillis() - timestamp) / 1000f;
-			System.out.println("(parsed: " + Parser.get_line_qnt() + " lines, total time: " + String.format(Locale.US, "%.2f", time) + " s)");
+			System.out.println("\n(parsed: " + Parser.get_line_qnt() + " lines, total time: " + String.format(Locale.US, "%.2f", time) + " s)");
+			System.out.println("Build SUCCESS, warnings:" + pi.get_warning_cntr());
 		}
 	}
 
