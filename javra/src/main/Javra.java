@@ -219,6 +219,7 @@ public class Javra {
 		
 		if(0 != pi.get_error_cntr()) {
 			System.out.println("\nBuild FAIL, warnings:" + pi.get_warning_cntr() + ", errors:" + pi.get_error_cntr() + "/" + pi.get_max_errors());
+			System.exit(1);
 		}
 		else {
 			System.out.println();
@@ -244,6 +245,7 @@ public class Javra {
 			float time = (System.currentTimeMillis() - timestamp) / 1000f;
 			System.out.println("\n(parsed: " + Parser.get_line_qnt() + " lines, total time: " + String.format(Locale.US, "%.2f", time) + " s)");
 			System.out.println("Build SUCCESS, warnings:" + pi.get_warning_cntr());
+			System.exit(0);
 		}
 	}
 

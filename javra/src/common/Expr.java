@@ -110,6 +110,20 @@ public class Expr {
 					}
 					
 				}
+				else if(_expr.startsWith("\'")) {
+					if(0x02 < _expr.length() && '\\' != _expr.charAt(0x01) && '\'' != _expr.charAt(0x01) && '\'' == _expr.charAt(0x02)) {
+						result = (long)_expr.charAt(0x01);
+						_expr = _expr.substring(0x03).trim();
+					}
+					else if(0x03 < _expr.length() && '\\' == _expr.charAt(0x01) && '\'' == _expr.charAt(0x02) && '\'' == _expr.charAt(0x03)) {
+						result = (long)'\'';
+						_expr = _expr.substring(0x04).trim();
+					}
+					else {
+						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
+						break;
+					}
+				}
 				else if(_expr.startsWith("(")) {
 					int length = par_length(_expr, 0x01);
 					if(-1 == length) {
