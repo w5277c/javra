@@ -130,7 +130,7 @@ public class JAMnenomic extends JAObject {
 								}
 							}
 							else {
-								if(range_check(pi, value, 0x800, true)) {
+								if(pi.get_device().get_flash_size() <= 0x1000 || range_check(pi, value, 0x800, true)) {
 									opcode1 = (int)((value & 0x0fff));
 								}
 							}

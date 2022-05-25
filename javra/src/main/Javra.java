@@ -181,38 +181,38 @@ public class Javra {
 					pi.print(EMsgType.MSG_ERROR, obj.get_line(), JAObject.MSG_UNKNOWN_LEXEME, " '" + obj.get_line().get_failpart() + "'");
 				}
 			}
-
-			FileOutputStream list_fos = null;
-			try {
-				boolean list_on = true;
-				boolean listmac = pi.get_listmac();
-				list_fos = new FileOutputStream(new File(list_filename));
-				for(JAObject obj : pi.get_objects()) {
-					if(obj instanceof JAList) {
-						list_on = true;
-					}
-					else if(obj instanceof JANoList) {
-						list_on = false;
-					}
-					else if(obj instanceof JAListMac) {
-						listmac = true;
-					}
-
-					if((list_on && !(obj instanceof JAMacro)) || (listmac && (obj instanceof JAMacro))) {
-						obj.write_list(list_fos);
-					}
+		}
+		
+		FileOutputStream list_fos = null;
+		try {
+			boolean list_on = true;
+			boolean listmac = pi.get_listmac();
+			list_fos = new FileOutputStream(new File(list_filename));
+			for(JAObject obj : pi.get_objects()) {
+				if(obj instanceof JAList) {
+					list_on = true;
 				}
-				list_fos.flush();
-				list_fos.close();
+				else if(obj instanceof JANoList) {
+					list_on = false;
+				}
+				else if(obj instanceof JAListMac) {
+					listmac = true;
+				}
+
+				if((list_on && !(obj instanceof JAMacro)) || (listmac && (obj instanceof JAMacro))) {
+					obj.write_list(list_fos);
+				}
 			}
-			catch(Exception ex) {
-				ex.printStackTrace();
-				if(null != list_fos) {
-					try {
-						list_fos.close();
-					}
-					catch(Exception ex2) {
-					}
+			list_fos.flush();
+			list_fos.close();
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+			if(null != list_fos) {
+				try {
+					list_fos.close();
+				}
+				catch(Exception ex2) {
 				}
 			}
 		}
