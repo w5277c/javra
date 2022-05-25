@@ -49,16 +49,16 @@ public class JAData extends JAObject {
 		//TODO оттестировать и оптимизировать
 		while(null != value && !value.isEmpty()) {
 			int pos1 = value.indexOf("\"");
-			int pos2 = (-1 == pos1 ? -1 : value.substring(pos1+0x01).indexOf("\""));
+			int pos2 = (0 == pos1 ? value.substring(0x01).indexOf("\"") : -1);
 			
-			if(-1 != pos1 && -1 == pos2) {
+			if(0 == pos1 && -1 == pos2) {
 				pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_SYNTAX);
 				break;
 			}
 			String part;
-			if(-1 != pos1 && -1 != pos2) {
-				part = value.substring(pos1+0x01, pos1+pos2+0x01).trim();
-				value = value.substring(pos1+pos2+0x03).trim();
+			if(0x00 == pos1 && -1 != pos2) {
+				part = value.substring(0x01, pos2+0x01);
+				value = value.substring(pos2+0x03).trim();
 				try {
 					byte[] _data = part.getBytes("ASCII");
 					if((data.length-offset) < _data.length) {
@@ -84,7 +84,7 @@ public class JAData extends JAObject {
 					value = value.substring(pos1+0x01).trim();
 				}
 
-				Long value = Expr.parse(pi, line, part);
+				Long value = Expr.parse(pi, line, part.toLowerCase());
 				if(null == value) {
 					expr_fail = true;
 					value = 0l;

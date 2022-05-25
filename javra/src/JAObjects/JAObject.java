@@ -49,7 +49,7 @@ public class JAObject {
 	public static JAObject parse(ProgInfo l_pi, Line l_line) throws Exception {
 		String parts[] = l_line.get_text().split("\\s", 0x02);
 		String name = parts[0x00].trim().toLowerCase();
-		String value = (0x02 == parts.length ? value = parts[0x01].trim().toLowerCase() : "");
+		String value = (0x02 == parts.length ? value = parts[0x01].trim() : "");
 
 		if(!name.isEmpty()) {
 			if(name.equals("#")) {
@@ -59,45 +59,45 @@ public class JAObject {
 			if(null != l_pi.get_ii() && l_pi.get_ii().is_blockskip()) {
 				switch(name) {
 					case ".ifdef":
-						return new JAIfDef(l_pi, l_line, value);
+						return new JAIfDef(l_pi, l_line, value.toLowerCase());
 					case ".ifndef":
-						return new JAIfNDef(l_pi, l_line, value);
+						return new JAIfNDef(l_pi, l_line, value.toLowerCase());
 					case ".if":
-						return new JAIf(l_pi, l_line, value);
+						return new JAIf(l_pi, l_line, value.toLowerCase());
 					case ".endif":
-						return new JAEndIf(l_pi, l_line, value);
+						return new JAEndIf(l_pi, l_line, value.toLowerCase());
 					case ".else":
-						return new JAElse(l_pi, l_line, value);
+						return new JAElse(l_pi, l_line, value.toLowerCase());
 					case ".elseif":
-						return new JAElseIf(l_pi, l_line, value);
+						return new JAElseIf(l_pi, l_line, value.toLowerCase());
 					default:
 				}
 			}
 			else {
 				switch(name) {
 					case ".equ":
-						return new JAEQU(l_pi, l_line, value);
+						return new JAEQU(l_pi, l_line, value.toLowerCase());
 					case ".set":
-						return new JASet(l_pi, l_line, value);
+						return new JASet(l_pi, l_line, value.toLowerCase());
 					case ".org":
-						return new JAORG(l_pi, l_line, value);
+						return new JAORG(l_pi, l_line, value.toLowerCase());
 					case ".include":
 						return new JAInclude(l_pi, l_line, value);
 					case ".device":
-						return new JADevice(l_pi, l_line, value);
+						return new JADevice(l_pi, l_line, value.toLowerCase());
 					case ".ifdef":
-						return new JAIfDef(l_pi, l_line, value);
+						return new JAIfDef(l_pi, l_line, value.toLowerCase());
 					case ".ifndef":
-						return new JAIfNDef(l_pi, l_line, value);
+						return new JAIfNDef(l_pi, l_line, value.toLowerCase());
 					case ".endif":
-						return new JAEndIf(l_pi, l_line, value);
+						return new JAEndIf(l_pi, l_line, value.toLowerCase());
 					case ".if":
-						return new JAIf(l_pi, l_line, value);
+						return new JAIf(l_pi, l_line, value.toLowerCase());
 					case ".else":
-						return new JAElse(l_pi, l_line, value);
+						return new JAElse(l_pi, l_line, value.toLowerCase());
 					case ".elseif":
 					case ".elif":
-						return new JAElseIf(l_pi, l_line, value);
+						return new JAElseIf(l_pi, l_line, value.toLowerCase());
 					case ".message":
 						return new JAMessage(l_pi, l_line, value, EMsgType.MSG_DMESSAGE);
 					case ".warning":
@@ -105,14 +105,14 @@ public class JAObject {
 					case ".error":
 						return new JAMessage(l_pi, l_line, value, EMsgType.MSG_DERROR);
 					case ".def":
-						return new JADef(l_pi, l_line, value);
+						return new JADef(l_pi, l_line, value.toLowerCase());
 					case ".undef":
-						return new JAUndef(l_pi, l_line, value);
+						return new JAUndef(l_pi, l_line, value.toLowerCase());
 					case ".macro":
-						return new JAMacro(l_pi, l_line, value, true);
+						return new JAMacro(l_pi, l_line, value.toLowerCase(), true);
 					case ".endm":
 					case ".endmacro":
-						return new JAMacro(l_pi, l_line, value, false);
+						return new JAMacro(l_pi, l_line, value.toLowerCase(), false);
 					case ".db":
 						return new JAData(l_pi, l_line, value, 0x01);
 					case ".dw":
@@ -122,25 +122,25 @@ public class JAObject {
 					case ".dq":
 						return new JAData(l_pi, l_line, value, 0x08);
 					case ".exit":
-						return new JAExit(l_pi, l_line, value);
+						return new JAExit(l_pi, l_line, value.toLowerCase());
 					case ".list":
-						return new JAList(l_pi, l_line, value);
+						return new JAList(l_pi, l_line, value.toLowerCase());
 					case ".nolist":
-						return new JANoList(l_pi, l_line, value);
+						return new JANoList(l_pi, l_line, value.toLowerCase());
 					case ".listmac":
-						return new JAListMac(l_pi, l_line, value);
+						return new JAListMac(l_pi, l_line, value.toLowerCase());
 					case ".overlap":
-						return new JAOverlap(l_pi, l_line, value);
+						return new JAOverlap(l_pi, l_line, value.toLowerCase());
 					case ".nooverlap":
-						return new JANoOverlap(l_pi, l_line, value);
+						return new JANoOverlap(l_pi, l_line, value.toLowerCase());
 					case ".byte":
 						return new JAByte(l_pi, l_line, value);
 					case ".cseg":
-						return new JACSeg(l_pi, l_line, value);
+						return new JACSeg(l_pi, l_line, value.toLowerCase());
 					case ".dseg":
-						return new JADSeg(l_pi, l_line, value);
+						return new JADSeg(l_pi, l_line, value.toLowerCase());
 					case ".eseg":
-						return new JAESeg(l_pi, l_line, value);
+						return new JAESeg(l_pi, l_line, value.toLowerCase());
 
 						//TODO .csegsize(for AT94K),
 						
@@ -149,17 +149,17 @@ public class JAObject {
 							l_pi.print(EMsgType.MSG_WARNING, l_line, MSG_UNSUPPORTED, name);
 						}
 						else if(name.replaceAll(REGEX_LABEL_NAME, "").isEmpty()) {
-							return new JALabel(l_pi, l_line, value, name.substring(0x00, name.length()-0x01));
+							return new JALabel(l_pi, l_line, value.toLowerCase(), name.substring(0x00, name.length()-0x01));
 						}
 						else {
 							EMnemonic em = EMnemonic.fromName(name);
 							if(null != em) {
-								return new JAMnenomic(l_pi, l_line, value, em);
+								return new JAMnenomic(l_pi, l_line, value.toLowerCase(), em);
 							}
 							else {
 								JAMacro macro = l_pi.get_macro(name);
 								if(null != macro) {
-									return new JAMacroBlock(l_pi, l_line, value, macro);
+									return new JAMacroBlock(l_pi, l_line, value.toLowerCase(), macro);
 								}
 								else {
 									l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME, " '" + name + "'");

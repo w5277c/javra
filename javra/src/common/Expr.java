@@ -19,15 +19,17 @@ public class Expr {
 	public static Long parse(ProgInfo l_pi, Line l_line, String l_expr) {
 		Long result = 0l;
 		int count = 0x00;
-		String unary = "";
+		char unary = 0x00;
 		boolean first_flag = true;
 		LinkedList<Long> elemets = new LinkedList<>();
 		LinkedList<EOperator> operators = new LinkedList<>();
 		
 		String _expr = new String(l_expr.trim());
 		while(!_expr.isEmpty()) {
-			if(first_flag && (_expr.startsWith("!") || _expr.startsWith("~") || _expr.startsWith("-"))) {
-				unary = _expr.substring(0x00, 0x01);
+			
+			char c = _expr.charAt(0x00);
+			if(first_flag && ('!' == c || '~' == c || '-' == c)) {
+				unary = c;
 				_expr = _expr.substring(0x01);
 				first_flag = false;
 			}
@@ -49,7 +51,7 @@ public class Expr {
 				count++;
 			}
 			else {
-				if(_expr.startsWith("0x")) {
+				if('0' == c && _expr.length() > 0x01 && 'x' == _expr.charAt(0x01)) {
 					int pos = 0x02;
 					while(is_hex_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x02 != pos) {
@@ -61,7 +63,7 @@ public class Expr {
 						break;
 					}
 				}
-				else if(_expr.startsWith("0b")) {
+				else if('0' == c && _expr.length() > 0x01 && 'b' == _expr.charAt(0x01)) {
 					int pos = 0x02;
 					while(is_bin_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x02 != pos) {
@@ -73,7 +75,7 @@ public class Expr {
 						break;
 					}
 				}
-				else if('0' <= _expr.charAt(0x00) && '9' >= _expr.charAt(0x00)) {
+				else if('0' <= c && '9' >= c) {
 					int pos = 0x00;
 					while(is_dec_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x00 != pos) {
@@ -85,7 +87,7 @@ public class Expr {
 						break;
 					}
 				}
-				else if(_expr.startsWith("$")) {
+				else if('$' == c) {
 					int pos = 0x00;
 					while(is_hex_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x00 != pos) {
@@ -97,7 +99,7 @@ public class Expr {
 						break;
 					}
 				}
-				else if(0x02 <=_expr.length() && '0' == _expr.charAt(0x00) &&  '0' <= _expr.charAt(0x01) && '7' >= _expr.charAt(0x01)) {
+				else if(0x02 <=_expr.length() && '0' == c &&  '0' <= _expr.charAt(0x01) && '7' >= _expr.charAt(0x01)) {
 					int pos = 0x00;
 					while(is_oct_digit(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					if(0x00 != pos) {
@@ -110,7 +112,7 @@ public class Expr {
 					}
 					
 				}
-				else if(_expr.startsWith("\'")) {
+				else if('\'' == c) {
 					if(0x02 < _expr.length() && '\\' != _expr.charAt(0x01) && '\'' != _expr.charAt(0x01) && '\'' == _expr.charAt(0x02)) {
 						result = (long)_expr.charAt(0x01);
 						_expr = _expr.substring(0x03).trim();
@@ -124,7 +126,7 @@ public class Expr {
 						break;
 					}
 				}
-				else if(_expr.startsWith("(")) {
+				else if('(' == c) {
 					int length = par_length(_expr, 0x01);
 					if(-1 == length) {
 						l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, ")");
@@ -137,7 +139,7 @@ public class Expr {
 					}
 					_expr = _expr.substring(length+0x02).trim();
 				}
-				else if(is_alpha(_expr.charAt(0x00)) || '_' == _expr.charAt(0x00)) {
+				else if(is_alpha(c) || '_' == c) {
 					int pos = 0x00;
 					while(is_label(_expr.charAt(pos))) {pos++; if(pos == _expr.length()) break;}
 					String name = _expr.substring(0x00, pos).trim();
@@ -150,7 +152,7 @@ public class Expr {
 						}
 					}
 					if(null != func) {
-						if(_expr.startsWith("(")) {
+						if('(' == _expr.charAt(0x00)) {
 							int length = par_length(_expr, 0x01);
 							if(-1 == length) {
 								l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_MISSING, ")");
@@ -200,13 +202,13 @@ public class Expr {
 				}
 				if(null != result) {
 					switch(unary) {
-						case "-":
+						case '-':
 							result = -result;
 							break;
-						case "!":
+						case '!':
 							result = (0x00 == result ? 0x01l : 0x00l);
 							break;
-						case "~":
+						case '~':
 							result = ~result;
 							break;
 					}
