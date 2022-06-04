@@ -16,7 +16,7 @@ public class JAObject {
 	public	final	static	String	MSG_INVALID_NUMBER		= "invalid number";
 	public	final	static	String	MSG_INVALID_SYNTAX		= "invalid syntax";
 	public	final	static	String	MSG_ALREADY_DEFINED		= "already defined";
-	public	final	static	String	MSG_UNKNOWN_LEXEME		= "unknown lexeme";
+	public	final	static	String	MSG_UNKNOWN_LEXEME		= "Found no label/variable/constant named";
 	public	final	static	String	MSG_UNKNOWN_CONSTANT		= "unknown constant";
 	public	final	static	String	MSG_ABSENT_FILE			= "absent_file";
 	public	final	static	String	MSG_MISSING					= "missing ";

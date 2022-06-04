@@ -11,6 +11,7 @@ public enum EMsgType {
 	MSG_DMESSAGE("Message"),
 	MSG_DWARNING("Warning"),
 	MSG_DERROR("Error"),
+	MSG_DTODO("TODO"),
 	MSG_INFO("");
 	
 	private String text;

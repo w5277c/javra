@@ -43,7 +43,7 @@ import java.util.Locale;
 import output.IntelHexBuilder;
 
 public class Javra {
-	public	static	final	String	VERSION	= "0.1";
+	public	static	final	String	VERSION	= "0.2";
 	
 	public static void main(String[] args) throws Exception {
 		if(0x00 == args.length) {
@@ -178,7 +178,7 @@ public class Javra {
 					break;
 				}
 				if(obj.is_expr_fail()) {
-					pi.print(EMsgType.MSG_ERROR, obj.get_line(), JAObject.MSG_UNKNOWN_LEXEME, " '" + obj.get_line().get_failpart() + "'");
+					pi.print(EMsgType.MSG_ERROR, obj.get_line(), JAObject.MSG_UNKNOWN_LEXEME, " " + obj.get_line().get_failpart().toUpperCase());
 				}
 			}
 		}

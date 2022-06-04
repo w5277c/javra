@@ -43,6 +43,8 @@ public class JAMnenomic extends JAObject {
 	public void parse() {
 		super.parse();
 		
+		EMnemonic _em = em;
+		
 		String[] params = value.split(",");
 
 		if(null == address) {
@@ -53,7 +55,7 @@ public class JAMnenomic extends JAObject {
 		}
 		
 		if(0x02 < params.length) {
-			pi.print(EMsgType.MSG_ERROR, line, "Garbage after instruction " + em + ":" + value);
+			pi.print(EMsgType.MSG_ERROR, line, "Garbage after instruction " + _em + ":" + value);
 		}
 		else {
 			String param1 = (0x00 < params.length ? params[0x00].trim() : null);
@@ -61,11 +63,11 @@ public class JAMnenomic extends JAObject {
 			String param2 = (0x01 < params.length ? params[0x01].trim() : null);
 			if(null != param2 && param2.isEmpty()) param2 = null;
 
-			if(em.get_id() <= EMnemonic.MN_BREAK.get_id()) {
-				garbage_check(pi, em, param1, param2, 0);
+			if(_em.get_id() <= EMnemonic.MN_BREAK.get_id()) {
+				garbage_check(pi, _em, param1, param2, 0);
 			}
-			else if(em.get_id() <= EMnemonic.MN_ELPM.get_id()) {
-				if(garbage_check(pi, em, param1, param2, 1, 2)) {
+			else if(_em.get_id() <= EMnemonic.MN_ELPM.get_id()) {
+				if(garbage_check(pi, _em, param1, param2, 1, 2)) {
 					if(2 == params.length) {
 						Integer register = pi.get_register(param1);
 						if(null != register) {
@@ -73,19 +75,19 @@ public class JAMnenomic extends JAObject {
 						}
 						Integer ind = get_indirect(pi, param2);
 						if(IND_Z == ind) {
-							if(EMnemonic.MN_LPM == em) {
-								em = EMnemonic.MN_LPM_Z;
+							if(EMnemonic.MN_LPM == _em) {
+								_em = EMnemonic.MN_LPM_Z;
 							}
-							else if(EMnemonic.MN_ELPM == em) {
-								em = EMnemonic.MN_ELPM_Z;
+							else if(EMnemonic.MN_ELPM == _em) {
+								_em = EMnemonic.MN_ELPM_Z;
 							}
 						}
 						else if(IND_ZP == ind) {
-							if(EMnemonic.MN_LPM == em) {
-								em = EMnemonic.MN_LPM_ZP;
+							if(EMnemonic.MN_LPM == _em) {
+								_em = EMnemonic.MN_LPM_ZP;
 							}
-							else if(EMnemonic.MN_ELPM == em) {
-								em = EMnemonic.MN_ELPM_ZP;
+							else if(EMnemonic.MN_ELPM == _em) {
+								_em = EMnemonic.MN_ELPM_ZP;
 							}
 						}
 						else {
@@ -95,36 +97,40 @@ public class JAMnenomic extends JAObject {
 				}
 			}
 			else {
-				if(em.get_id() >= EMnemonic.MN_BRBS.get_id()) {
-					garbage_check(pi, em, param1, param2, 2);
+				if(_em.get_id() >= EMnemonic.MN_BRBS.get_id()) {
+					garbage_check(pi, _em, param1, param2, 2);
 				}
-				if(em.get_id() <= EMnemonic.MN_BCLR.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 1)) {
-						Integer bitnum = get_bitnum(pi, em, param1);
+				if(_em.get_id() <= EMnemonic.MN_BCLR.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 1)) {
+						Integer bitnum = get_bitnum(pi, _em, param1);
 						if(null != bitnum) {
 							opcode1 = (bitnum << 0x04);
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_ROL.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 1)) {
-						Integer register = get_register(pi, em, param1);
-						if(em == EMnemonic.MN_SER && register < 16) {
-							regrange_check(pi, em, register, 16, 31);
-							register &= 0x0f;
-						}
-						opcode1 = (register << 0x04);
-						if(em.get_id() >= EMnemonic.MN_TST.get_id()) {
-							opcode1 |= ((register & 0x10)<<0x05) | (register & 0x0f);
+				else if(_em.get_id() <= EMnemonic.MN_ROL.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 1)) {
+						Integer register = get_register(pi, _em, param1);
+						if(null != register) {
+							if(_em == EMnemonic.MN_SER && register < 16) {
+								regrange_check(pi, _em, register, 16, 31);
+								register &= 0x0f;
+							}
+							else {
+								opcode1 = (register << 0x04);
+								if(_em.get_id() >= EMnemonic.MN_TST.get_id()) {
+									opcode1 |= ((register & 0x10)<<0x05) | (register & 0x0f);
+								}
+							}
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_RCALL.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 1)) {
+				else if(_em.get_id() <= EMnemonic.MN_RCALL.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 1)) {
 						Long value = Expr.parse(pi, line, param1);
 						if(null != value) {
 							value -= (pi.get_cseg().get_cur_block(line).get_address() + 0x01);
-							if(em.get_id() <= EMnemonic.MN_BRID.get_id()) {
+							if(_em.get_id() <= EMnemonic.MN_BRID.get_id()) {
 								if(range_check(pi, value, 0x40, true)) {
 									opcode1 = (int)((value & 0x7f) << 3);
 								}
@@ -140,9 +146,9 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_CALL.get_id()) {
+				else if(_em.get_id() <= EMnemonic.MN_CALL.get_id()) {
 					opcode2 = 0;//Пишем два слова даже если не смогли распарсить
-					if(garbage_check(pi, em, param1, param2, 1)) {
+					if(garbage_check(pi, _em, param1, param2, 1)) {
 						Long value = Expr.parse(pi, line, param1);
 						if(range_check(pi, value, 0x400000, false)) {
 							opcode1 = (int)(((value & 0x3e0000) >> 13) | ((value & 0x010000) >> 16));
@@ -150,9 +156,9 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_BRBC.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						opcode1 = get_bitnum(pi, em, param1);
+				else if(_em.get_id() <= EMnemonic.MN_BRBC.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						opcode1 = get_bitnum(pi, _em, param1);
 						if(null != opcode1) {
 							Long value = Expr.parse(pi, line, param2);
 							if(null != value) {
@@ -167,31 +173,31 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_MUL.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
+				else if(_em.get_id() <= EMnemonic.MN_MUL.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
 						if(null != register1) {
 							opcode1 = (int)(register1 << 0x04);
-							Integer register2 = get_register(pi, em, param2);
+							Integer register2 = get_register(pi, _em, param2);
 							if(null != register2) {
 								opcode1 |= (int)(((register2 & 0x10) << 0x05) | (register2 & 0x0f));
 							}
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_MOVW.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
+				else if(_em.get_id() <= EMnemonic.MN_MOVW.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
 						if(null != register1) {
 							if(0x01 == (register1 % 0x02)) {
-								pi.print(EMsgType.MSG_ERROR, line, em + " must use a even numbered register for Rd");
+								pi.print(EMsgType.MSG_ERROR, line, _em + " must use a even numbered register for Rd");
 							}
 							else {
 								opcode1 = (int)((register1 / 2) << 0x04);
-								Integer register2 = get_register(pi, em, param2);
+								Integer register2 = get_register(pi, _em, param2);
 								if(null != register2) {
 									if(0x01 == (register2 % 0x02)) {
-										pi.print(EMsgType.MSG_ERROR, line, em + " must use a even numbered register for Rr");
+										pi.print(EMsgType.MSG_ERROR, line, _em + " must use a even numbered register for Rr");
 									}
 									else {
 										opcode1 |= (int)(register2 / 2);
@@ -201,56 +207,58 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_MULS.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
-						if(regrange_check(pi, em, register1, 16, 31)) {
+				else if(_em.get_id() <= EMnemonic.MN_MULS.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
+						if(regrange_check(pi, _em, register1, 16, 31)) {
 							opcode1 = (int)((register1 & 0x0f) << 0x04);
-							Integer register2 = get_register(pi, em, param2);
-							if(regrange_check(pi, em, register2, 16, 31)) {
+							Integer register2 = get_register(pi, _em, param2);
+							if(regrange_check(pi, _em, register2, 16, 31)) {
 								opcode1 |= (int)(register2 & 0x0f);
 							}
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_FMULSU.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
-						if(regrange_check(pi, em, register1, 16, 23)) {
+				else if(_em.get_id() <= EMnemonic.MN_FMULSU.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
+						if(regrange_check(pi, _em, register1, 16, 23)) {
 							opcode1 = (int)((register1 & 0x07) << 0x04);
-							Integer register2 = get_register(pi, em, param2);
-							if(regrange_check(pi, em, register2, 16, 23)) {
+							Integer register2 = get_register(pi, _em, param2);
+							if(regrange_check(pi, _em, register2, 16, 23)) {
 								opcode1 |= (int)(register2 & 0x07);
 							}
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_SBIW.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
-						if(register1 != 24 && register1 != 26 && register1 != 28 && register1 != 30) {
-							pi.print(EMsgType.MSG_ERROR, line, em + "  can only use registers R24, R26, R28 or R30");
-						}
-						else {
-							opcode1 = (int)(((register1 - 24) / 0x02) << 0x04);
-							Long value = Expr.parse(pi, line, param2);
-							if(constrange_check(pi, em, value, 0, 63)) {
-								opcode1 |= (int)(((value & 0x30) << 0x02) | (value & 0x0f));
+				else if(_em.get_id() <= EMnemonic.MN_SBIW.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
+						if(null != register1) {
+							if(register1 != 24 && register1 != 26 && register1 != 28 && register1 != 30) {
+								pi.print(EMsgType.MSG_ERROR, line, _em + "  can only use registers R24, R26, R28 or R30");
+							}
+							else {
+								opcode1 = (int)(((register1 - 24) / 0x02) << 0x04);
+								Long value = Expr.parse(pi, line, param2);
+								if(constrange_check(pi, _em, value, 0, 63)) {
+									opcode1 |= (int)(((value & 0x30) << 0x02) | (value & 0x0f));
+								}
 							}
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_CBR.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
-						if(regrange_check(pi, em, register1, 16, 31)) {
+				else if(_em.get_id() <= EMnemonic.MN_CBR.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
+						if(regrange_check(pi, _em, register1, 16, 31)) {
 							opcode1 = (int)((register1 & 0x0f) << 0x04);
 							Long value = Expr.parse(pi, line, param2);
 							if(null != value) {
 								if(-128 > value || 255 < value) {
 									pi.print(EMsgType.MSG_WARNING, line, " Constant out of range (-128 <= " + value + " <= 255). Will be masked");
 								}
-								if(em == EMnemonic.MN_CBR) value = ~value;
+								if(_em == EMnemonic.MN_CBR) value = ~value;
 								opcode1 |= (int)(((value & 0xf0) << 0x04) | (value & 0x0f));
 							}
 							else {
@@ -259,22 +267,22 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_BLD.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
+				else if(_em.get_id() <= EMnemonic.MN_BLD.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
 						if(null != register1) {
 							opcode1 = (int)(register1 << 0x04);
-							Integer bitnum = get_bitnum(pi, em, param2);
+							Integer bitnum = get_bitnum(pi, _em, param2);
 							if(null != bitnum) {
 								opcode1 |= bitnum;
 							}
 						}
 					}
 				}
-				else if(em == EMnemonic.MN_IN) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
-						if(regrange_check(pi, em, register1, 0, 31)) {
+				else if(_em == EMnemonic.MN_IN) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
+						if(regrange_check(pi, _em, register1, 0, 31)) {
 							opcode1 = (int)(register1 << 0x04);
 							Long value = Expr.parse(pi, line, param2);
 							if(iorange_check(pi, value, 0, 0x3f)) {
@@ -283,32 +291,34 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
-				else if(em == EMnemonic.MN_OUT) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
+				else if(_em == EMnemonic.MN_OUT) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
 						Long value = Expr.parse(pi, line, param1);
 						if(iorange_check(pi, value, 0, 0x3f)) {
 							opcode1 = (int)(((value & 0x30) << 0x05) | (value & 0x0f));
-							Integer register1 = get_register(pi, em, param2);
-							opcode1 |= (int)(register1 << 0x04);
+							Integer register1 = get_register(pi, _em, param2);
+							if(null != register1) {
+								opcode1 |= (int)(register1 << 0x04);
+							}
 						}
 					}
 				}
-				else if(em.get_id() <= EMnemonic.MN_CBI.get_id()) {
-					if(garbage_check(pi, em, param1, param2, 2)) {
+				else if(_em.get_id() <= EMnemonic.MN_CBI.get_id()) {
+					if(garbage_check(pi, _em, param1, param2, 2)) {
 						Long value = Expr.parse(pi, line, param1);
 						if(iorange_check(pi, value, 0, 0x1f)) {
 							opcode1 = (int)(value << 0x03);
-							Integer bitnum = get_bitnum(pi, em, param2);
+							Integer bitnum = get_bitnum(pi, _em, param2);
 							if(null != bitnum) {
 								opcode1 |= bitnum;
 							}
 						}
 					}
 				}
-				else if(em == EMnemonic.MN_LDS) {
+				else if(_em == EMnemonic.MN_LDS) {
 					opcode2 = 0;
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
 						if(null != register1) {
 							opcode1 = (int)(register1 << 0x04);
 							Long value = Expr.parse(pi, line, param2);
@@ -318,54 +328,54 @@ public class JAMnenomic extends JAObject {
 						}
 					}
 				}
-				else if(em == EMnemonic.MN_STS) {
+				else if(_em == EMnemonic.MN_STS) {
 					opcode2 =0;
-					if(garbage_check(pi, em, param1, param1, 2)) {
+					if(garbage_check(pi, _em, param1, param1, 2)) {
 						Long value = Expr.parse(pi, line, param1);
 						if(sramrange_check(pi, value, 0, 0xffff)) {
 							opcode2 = value.intValue();
-							Integer register1 = get_register(pi, em, param2);
+							Integer register1 = get_register(pi, _em, param2);
 							if(null != register1) {
 								opcode1 = (int)(register1 << 0x04);
 							}
 						}
 					}
 				}
-				else if(em == EMnemonic.MN_LD) {
-					em = EMnemonic.MN_LD_X;
-					if(garbage_check(pi, em, param1, param2, 2)) {
-						Integer register1 = get_register(pi, em, param1);
+				else if(_em == EMnemonic.MN_LD) {
+					_em = EMnemonic.MN_LD_X;
+					if(garbage_check(pi, _em, param1, param2, 2)) {
+						Integer register1 = get_register(pi, _em, param1);
 						if(null != register1) {
 							opcode1 = (int)(register1 << 0x04);
 							Integer value = get_indirect(pi, param2);
 							if(null != value) {
-								em = EMnemonic.fromId(EMnemonic.MN_LD_X.get_id() + value.intValue());
+								_em = EMnemonic.fromId(EMnemonic.MN_LD_X.get_id() + value.intValue());
 							}
 						}
 					}
 				}
-				else if(em == EMnemonic.MN_ST) {
-					em = EMnemonic.MN_ST_X;
-					if(garbage_check(pi, em, param1, param2, 2)) {
+				else if(_em == EMnemonic.MN_ST) {
+					_em = EMnemonic.MN_ST_X;
+					if(garbage_check(pi, _em, param1, param2, 2)) {
 						Integer value = get_indirect(pi, param1);
 						if(null != value) {
-							em = EMnemonic.fromId(EMnemonic.MN_ST_X.get_id() + value.intValue());
-							Integer register1 = get_register(pi, em, param2);
+							_em = EMnemonic.fromId(EMnemonic.MN_ST_X.get_id() + value.intValue());
+							Integer register1 = get_register(pi, _em, param2);
 							if(null != register1) {
 								opcode1 = (int)(register1 << 0x04);
 							}
 						}
 					}
 				}
-				else if(em == EMnemonic.MN_LDD) {
-					Integer register1 = get_register(pi, em, param1);
+				else if(_em == EMnemonic.MN_LDD) {
+					Integer register1 = get_register(pi, _em, param1);
 					if(null != register1) {
 						opcode1 = (int)(register1 << 0x04);
 						if('z' == param2.charAt(0x00)) {
-							em = EMnemonic.MN_LDD_Z;
+							_em = EMnemonic.MN_LDD_Z;
 						}
 						else if('y' == param2.charAt(0x00)) {
-							em = EMnemonic.MN_LDD_Y;
+							_em = EMnemonic.MN_LDD_Y;
 						}
 						else {
 							pi.print(EMsgType.MSG_ERROR, line, " garbage in second operand (" + param2 + ")");
@@ -377,18 +387,18 @@ public class JAMnenomic extends JAObject {
 						else {
 							tmp = tmp.substring(0x01).trim();
 							Long value = Expr.parse(pi, line, tmp);
-							if(constrange_check(pi, em, value, 0, 63)) {
+							if(constrange_check(pi, _em, value, 0, 63)) {
 								opcode1 |= (int)((((value & 0x20) << 0x08) | ((value & 0x18) << 0x07) | (value & 0x07)));
 							}
 						}
 					}
 				}
-				else if(em == EMnemonic.MN_STD) {
+				else if(_em == EMnemonic.MN_STD) {
 					if('z' == param1.charAt(0x00)) {
-						em = EMnemonic.MN_STD_Z;
+						_em = EMnemonic.MN_STD_Z;
 					}
 					else if('y' == param1.charAt(0x00)) {
-						em = EMnemonic.MN_STD_Y;
+						_em = EMnemonic.MN_STD_Y;
 					}
 					else {
 						pi.print(EMsgType.MSG_ERROR, line, " garbage in second operand (" + param1 + ")");
@@ -400,10 +410,10 @@ public class JAMnenomic extends JAObject {
 					else {
 						tmp = tmp.substring(0x01).trim();
 						Long value = Expr.parse(pi, line, tmp);
-						if(constrange_check(pi, em, value, 0, 63)) {
+						if(constrange_check(pi, _em, value, 0, 63)) {
 							opcode1 = (int)((((value & 0x20) << 0x08) | ((value & 0x18) << 0x07) | (value & 0x07)));
 							
-							Integer register1 = get_register(pi, em, param2);
+							Integer register1 = get_register(pi, _em, param2);
 							if(null != register1) {
 								opcode1 |= (int)(register1 << 0x04);
 							}
@@ -411,16 +421,16 @@ public class JAMnenomic extends JAObject {
 					}					
 				}
 				else {
-					pi.print(EMsgType.MSG_ERROR, line, " missing opcode, check " + em);
+					pi.print(EMsgType.MSG_ERROR, line, " missing opcode, check " + _em);
 				}
 			}
 
-			if(0x00 != (pi.get_device().get_flags() & em.get_flags())) {
-				pi.print(EMsgType.MSG_ERROR, line, em + " instruction is not supported on " + pi.get_device().get_name());
+			if(null != pi.get_device() && (0x00 != (pi.get_device().get_flags() & _em.get_flags()))) {
+				pi.print(EMsgType.MSG_ERROR, line, _em + " instruction is not supported on " + pi.get_device().get_name());
 			}
 		}
 		
-		opcode1 |= em.get_opcode();
+		opcode1 |= _em.get_opcode();
 
 		pi.get_segment().get_cur_block(line).write_opcode(opcode1);
 		if(null != opcode2) {

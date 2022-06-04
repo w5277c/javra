@@ -81,7 +81,12 @@ public class JAMessage extends JAObject {
 				}
 			}
 			if(null != sb && !expr_fail) {
-				pi.print(msg_type, line, sb.toString());
+				if(sb.toString().toLowerCase().startsWith("todo")) {
+					pi.print(EMsgType.MSG_DTODO, line, sb.toString().substring(0x04).trim());
+				}
+				else {
+					pi.print(msg_type, line, sb.toString());
+				}
 			}
 		}
 		else {

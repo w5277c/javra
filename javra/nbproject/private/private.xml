@@ -3,22 +3,22 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JADef.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAOverlap.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAEQU.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAIf.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAObject.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/IncludeInfo.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAMessage.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAMnenomic.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/ProgInfo.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAByte.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/common/Expr.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAMacro.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/Line.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAElseIf.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/Javra.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAInclude.java</file>
-            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAORG.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/Parser.java</file>
             <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAData.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JASet.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/main/SegmentInfo.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/enums/EMnemonic.java</file>
+            <file>file:/media/kostas/repos/w5277c/javra/javra/src/JAObjects/JAMacroBlock.java</file>
         </group>
     </open-files>
 </project-private>
