@@ -134,8 +134,7 @@ public class Expr {
 					}
 					result = parse(l_pi, l_line, _expr.substring(0x01, 0x01 + length));
 					if(null == result) {
-						//l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
-						return 0l;
+						return null;
 					}
 					_expr = _expr.substring(length+0x02).trim();
 				}
@@ -168,8 +167,6 @@ public class Expr {
 								}
 							}
 							else {
-								//l_pi.print(EMsgType.MSG_ERROR, l_line, JAObject.MSG_INVALID_SYNTAX);
-								//break;
 								return null;
 							}
 						}
