@@ -533,7 +533,7 @@ public class JAMnenomic extends JAObject {
 	private Integer get_bitnum(ProgInfo pi, EMnemonic l_em, String l_param) {
 		Long expr = Expr.parse(pi, line, l_param);
 		if(null == expr) {
-			pi.print(EMsgType.MSG_ERROR, line, l_em + " invalid expression in operand '" + l_param + "'");
+			expr_fail = true;
 			return null;
 		}
 		if(0>expr || 7<expr) {
