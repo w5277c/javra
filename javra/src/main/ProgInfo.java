@@ -14,6 +14,7 @@ import enums.ESegmentType;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class ProgInfo {
@@ -37,7 +38,7 @@ public class ProgInfo {
 	private	HashMap<String,Integer>		registers		= new HashMap<>();
 	private	LinkedList<JAObject>			objects			= new LinkedList<>();
 	private	boolean							listmac			= false;
-	
+	private	boolean							iu_analyze		= false;	//Include usage analyze
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
 
 	public ProgInfo() throws IOException {
@@ -85,6 +86,9 @@ public class ProgInfo {
 			Constant constatnt = new Constant(l_line, l_name, l_value, l_redef);
 			if(null == cur_macroblock) {
 				constants.put(l_name, constatnt);
+				if(iu_analyze && null != ii) {
+					ii.get_resources().add(l_name);
+				}
 			}
 			else {
 				cur_macroblock.add_constant(constatnt);
@@ -109,6 +113,9 @@ public class ProgInfo {
 			int addr = get_segment().get_cur_block(l_line).get_address();
 			if(null == cur_macroblock) {
 				labels.put(l_name, new Label(l_line, l_name, addr));
+				if(iu_analyze && null != ii) {
+					ii.get_resources().add(l_name);
+				}
 			}
 			else {
 				cur_macroblock.add_label(new Label(l_line, l_name, addr));
@@ -328,5 +335,9 @@ public class ProgInfo {
 	}
 	public boolean get_listmac() {
 		return listmac;
+	}
+	
+	public boolean get_iu_analyze() {
+		return iu_analyze;
 	}
 }

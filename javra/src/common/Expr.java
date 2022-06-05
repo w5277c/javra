@@ -9,8 +9,10 @@ import JAObjects.JAObject;
 import enums.EFunction;
 import enums.EMsgType;
 import enums.EOperator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import main.Constant;
+import main.IncludeInfo;
 import main.Label;
 import main.Line;
 import main.ProgInfo;
@@ -178,11 +180,27 @@ public class Expr {
 					else {
 						Constant constant = l_pi.get_constant(name);
 						if(null != constant) {
+							if(l_pi.get_iu_analyze() && null != l_pi.get_ii()) {
+								for(IncludeInfo _ii : l_pi.get_ii().get_iis()) {
+									if(!_ii.is_used() && _ii.get_resources().contains(constant.get_name())) {
+										_ii.set_used();
+										break;
+									}
+								}
+							}
 							result = constant.get_value();
 						}
 						else {
 							Label label = l_pi.get_label(name);
 							if(null != label) {
+								if(l_pi.get_iu_analyze() && null != l_pi.get_ii()) {
+									for(IncludeInfo _ii : l_pi.get_ii().get_iis()) {
+										if(!_ii.is_used() && _ii.get_resources().contains(label.get_name())) {
+											_ii.set_used();
+											break;
+										}
+									}
+								}
 								result = (long)label.get_addr();
 							}
 							else {

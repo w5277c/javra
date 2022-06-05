@@ -5,6 +5,7 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package main;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class IncludeInfo {
@@ -13,9 +14,16 @@ public class IncludeInfo {
 	private	boolean					elseif_skip		= false;
 	private	LinkedList<Boolean>	block_skip		= new LinkedList<>();
 	private	int						block_cntr		= 0;
+	private	boolean					used				= false;
+	private	HashSet<IncludeInfo>	iis				= null;
+	private	HashSet<String>		resources		= null;
 	
-	public IncludeInfo(String l_filename) {
+	public IncludeInfo(ProgInfo l_pi, String l_filename) {
 		filename = l_filename;
+		if(l_pi.get_iu_analyze()) {
+			iis = new HashSet<>();
+			resources = new HashSet<>();
+		}
 	}
 	
 	public boolean is_blockskip() {
@@ -61,5 +69,18 @@ public class IncludeInfo {
 	
 	public String get_filename() {
 		return filename;
+	}
+	
+	public HashSet<IncludeInfo> get_iis() {
+		return iis;
+	}
+	public HashSet<String> get_resources() {
+		return resources;
+	}
+	public void set_used() {
+		used = true;
+	}
+	public boolean is_used() {
+		return used;
 	}
 }
