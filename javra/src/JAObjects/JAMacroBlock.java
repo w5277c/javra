@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import main.Constant;
+import main.IncludeInfo;
 import main.Label;
 import main.Line;
 import main.Parser;
@@ -47,6 +48,16 @@ public class JAMacroBlock extends JAObject {
 				else {
 					Long value = Expr.parse(pi, line, _str);
 					if(null != value) {
+						JAMacroBlock macroblock = pi.get_macroblock();
+						if(pi.get_analyze() && (null != macroblock || null != pi.get_ii())) {
+							for(IncludeInfo _ii : (null == macroblock ? pi.get_ii().get_iis() : macroblock.get_macro().get_ii().get_iis())) {
+								if(!_ii.is_used() && _ii.get_resources().contains(_str)) {
+									_ii.set_used();
+									break;
+								}
+							}
+						}
+
 						params.add(value.toString());
 					}
 					else {
@@ -100,6 +111,10 @@ public class JAMacroBlock extends JAObject {
 	}
 	public void add_constant(Constant l_constant) {
 		constants.put(l_constant.get_name(), l_constant);
+	}
+	
+	public JAMacro get_macro() {
+		return macro;
 	}
 	
 	@Override

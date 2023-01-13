@@ -11,7 +11,6 @@ import JAObjects.JAObject;
 import enums.EMsgType;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Scanner;
 
 public class Parser {
@@ -29,7 +28,7 @@ public class Parser {
 		
 		IncludeInfo cur_ii = new IncludeInfo(l_pi, l_filename);
 		IncludeInfo old_ii = l_pi.exch_ii(cur_ii);
-		if(l_pi.get_iu_analyze() && null != old_ii) {
+		if(l_pi.get_analyze() && null != old_ii) {
 			old_ii.get_iis().add(cur_ii);
 		}
 		
@@ -98,17 +97,17 @@ public class Parser {
 		scanner.close();
 		
 
-		if(l_pi.get_iu_analyze()) {
+		if(l_pi.get_analyze()) {
 			for(IncludeInfo ii : cur_ii.get_iis()) {
 				if(!ii.is_used()) {
-					l_pi.print(EMsgType.MSG_WARNING, null, cur_ii.get_filename() + ": inluded file '" + ii.get_filename() + "' is not used here");
+					l_pi.print(EMsgType.MSG_REPORT, null, cur_ii.get_filename() + ": inluded file '" + ii.get_filename() + "' is not used here");
 				}
 			}
 		}
 
 		cur_ii = l_pi.exch_ii(old_ii);
 		if(!l_pi.is_terminating() && 0 != cur_ii.get_blockcntr()) {
-			l_pi.print(EMsgType.MSG_WARNING, null, "some of.if/.ifdef/.ifndef not correctly closed(cntr:" + cur_ii.get_blockcntr() + ")");
+			l_pi.print(EMsgType.MSG_WARNING, null, l_filename + ": some of.if/.ifdef/.ifndef not correctly closed(cntr:" + cur_ii.get_blockcntr() + ")");
 		}
 	}
 	

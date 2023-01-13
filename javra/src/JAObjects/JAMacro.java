@@ -9,15 +9,19 @@ import enums.EMsgType;
 import java.util.HashMap;
 import java.util.LinkedList;
 import main.Constant;
+import main.IncludeInfo;
 import main.Label;
 import main.Line;
 import main.ProgInfo;
 
 public class JAMacro extends JAObject {
+	private	IncludeInfo						ii;
 	private	LinkedList<Line>				body			= new LinkedList<>();
 
 	public JAMacro(ProgInfo l_pi, Line l_line, String l_value, boolean l_start) throws Exception {
 		super(l_pi, l_line, l_value);
+		
+		ii = l_pi.get_ii();
 		
 		if(l_start) {
 			if(!value.isEmpty()) {
@@ -48,5 +52,9 @@ public class JAMacro extends JAObject {
 	}
 	public LinkedList<Line> get_body() {
 		return body;
+	}
+	
+	public IncludeInfo get_ii() {
+		return ii;
 	}
 }

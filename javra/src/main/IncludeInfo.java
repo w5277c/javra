@@ -20,7 +20,7 @@ public class IncludeInfo {
 	
 	public IncludeInfo(ProgInfo l_pi, String l_filename) {
 		filename = l_filename;
-		if(l_pi.get_iu_analyze()) {
+		if(l_pi.get_analyze()) {
 			iis = new HashSet<>();
 			resources = new HashSet<>();
 		}

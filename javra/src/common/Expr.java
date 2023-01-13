@@ -5,6 +5,7 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package common;
 
+import JAObjects.JAMacroBlock;
 import JAObjects.JAObject;
 import enums.EFunction;
 import enums.EMsgType;
@@ -180,8 +181,9 @@ public class Expr {
 					else {
 						Constant constant = l_pi.get_constant(name);
 						if(null != constant) {
-							if(l_pi.get_iu_analyze() && null != l_pi.get_ii()) {
-								for(IncludeInfo _ii : l_pi.get_ii().get_iis()) {
+							JAMacroBlock macroblock = l_pi.get_macroblock();
+							if(l_pi.get_analyze() && (null != macroblock || null != l_pi.get_ii())) {
+								for(IncludeInfo _ii : (null == macroblock ? l_pi.get_ii().get_iis() : macroblock.get_macro().get_ii().get_iis())) {
 									if(!_ii.is_used() && _ii.get_resources().contains(constant.get_name())) {
 										_ii.set_used();
 										break;
@@ -193,8 +195,9 @@ public class Expr {
 						else {
 							Label label = l_pi.get_label(name);
 							if(null != label) {
-								if(l_pi.get_iu_analyze() && null != l_pi.get_ii()) {
-									for(IncludeInfo _ii : l_pi.get_ii().get_iis()) {
+								JAMacroBlock macroblock = l_pi.get_macroblock();
+								if(l_pi.get_analyze() && (null != macroblock || null != l_pi.get_ii())) {
+									for(IncludeInfo _ii : (null == macroblock ? l_pi.get_ii().get_iis() : macroblock.get_macro().get_ii().get_iis())) {
 										if(!_ii.is_used() && _ii.get_resources().contains(label.get_name())) {
 											_ii.set_used();
 											break;

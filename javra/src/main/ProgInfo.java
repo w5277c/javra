@@ -38,7 +38,7 @@ public class ProgInfo {
 	private	HashMap<String,Integer>		registers		= new HashMap<>();
 	private	LinkedList<JAObject>			objects			= new LinkedList<>();
 	private	boolean							listmac			= false;
-	private	boolean							iu_analyze		= false;	//Include usage analyze
+	private	boolean							analyze			= false;	//Advanced code analysis
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
 
 	public ProgInfo() throws IOException {
@@ -86,7 +86,7 @@ public class ProgInfo {
 			Constant constatnt = new Constant(l_line, l_name, l_value, l_redef);
 			if(null == cur_macroblock) {
 				constants.put(l_name, constatnt);
-				if(iu_analyze && null != ii) {
+				if(analyze && null != ii) {
 					ii.get_resources().add(l_name);
 				}
 			}
@@ -113,7 +113,7 @@ public class ProgInfo {
 			int addr = get_segment().get_cur_block(l_line).get_address();
 			if(null == cur_macroblock) {
 				labels.put(l_name, new Label(l_line, l_name, addr));
-				if(iu_analyze && null != ii) {
+				if(analyze && null != ii) {
 					ii.get_resources().add(l_name);
 				}
 			}
@@ -337,7 +337,10 @@ public class ProgInfo {
 		return listmac;
 	}
 	
-	public boolean get_iu_analyze() {
-		return iu_analyze;
+	public boolean get_analyze() {
+		return analyze;
+	}
+	public void set_analyze() {
+		analyze = true;
 	}
 }

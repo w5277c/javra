@@ -43,7 +43,7 @@ import java.util.Locale;
 import output.IntelHexBuilder;
 
 public class Javra {
-	public	static	final	String	VERSION	= "0.2";
+	public	static	final	String	VERSION	= "0.21";
 	
 	public static void main(String[] args) throws Exception {
 		if(0x00 == args.length) {
@@ -116,6 +116,9 @@ public class Javra {
 			}
 			else if(arg.equals("--listmac")) {
 				pi.set_listmac();
+			}
+			else if(arg.equals("--analyze")) {
+				pi.set_analyze();
 			}
 			else if(arg.equals("--max_errors") && args.length > args_pos) {
 				try {
@@ -267,6 +270,7 @@ public class Javra {
 		System.out.println("\t[--listmac] list macro expansion in listfile");
 		System.out.println("\t[--max_errors <number>] maximum number of errors before exit (default: " + ProgInfo.DEF_MAX_ERROS + ")");
 		System.out.println("\t[--devices] list out supported devices");
+		System.out.println("\t[--analyze] advanced code analysis ");
 		System.out.println("\t[--version] version information");
 		System.out.println("\t[--help/-h] this help text");
 		System.out.println("\t<file to assemble>");

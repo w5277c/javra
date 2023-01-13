@@ -8,6 +8,7 @@ package enums;
 public enum EMsgType {
 	MSG_ERROR("Error"),
 	MSG_WARNING("Warning"),
+	MSG_REPORT("Report"),
 	MSG_DMESSAGE("Message"),
 	MSG_DWARNING("Warning"),
 	MSG_DERROR("Error"),
