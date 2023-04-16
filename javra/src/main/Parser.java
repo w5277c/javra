@@ -99,7 +99,7 @@ public class Parser {
 
 		if(l_pi.get_analyze()) {
 			for(IncludeInfo ii : cur_ii.get_iis()) {
-				if(!ii.is_used() && !ii.get_iis().isEmpty()) {
+				if(!ii.is_used() && !ii.get_resources().isEmpty()) {
 					l_pi.print(EMsgType.MSG_REPORT, null, cur_ii.get_filename() + ": inluded file '" + ii.get_filename() + "' is not used here");
 				}
 			}
