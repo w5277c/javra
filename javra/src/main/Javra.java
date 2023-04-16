@@ -43,7 +43,7 @@ import java.util.Locale;
 import output.IntelHexBuilder;
 
 public class Javra {
-	public	static	final	String	VERSION	= "0.21";
+	public	static	final	String	VERSION	= "0.22";
 	
 	public static void main(String[] args) throws Exception {
 		if(0x00 == args.length) {

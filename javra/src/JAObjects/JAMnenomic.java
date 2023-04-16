@@ -2,15 +2,14 @@
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 14.05.2022	konstantin@5277.ru			Начало
+17.04.2023	konstantin@5277.ru			Багфикс парсинга выражений вида LDI r16,','
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 package JAObjects;
 
 import common.Expr;
 import enums.EMsgType;
 import enums.EMnemonic;
-import enums.ESegmentType;
 import java.io.OutputStream;
-import main.CodeBlock;
 import main.Line;
 import main.ProgInfo;
 
@@ -45,7 +44,7 @@ public class JAMnenomic extends JAObject {
 		
 		EMnemonic _em = em;
 		
-		String[] params = value.split(",");
+		String[] params = value.split(",", 0x02);
 
 		if(null == address) {
 			address = pi.get_cseg().get_cur_block(line).get_address();
