@@ -275,7 +275,7 @@ public class Javra {
 		System.out.println("\t[--define/-D <symbol>[=<value>]] define symbol ('javra' already defined)");
 		System.out.println("\t[--includepath/-I <dir>] additional include path");
 		System.out.println("\t[--listmac] list macro expansion in listfile");
-		System.out.println("\t[--charset/-c] charset for input files(default: UTF8");
+		System.out.println("\t[--charset/-c] charset for input files(default: UTF8)");
 		System.out.println("\t[--max_errors <number>] maximum number of errors before exit (default: " + ProgInfo.DEF_MAX_ERROS + ")");
 		System.out.println("\t[--devices] list out supported devices");
 		System.out.println("\t[--analyze] advanced code analysis ");
