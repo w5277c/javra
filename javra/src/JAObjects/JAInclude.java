@@ -12,7 +12,7 @@ import main.Parser;
 import main.ProgInfo;
 
 public class JAInclude extends JAObject {
-	public JAInclude(ProgInfo l_pi, Line l_line, String l_value) throws Exception {
+	public JAInclude(ProgInfo l_pi, Line l_line, String l_value, String l_charset) throws Exception {
 		super(l_pi, l_line, l_value);
 		
 		String filename = parse_string(value);
@@ -30,7 +30,7 @@ public class JAInclude extends JAObject {
 				}
 			}				
 			if(file.exists()) {
-				new Parser(l_pi, filename, file);
+				new Parser(l_pi, filename, file, l_charset);
 			}
 			else {
 				l_pi.print(EMsgType.MSG_ERROR, line, MSG_ABSENT_FILE + " " + file.getAbsolutePath());

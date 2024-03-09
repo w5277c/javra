@@ -2,6 +2,7 @@
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 07.05.2022	konstantin@5277.ru			Начало
+09.03.2024	w5277c@gmail.com			Добавлен параметр для выбора кодировки
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 TODO:
 1. #pragma warning range byte option
@@ -38,12 +39,13 @@ import enums.EDevice;
 import enums.EMsgType;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.Locale;
 import output.IntelHexBuilder;
 
 public class Javra {
-	public	static	final	String	VERSION	= "0.22";
+	public	static	final	String	VERSION	= "0.23";
 	
 	public static void main(String[] args) throws Exception {
 		if(0x00 == args.length) {
@@ -71,6 +73,8 @@ public class Javra {
 		
 		long timestamp = System.currentTimeMillis();
 
+		String charset = StandardCharsets.UTF_8.name();
+		
 		ProgInfo pi = new ProgInfo();
 		
 		String asm_filename = null;
@@ -117,6 +121,9 @@ public class Javra {
 			else if(arg.equals("--listmac")) {
 				pi.set_listmac();
 			}
+			else if((arg.equals("-c") || arg.equals("--charset")) && args.length > args_pos) {
+				charset = args[args_pos++];
+			}
 			else if(arg.equals("--analyze")) {
 				pi.set_analyze();
 			}
@@ -155,7 +162,7 @@ public class Javra {
 			map_filename = (-1 == pos ? asm_filename : asm_filename.substring(0, pos)) + ".map";
 		}
 		
-		new Parser(pi, asm_filename, new File(asm_filename));
+		new Parser(pi, asm_filename, new File(asm_filename), charset);
 		if(pi.is_terminating()) {
 			pi.print("Maximum error count reached. Exiting...");
 		}
@@ -259,7 +266,7 @@ public class Javra {
 		System.out.println("This project is distributed AS IS.\nThe author does not give any guarantees and is not responsible for the work " +
 									"of the program. \nHowever, author adheres to the golden rule of morality.");
 		System.out.println();
-		System.out.println("If necessary, you can find the project on https://github.com/w5277c/javra or write to konstantin@5277.ru");
+		System.out.println("If necessary, you can find the project on https://github.com/w5277c/javra or write to w5277c@gmail.com");
 		System.out.println();
 		System.out.println("usage:");
 		System.out.println("avra\t[-o <filename>] output hex file name");
@@ -268,6 +275,7 @@ public class Javra {
 		System.out.println("\t[--define/-D <symbol>[=<value>]] define symbol ('javra' already defined)");
 		System.out.println("\t[--includepath/-I <dir>] additional include path");
 		System.out.println("\t[--listmac] list macro expansion in listfile");
+		System.out.println("\t[--charset/-c] charset for input files(default: UTF8");
 		System.out.println("\t[--max_errors <number>] maximum number of errors before exit (default: " + ProgInfo.DEF_MAX_ERROS + ")");
 		System.out.println("\t[--devices] list out supported devices");
 		System.out.println("\t[--analyze] advanced code analysis ");

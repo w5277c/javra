@@ -18,16 +18,18 @@ import main.Parser;
 import main.ProgInfo;
 
 public class JAMacroBlock extends JAObject {
-	private	JAMacro							macro;
-	private	Integer							address;
-	private	LinkedList<JAObject>			objects		= new LinkedList<>();
+	private	JAMacro						macro;
+	private	Integer						address;
+	private	LinkedList<JAObject>		objects		= new LinkedList<>();
 	private	HashMap<String,Constant>	constants	= new HashMap<>();
 	private	HashMap<String,Label>		labels		= new HashMap<>();
-
-	public JAMacroBlock(ProgInfo l_pi, Line l_line, String l_value, JAMacro l_macro) {
+	private String						charset;
+	
+	public JAMacroBlock(ProgInfo l_pi, Line l_line, String l_value, JAMacro l_macro, String l_charset) {
 		super(l_pi, l_line, l_value);
 		
 		macro = l_macro;
+		charset = l_charset;
 		
 		parse();
 	}
@@ -91,7 +93,7 @@ public class JAMacroBlock extends JAObject {
 			}
 			
 			pi.set_macroblock(this);
-			JAObject obj = Parser.line_parse(pi, new Line(line.get_filename(), line.get_line_number(), index, str));
+			JAObject obj = Parser.line_parse(pi, new Line(line.get_filename(), line.get_line_number(), index, str), charset);
 			if(null != obj) {
 				objects.add(obj);
 			}

@@ -17,24 +17,24 @@ public class JAObject {
 	public	final	static	String	MSG_INVALID_SYNTAX		= "invalid syntax";
 	public	final	static	String	MSG_ALREADY_DEFINED		= "already defined";
 	public	final	static	String	MSG_UNKNOWN_LEXEME		= "Found no label/variable/constant named";
-	public	final	static	String	MSG_UNKNOWN_CONSTANT		= "unknown constant";
+	public	final	static	String	MSG_UNKNOWN_CONSTANT	= "unknown constant";
 	public	final	static	String	MSG_ABSENT_FILE			= "absent_file";
-	public	final	static	String	MSG_MISSING					= "missing ";
+	public	final	static	String	MSG_MISSING				= "missing ";
 	public	final	static	String	MSG_UNSUPPORTED			= "unsupported ";
-	public	final	static	String	MSG_ILLEGAL_OPERATOR		= "illegal operator: ";
-	public	final	static	String	MSG_DIVISION_BY_ZERO		= "division by zero";
+	public	final	static	String	MSG_ILLEGAL_OPERATOR	= "illegal operator: ";
+	public	final	static	String	MSG_DIVISION_BY_ZERO	= "division by zero";
 	public	final	static	String	MSG_WRONG_REGISTER		= "wrong register";
 	
 	public	final	static	String	MSG_DIRECTIVE_GARBAGE	= "Garbage after directive";
 	public	final	static	String	MSG_MISSING_PARAMETERS	= "Directive missing parameter";
-	public	final	static	String	MSG_LABEL_GARBAGE			= "Garbage after label";
-	public	final	static	String	REGEX_CONST_NAME			= "[_|a-z][_\\d|a-z]*";
-	public	final	static	String	REGEX_LABEL_NAME			= "[_|a-z][_\\d|a-z]*:";
+	public	final	static	String	MSG_LABEL_GARBAGE		= "Garbage after label";
+	public	final	static	String	REGEX_CONST_NAME		= "[_|a-z][_\\d|a-z]*";
+	public	final	static	String	REGEX_LABEL_NAME		= "[_|a-z][_\\d|a-z]*:";
 	
-	protected					ProgInfo	pi;
-	protected					Line		line;
-	protected					String	value;
-	protected					boolean	expr_fail	= false;
+	protected				ProgInfo	pi;
+	protected				Line		line;
+	protected				String		value;
+	protected				boolean		expr_fail	= false;
 	
 	protected JAObject(ProgInfo l_pi, Line l_line, String l_value) {
 		pi = l_pi;
@@ -46,7 +46,7 @@ public class JAObject {
 		expr_fail = false;
 	}
 	
-	public static JAObject parse(ProgInfo l_pi, Line l_line) throws Exception {
+	public static JAObject parse(ProgInfo l_pi, Line l_line, String l_charset) throws Exception {
 		String parts[] = l_line.get_text().split("\\s", 0x02);
 		String name = parts[0x00].trim().toLowerCase();
 		String value = (0x02 == parts.length ? value = parts[0x01].trim() : "");
@@ -82,7 +82,7 @@ public class JAObject {
 					case ".org":
 						return new JAORG(l_pi, l_line, value.toLowerCase());
 					case ".include":
-						return new JAInclude(l_pi, l_line, value);
+						return new JAInclude(l_pi, l_line, value, l_charset);
 					case ".device":
 						return new JADevice(l_pi, l_line, value.toLowerCase());
 					case ".ifdef":
@@ -159,7 +159,7 @@ public class JAObject {
 							else {
 								JAMacro macro = l_pi.get_macro(name);
 								if(null != macro) {
-									return new JAMacroBlock(l_pi, l_line, value.toLowerCase(), macro);
+									return new JAMacroBlock(l_pi, l_line, value.toLowerCase(), macro, l_charset);
 								}
 								else {
 									l_pi.print(EMsgType.MSG_ERROR, l_line, MSG_UNKNOWN_LEXEME, " '" + name + "'");
