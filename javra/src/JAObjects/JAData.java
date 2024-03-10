@@ -2,6 +2,7 @@
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 09.05.2022	konstantin@5277.ru			Начало
+10.03.2024	w5277c@gmail.com			Исправлен парсинг разделителя
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 TODO: поддержка других кодировок, KOI8-R...
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -46,8 +47,23 @@ public class JAData extends JAObject {
 		data = new byte[0x40];
 		offset = 0x00;
 		
-		//TODO оттестировать и оптимизировать
+		boolean begin = true;
+//TODO оттестировать и оптимизировать
 		while(null != value && !value.isEmpty()) {
+			if(!begin) {
+				int pos = value.indexOf(",");
+				if(0 == pos) {
+					value = value.substring(0x01);
+				}
+				else {
+					pi.print(EMsgType.MSG_ERROR, line, MSG_INVALID_SYNTAX, ", missing comma delimeter");
+					break;
+				}
+			}
+			else {
+				begin = false;
+			}
+			
 			int pos1 = value.indexOf("\"");
 			int pos2 = (0 == pos1 ? value.substring(0x01).indexOf("\"") : -1);
 			
@@ -58,7 +74,7 @@ public class JAData extends JAObject {
 			String part;
 			if(0x00 == pos1 && -1 != pos2) {
 				part = value.substring(0x01, pos2+0x01);
-				value = value.substring(pos2+0x03).trim();
+				value = value.substring(pos2+0x02).trim();
 				try {
 					byte[] _data = part.getBytes("ASCII");
 					if((data.length-offset) < _data.length) {
@@ -81,13 +97,13 @@ public class JAData extends JAObject {
 				}
 				else {
 					part = value.substring(0, pos1).trim();
-					value = value.substring(pos1+0x01).trim();
+					value = value.substring(pos1).trim();
 				}
 
-				Long value = Expr.parse(pi, line, part.toLowerCase());
-				if(null == value) {
+				Long _value = Expr.parse(pi, line, part.toLowerCase());
+				if(null == _value) {
 					expr_fail = true;
-					value = 0l;
+					_value = 0l;
 				}
 				if((data.length-offset) < size) {
 					byte[] _tmp = new byte[offset + size + 0x40];
@@ -95,7 +111,7 @@ public class JAData extends JAObject {
 					data = _tmp;
 				}
 				ByteBuffer bb = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.LITTLE_ENDIAN);
-				bb.putLong(value);
+				bb.putLong(_value);
 				System.arraycopy(bb.array(), 0x00, data, offset, size);
 				offset+=size;
 			}

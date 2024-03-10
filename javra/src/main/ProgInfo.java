@@ -19,26 +19,26 @@ import java.util.LinkedList;
 
 public class ProgInfo {
 	public	final	static	int			DEF_MAX_ERROS	= 10;
-	public	int								max_errors		= DEF_MAX_ERROS;
+	public	int							max_errors		= DEF_MAX_ERROS;
 	private	LinkedList<String>			lib_paths		= new LinkedList<>();
-	private	SegmentInfo						cseg				= new SegmentInfo(this, ESegmentType.CODE);
-	private	SegmentInfo						dseg				= new SegmentInfo(this, ESegmentType.DATA);
-	private	SegmentInfo						eseg				= new SegmentInfo(this, ESegmentType.EEPROM);
-	private	SegmentInfo						segment			= cseg;
-	private	int								error_cntr		= 0;
-	private	int								warning_cntr	= 0;
+	private	SegmentInfo					cseg			= new SegmentInfo(this, ESegmentType.CODE);
+	private	SegmentInfo					dseg			= new SegmentInfo(this, ESegmentType.DATA);
+	private	SegmentInfo					eseg			= new SegmentInfo(this, ESegmentType.EEPROM);
+	private	SegmentInfo					segment			= cseg;
+	private	int							error_cntr		= 0;
+	private	int							warning_cntr	= 0;
 	private	HashMap<String,Constant>	constants		= new HashMap<>();
 	private	HashMap<String,Label>		labels			= new HashMap<>();
 	private	HashMap<String,JAMacro>		macros			= new HashMap<>();
-	private	JAMacro							cur_macro		= null;
-	private	JAMacroBlock					cur_macroblock	= null;
-	private	String							root_path;
-	private	EDevice							device			= null;
-	private	IncludeInfo						ii					= null;
+	private	JAMacro						cur_macro		= null;
+	private	JAMacroBlock				cur_macroblock	= null;
+	private	String						root_path;
+	private	EDevice						device			= null;
+	private	IncludeInfo					ii				= null;
 	private	HashMap<String,Integer>		registers		= new HashMap<>();
-	private	LinkedList<JAObject>			objects			= new LinkedList<>();
-	private	boolean							listmac			= false;
-	private	boolean							analyze			= false;	//Advanced code analysis
+	private	LinkedList<JAObject>		objects			= new LinkedList<>();
+	private	boolean						listmac			= false;
+	private	boolean						analyze			= false;	//Advanced code analysis
 //	private	boolean	segment_overlap;   /* set by .NOOVERLAP, .OVERLAP     */
 
 	public ProgInfo() throws IOException {
