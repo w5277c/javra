@@ -2,6 +2,7 @@
 Файл распространяется под лицензией GPL-3.0-or-later, https://www.gnu.org/licenses/gpl-3.0.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 09.05.2022	konstantin@5277.ru			Начало
+20.09.2024	konstantin@5277.ru			Добавлен тип сообщения BUG
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //TODO '\ooo' (ooo = octal number) and '\xhh' (hh = hex number) are also recognized.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -83,6 +84,9 @@ public class JAMessage extends JAObject {
 			if(null != sb && !expr_fail) {
 				if(sb.toString().toLowerCase().startsWith("todo")) {
 					pi.print(EMsgType.MSG_DTODO, line, sb.toString().substring(0x04).trim());
+				}
+				else if(sb.toString().toLowerCase().startsWith("bug")) {
+					pi.print(EMsgType.MSG_DBUG, line, sb.toString().substring(0x03).trim());
 				}
 				else {
 					pi.print(msg_type, line, sb.toString());

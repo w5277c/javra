@@ -4,6 +4,8 @@
 07.05.2022	konstantin@5277.ru			Начало
 09.03.2024	w5277c@gmail.com			Добавлен параметр для выбора кодировки
 10.03.2024	w5277c@gmail.com			v0.24 Испрален парсинг разделителя в .db .dw и прочих
+20.09.2024	konstantin@5277.ru			v0.25 Добавлен тип сообщения BUG
+18.10.2024	konstantin@5277.ru			Выдаем ошибку и пропускаем блок, если не удалось распарсить условие .if
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 TODO:
 1. #pragma warning range byte option
@@ -46,7 +48,7 @@ import java.util.Locale;
 import output.IntelHexBuilder;
 
 public class Javra {
-	public	static	final	String	VERSION	= "0.24";
+	public	static	final	String	VERSION	= "0.25";
 	
 	public static void main(String[] args) throws Exception {
 		if(0x00 == args.length) {
