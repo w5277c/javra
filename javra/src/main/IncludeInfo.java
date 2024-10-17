@@ -12,11 +12,11 @@ public class IncludeInfo {
 	private	String					filename;
 	private	boolean					block_success	= false;
 	private	boolean					elseif_skip		= false;
-	private	LinkedList<Boolean>	block_skip		= new LinkedList<>();
+	private	LinkedList<Boolean>		block_skip		= new LinkedList<>();
 	private	int						block_cntr		= 0;
-	private	boolean					used				= false;
+	private	boolean					used			= false;
 	private	HashSet<IncludeInfo>	iis				= null;
-	private	HashSet<String>		resources		= null;
+	private	HashSet<String>			resources		= null;
 	
 	public IncludeInfo(ProgInfo l_pi, String l_filename) {
 		filename = l_filename;
